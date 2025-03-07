@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+    <h2>Galería de Fotos</h2>
+    <div class="galeria">
+        {% for imagen in imagenes %}
+            <div class="foto">
+                <img src="{{ url_for('static', filename=imagen) }}" alt="Foto">
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="paginacion">
+        {% if page > 1 %}
+            <a href="{{ url_for('fotos', page=page-1) }}" class="flecha">← Anterior</a>
+        {% endif %}
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('fotos', page=page+1) }}" class="flecha">Siguiente →</a>
+        {% endif %}
+    </div>
+{% endblock %}
+

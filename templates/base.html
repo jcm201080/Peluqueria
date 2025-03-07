@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Peluquería-Barbería{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <h1>Peluquería-Barbería</h1>
+        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('servicios') }}">Servicios</a></li>
+                <li><a href="{{ url_for('fotos') }}">Fotos</a></li>
+                <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="contenido">
+        {% block contenido %}{% endblock %}
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Peluquería-Barbería. Todos los derechos reservados.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% if request.path == '/contacto' %}
+        <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
+    {% endif %}
+</body>
+</html>
+
+
+</body>
+</html>

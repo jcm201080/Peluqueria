@@ -1,0 +1,329 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: white;
+    text-align: center;
+}
+
+/* Estilo del header con fondo cambiante */
+header {
+    height: 300px; /* Altura del header */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 1s ease-in-out;
+    display: flex;
+    flex-direction: column; /* Cambiar la dirección para que el contenido se organice de arriba hacia abajo */
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+}
+
+header h1 {
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente para el texto */
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px; /* Menos espacio debajo del título */
+}
+
+nav {
+    margin-left: 20px; /* Mueve el menú más a la derecha */
+    margin-right: 50px;
+    width: 100%; /* Hacer que el nav ocupe todo el ancho disponible */
+    text-align: center; /* Centra el contenido del nav */
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block; /* Hace que los elementos del menú se comporten como bloques pero en línea */
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Estilo del logo */
+.logo {
+    display: block;
+    margin: 10px auto; /* Centrar y dar espacio */
+    max-width: 120px; /* Reduce el tamaño del logo */
+    height: auto;
+    border-radius: 15px; /* Bordes redondeados */
+}
+
+#contenido {
+    margin-top: 50px;
+}
+
+footer {
+    background-color: black;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Media Query para pantallas pequeñas */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column; /* Coloca los elementos de header en columna */
+        height: auto; /* Ajusta la altura del header para pantallas pequeñas */
+    }
+
+    header h1 {
+        margin-bottom: 10px; /* Menos espacio entre el título y el logo */
+    }
+
+    .logo {
+        margin: 20px auto; /* Centrar el logo con más espacio */
+        max-width: 100px; /* Reducir el tamaño del logo */
+    }
+
+    nav {
+        width: 100%; /* Hacer que el nav ocupe el ancho completo */
+        text-align: center; /* Centrar el menú */
+        margin: 0; /* Eliminar márgenes */
+    }
+
+    nav ul {
+        display: block; /* Cambiar a bloque para apilar los elementos */
+        margin: 0;
+        padding: 0;
+    }
+
+    nav ul li {
+        display: block; /* Cada enlace será un bloque en vez de en línea */
+        margin: 10px 0; /* Espaciado entre los elementos del menú */
+    }
+}
+
+
+
+/*contacto*/
+.contacto {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    gap: 20px; /* Espacio entre columnas */
+    align-items: center;
+    justify-content: center;
+    max-width: 80%;
+    margin: auto;
+    padding: 20px;
+    margin-bottom: 150px;
+}
+
+/* Estilo para la dirección */
+.contacto .direccion {
+    text-align: left;
+    font-size: 18px;
+    min-width: 300px; /* Para que no se haga muy pequeña */
+}
+
+/* Estilo para el mapa */
+.contacto iframe {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+    .contacto {
+        grid-template-columns: 1fr; /* Una sola columna en móviles */
+        text-align: center;
+    }
+
+    .contacto .direccion {
+        text-align: center;
+    }
+
+    .contacto iframe {
+        width: 100%;
+    }
+}
+
+}
+
+/* Estilo para la dirección */
+.contacto .direccion {
+    flex: 1;
+    text-align: left;
+    font-size: 18px;
+    min-width: 300px; /* Evita que se haga demasiado pequeña */
+}
+
+/* Estilo para el mapa */
+.contacto iframe {
+    flex: 1;
+    max-width: 100%;
+    height: 400px;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+    .contacto {
+        flex-direction: column; /* Cambia a diseño en columna */
+        text-align: center;
+    }
+
+    .contacto .direccion {
+        text-align: center; /* Centra el texto en pantallas pequeñas */
+    }
+
+    .contacto iframe {
+        width: 100%; /* Ajusta el mapa al ancho completo */
+    }
+}
+/*Pagina index o principal*/
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #333;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6; /* Da un efecto más suave a la imagen */
+}
+
+.hero-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro para resaltar el texto */
+}
+
+.hero-text h2 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+.hero-text p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    font-family: 'Verdana', sans-serif;
+}
+
+.cta-button {
+    background-color: #f5a623; /* Color llamativo */
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #d48f1c; /* Color más oscuro al pasar el cursor */
+}
+
+
+/*Pagina servicios*/
+.cuadro-precios {
+    background-color: #D2B48C; /* Marrón claro */
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%;
+    margin: 20px auto;
+    text-align: center;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 150px;
+}
+
+.cuadro-precios h3 {
+    font-size: 28px;
+    font-family: 'Georgia', serif;
+    margin-bottom: 15px;
+}
+
+.cuadro-precios .blanco {
+    color: white;
+}
+
+.cuadro-precios .negro {
+    color: black;
+}
+
+.cuadro-precios ul {
+    list-style: none;
+    padding: 0;
+}
+
+.cuadro-precios li {
+    font-size: 20px;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.cuadro-precios li:last-child {
+    border-bottom: none;
+}
+
+/*Estilos fotos.html*/
+.galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    justify-items: center;
+    margin-bottom:150px;
+}
+
+.foto img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.paginacion {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.flecha {
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 15px;
+    background: #8B4513; /* Marrón */
+    color: white;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+
+.flecha:hover {
+    background: #A0522D;
+}
+/* Como funciona:
+ Carga automática: Solo tienes que meter imágenes en static/img/fotos/ y se mostrarán.
+✅ Paginación: Muestra 10 imágenes por página y navega con flechas.
+✅ Diseño con grid: Se adapta a diferentes tamaños de pantalla.
+✅ Imágenes con bordes redondeados y sombras para un efecto elegante.*/
+
+
+
