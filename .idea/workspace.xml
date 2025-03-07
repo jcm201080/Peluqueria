@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5761e1ca-4e79-4a7f-8059-3cbcc71e0cf6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Peluqueria.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qr.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/script.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/script_contacto.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/style.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/contacto.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/fotos.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios.html" afterDir="false" />
-    </list>
+    <list default="true" id="5761e1ca-4e79-4a7f-8059-3cbcc71e0cf6" name="Changes" comment="https://github.com/jcm201080/Peluqueria.git" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -69,6 +53,19 @@
       <option name="presentableId" value="Default" />
       <updated>1741250170343</updated>
     </task>
+    <task id="LOCAL-00001" summary="https://github.com/jcm201080/Peluqueria.git">
+      <option name="closed" value="true" />
+      <created>1741351545134</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1741351545134</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="https://github.com/jcm201080/Peluqueria.git" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/jcm201080/Peluqueria.git" />
   </component>
 </project>
