@@ -5,9 +5,15 @@
     <div class="galeria">
         {% for imagen in imagenes %}
             <div class="foto">
-                <img src="{{ url_for('static', filename=imagen) }}" alt="Foto">
+                <!-- Añadimos un data atributo para facilitar la selección de imágenes en el modal -->
+                <img src="{{ url_for('static', filename=imagen) }}" alt="Foto" class="imagen-thumb" data-full="{{ url_for('static', filename=imagen) }}">
             </div>
         {% endfor %}
+    </div>
+ <!-- Modal para mostrar la imagen ampliada -->
+    <div id="modal" class="modal">
+        <span id="cerrar" class="cerrar">&times;</span>
+        <img id="imagenAmpliada" class="imagen-ampliada" src="" alt="Imagen Ampliada">
     </div>
 
     <!-- Controles de paginación -->
@@ -22,5 +28,11 @@
             <a href="{{ url_for('fotos', page=page+1) }}" class="flecha">Siguiente →</a>
         {% endif %}
     </div>
+
+    <!-- Enlazamos el archivo JS -->
+    <script src="{{ url_for('static', filename='fotos.js') }}"></script>
 {% endblock %}
+
+
+
 

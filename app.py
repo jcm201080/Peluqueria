@@ -16,7 +16,7 @@ def servicios():
 
 # Configurar la carpeta donde están las imágenes
 IMAGE_FOLDER = 'static/img'
-IMAGES_PER_PAGE = 10  # Número de imágenes por página
+IMAGES_PER_PAGE = 20  # Número de imágenes por página
 
 @app.route('/fotos')
 def fotos():
@@ -28,7 +28,7 @@ def fotos():
 
     # Paginación
     page = request.args.get('page', 1, type=int)
-    per_page = 10  # Número de imágenes por página
+    per_page = 20  # Número de imágenes por página
     total_pages = (len(imagenes) + per_page - 1) // per_page  # Calcular total de páginas
 
     start = (page - 1) * per_page
