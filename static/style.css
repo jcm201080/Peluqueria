@@ -170,6 +170,54 @@ footer {
     min-width: 300px;
 }
 
+/*Estilo Formulario reserva*/
+.contacto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    color: white; /* Para que se lea sobre el fondo oscuro */
+}
+
+.direccion {
+    flex: 1;
+    min-width: 300px;
+    background: rgba(0, 0, 0, 0.7); /* Fondo semitransparente para legibilidad */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.reserva-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: #333; /* Texto oscuro dentro de los inputs */
+}
+
+.btn-reservar {
+    background-color: #d4a373;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+}
+
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {

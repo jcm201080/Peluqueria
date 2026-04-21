@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="auth-form" style="max-width: 400px; margin: 50px auto; color: white;">
+    <h2>Iniciar Sesión</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="text" name="telefono" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" name="password" required class="form-control">
+        </div>
+        <button type="submit" class="btn-reservar">Entrar</button>
+    </form>
+    <p>¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate aquí</a></p>
+    <p style="margin-top: 10px;">
+        <a href="{{ url_for('auth.recuperar') }}" style="color: #d4a373;">¿Has olvidado tu contraseña?</a>
+    </p>
+</div>
+{% endblock %}

@@ -7,12 +7,14 @@
     <div class="cuadro-precios">
         <h3><span class="blanco">Nuestros</span> <span class="negro">Precios</span></h3>
         <ul>
-            <li><span>Corte de pelo</span> <span>28 €</span></li>
-            <li><span>Arreglo de barba</span> <span>26 €</span></li>
-            <li><span>Corte de pelo + Arreglo barba</span> <span>48 €</span></li>
-            <li><span>Corte de niño hasta 6 años</span> <span>18 €</span></li>
-            <li><span>Corte de niño hasta 12 años</span> <span>21 €</span></li>
+            {% for servicio in servicios %}
+            <li>
+                <span>{{ servicio.nombre }}</span> 
+                <span>{{ servicio.precio }} €</span>
+            </li>
+            {% else %}
+            <li><span>No hay servicios disponibles</span></li>
+            {% endfor %}
         </ul>
     </div>
 {% endblock %}
-

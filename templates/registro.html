@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="auth-form" style="max-width: 400px; margin: 50px auto; color: white;">
+    <h2>Crear Cuenta</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Nombre Completo:</label>
+            <input type="text" name="nombre" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="text" name="telefono" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" name="password" required class="form-control">
+        </div>
+        <button type="submit" class="btn-reservar">Registrarme</button>
+    </form>
+</div>
+{% endblock %}

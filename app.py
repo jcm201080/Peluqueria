@@ -1,57 +1,93 @@
 import os
 from flask import Flask, render_template, request
+from database.models import db, Usuario, Peluquero, Servicio, Cita
+from routes.citas import citas_bp
+from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
+from routes.admin import admin_bp
+from routes.auth import auth_bp
 
+from datetime import datetime, timedelta
+
+
+
+
+
+# 1. Definimos la App primero
 app = Flask(__name__)
 
+# 2. Configuraciones necesarias
+app.config['SECRET_KEY'] = 'clave_secreta_muy_dificil_123' # ¡Añadido!
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///peluqueria.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.register_blueprint(admin_bp)
+app.register_blueprint(auth_bp)
+
+
+# 3. Inicializamos extensiones con la app ya creada
+db.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
+
+# --- RUTAS ---
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 @app.route('/servicios')
 def servicios():
-    return render_template('servicios.html')
-
-
-# Configurar la carpeta donde están las imágenes
-IMAGE_FOLDER = 'static/img'
-IMAGES_PER_PAGE = 20  # Número de imágenes por página
+    lista_servicios = Servicio.query.all()
+    return render_template('servicios.html', servicios=lista_servicios)
 
 @app.route('/fotos')
 def fotos():
-    # Carpeta donde están las imágenes
     folder = os.path.join(app.static_folder, "img/fotos")
-
-    # Obtener todas las imágenes de la carpeta
+    if not os.path.exists(folder):
+        return "Carpeta de fotos no encontrada", 404
+        
     imagenes = [f"img/fotos/{img}" for img in os.listdir(folder) if img.endswith(('png', 'jpg', 'jpeg', 'gif'))]
-
-    # Paginación
+    
     page = request.args.get('page', 1, type=int)
-    per_page = 20  # Número de imágenes por página
-    total_pages = (len(imagenes) + per_page - 1) // per_page  # Calcular total de páginas
-
+    per_page = 20
+    total_pages = (len(imagenes) + per_page - 1) // per_page
     start = (page - 1) * per_page
     end = start + per_page
     imagenes_pagina = imagenes[start:end]
-
-    print(f"Total de imágenes detectadas: {len(imagenes)}")
-    print(imagenes)  # Para ver la lista de archivos detectados
 
     return render_template('fotos.html', imagenes=imagenes_pagina, page=page, total_pages=total_pages)
 
 
 @app.route('/contacto')
 def contacto():
-    return render_template('contacto.html')
+    servicios = Servicio.query.all()
+    
+    # Generamos los próximos 10 días
+    dias_disponibles = []
+    for i in range(10):
+        fecha = datetime.now() + timedelta(days=i)
+        dias_disponibles.append({
+            'valor': fecha.strftime('%Y-%m-%d'),
+            'texto': fecha.strftime('%A, %d %b').capitalize() # Ej: Lunes, 21 Abr
+        })
+        
+    return render_template('contacto.html', servicios=servicios, dias=dias_disponibles)
 
-
-
+# 4. Registro de Blueprints
+app.register_blueprint(citas_bp)
+# No olvides registrar el de auth cuando lo crees:
+# from routes.auth import auth_bp
+# app.register_blueprint(auth_bp)
 
 if __name__ == '__main__':
-    # Asegúrate de que el servidor se ejecuta en todas las interfaces de red (0.0.0.0)
-    port = int(os.environ.get("PORT", 5000))  # Usa el puerto de Render
-    app.run(host='0.0.0.0', port=port)
-
-
-
+    with app.app_context():
+        db.create_all() # Crea la base de datos y las tablas automáticamente
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
