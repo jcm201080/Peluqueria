@@ -34,13 +34,15 @@
                     <td>{{ cita.telefono_cliente }}</td>
                     <td>{{ cita.servicio }}</td>
                     <td>
-                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}" 
-                           onclick="return confirm('¿Borrar cita de {{ cita.nombre_invitado or cita.cliente_rel.nombre }}?')" 
-                           class="btn-delete">Eliminar</a>
+                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}"
+                            onclick="return confirm('¿Borrar cita de {{ cita.nombre_invitado or cita.cliente_rel.nombre }}?')"
+                            class="btn-delete">Eliminar</a>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="6" style="text-align:center;">No hay citas pendientes.</td></tr>
+                <tr>
+                    <td colspan="6" style="text-align:center;">No hay citas pendientes.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -49,16 +51,26 @@
     <div class="grid-admin">
         <section class="admin-card">
             <h3>💰 Servicios y Precios</h3>
+
             {% for s in servicios %}
             <form action="{{ url_for('admin.editar_servicio', id=s.id) }}" method="POST" class="form-edit-inline">
                 <input type="text" name="nombre" value="{{ s.nombre }}" style="flex:2">
                 <input type="number" step="0.1" name="precio" value="{{ s.precio }}" style="flex:1">
                 <button type="submit" class="btn-save">Guardar</button>
-                <a href="{{ url_for('admin.eliminar_servicio', id=s.id) }}" 
-                   onclick="return confirm('¿Eliminar {{ s.nombre }}?')" 
-                   class="btn-delete">Borrar</a>
+                <a href="{{ url_for('admin.eliminar_servicio', id=s.id) }}"
+                    onclick="return confirm('¿Eliminar {{ s.nombre }}?')" class="btn-delete">Borrar</a>
             </form>
             {% endfor %}
+
+            <hr style="border: 1px solid #333; margin: 20px 0;">
+
+            <h4>➕ Añadir Nuevo Servicio</h4>
+            <form action="{{ url_for('admin.nuevo_servicio') }}" method="POST" class="form-edit-inline">
+                <input type="text" name="nombre" placeholder="Nombre del servicio" required style="flex:2">
+                <input type="number" step="0.1" name="precio" placeholder="Precio" required style="flex:1">
+                <button type="submit" class="btn-save"
+                    style="background-color: #d4a373; color: black; font-weight: bold;">Crear</button>
+            </form>
         </section>
 
         <section class="admin-card">
@@ -67,16 +79,20 @@
             <div style="margin-bottom: 20px; padding: 10px; border-bottom: 1px dashed #444;">
                 <h4 style="color: #d4a373; margin-top: 0;">{{ p.nombre }}</h4>
                 <form action="{{ url_for('admin.actualizar_horario_peluquero', id=p.id) }}" method="POST">
-                    <p>Mañana: <input type="time" name="h_im" value="{{ p.h_inicio_manana }}"> - <input type="time" name="h_fm" value="{{ p.h_fin_manana }}"></p>
-                    <p>Tarde: <input type="time" name="h_it" value="{{ p.h_inicio_tarde }}"> - <input type="time" name="h_ft" value="{{ p.h_fin_tarde }}"></p>
-                    
+                    <p>Mañana: <input type="time" name="h_im" value="{{ p.h_inicio_manana }}"> - <input type="time"
+                            name="h_fm" value="{{ p.h_fin_manana }}"></p>
+                    <p>Tarde: <input type="time" name="h_it" value="{{ p.h_inicio_tarde }}"> - <input type="time"
+                            name="h_ft" value="{{ p.h_fin_tarde }}"></p>
+
                     <div style="font-size: 0.9em;">
                         {% set laborables = p.dias_laborables.split(',') %}
                         {% for i, dia in [('0','L'), ('1','M'), ('2','X'), ('3','J'), ('4','V'), ('5','S')] %}
-                        <label><input type="checkbox" name="dias" value="{{i}}" {{ 'checked' if i in laborables }}> {{dia}}</label>
+                        <label><input type="checkbox" name="dias" value="{{i}}" {{ 'checked' if i in laborables }}>
+                            {{dia}}</label>
                         {% endfor %}
                     </div>
-                    <button type="submit" class="btn-save" style="width:100%; margin-top:10px;">Actualizar Horario</button>
+                    <button type="submit" class="btn-save" style="width:100%; margin-top:10px;">Actualizar
+                        Horario</button>
                 </form>
             </div>
             {% endfor %}
