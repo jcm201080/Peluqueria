@@ -20,6 +20,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave_secreta_muy_dificil_123' # ¡Añadido!
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///peluqueria.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Límite de 20MB
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
