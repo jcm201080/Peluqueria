@@ -86,14 +86,34 @@ def fotos():
 def contacto():
     servicios = Servicio.query.all()
     
-    # Generamos los próximos 10 días
+    # Diccionarios de traducción
+    dias_es = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    meses_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+
     dias_disponibles = []
-    for i in range(10):
+    # Aumentamos el rango un poco (ej. a 12) para que, aunque quitemos domingos, 
+    # siempre muestre aproximadamente 10 días útiles al cliente.
+    for i in range(12):
         fecha = datetime.now() + timedelta(days=i)
+        
+        # 0=Lunes, 6=Domingo. 
+        # Si es 6 (Domingo), usamos 'continue' para saltar esta vuelta del bucle.
+        if fecha.weekday() == 6:
+            continue
+            
+        # Obtenemos el nombre del día y del mes en español usando el índice
+        nombre_dia = dias_es[fecha.weekday()]
+        nombre_mes = meses_es[fecha.month - 1]
+        numero_dia = fecha.day
+
         dias_disponibles.append({
             'valor': fecha.strftime('%Y-%m-%d'),
-            'texto': fecha.strftime('%A, %d %b').capitalize() # Ej: Lunes, 21 Abr
+            'texto': f"{nombre_dia}, {numero_dia} {nombre_mes}"
         })
+        
+        # Opcional: Si quieres que siempre salgan exactamente 10 días en la lista
+        if len(dias_disponibles) == 10:
+            break
         
     return render_template('contacto.html', servicios=servicios, dias=dias_disponibles)
 

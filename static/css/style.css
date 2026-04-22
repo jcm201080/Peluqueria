@@ -516,3 +516,8 @@ footer {
     cursor: pointer;
     font-weight: bold;
 }
+
+.flash-item{
+    color: red;
+    font-size: 35px;
+}
