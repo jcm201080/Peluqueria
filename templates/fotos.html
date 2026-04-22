@@ -1,38 +1,62 @@
 {% extends "base.html" %}
 
 {% block contenido %}
-    <h2>Galería de Fotos</h2>
-    <div class="galeria">
-        {% for imagen in imagenes %}
-            <div class="foto">
-                <!-- Añadimos un data atributo para facilitar la selección de imágenes en el modal -->
-                <img src="{{ url_for('static', filename=imagen) }}" alt="Foto" class="imagen-thumb" data-full="{{ url_for('static', filename=imagen) }}">
+<h2>Galería de Fotos</h2>
+
+{% if current_user.is_authenticated and current_user.es_admin %}
+<div class="admin-upload-section">
+    <h3>Panel de Administración: Añadir Trabajo</h3>
+    <form action="{{ url_for('admin.subir_foto') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="foto" accept="image/*" required>
+        <button type="submit" class="boton-reserva">Subir Foto</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="galeria">
+    {% for imagen in imagenes %}
+    <div class="foto">
+        <img src="{{ url_for('static', filename=imagen) }}" alt="Foto" class="imagen-thumb"
+            data-full="{{ url_for('static', filename=imagen) }}">
+
+        {% if current_user.is_authenticated and current_user.es_admin %}
+        <div class="admin-controls-overlay">
+            <div class="nombre-archivo-admin">
+                ID: {{ imagen.split('/')[-1].split('.')[0] }}
             </div>
-        {% endfor %}
-    </div>
- <!-- Modal para mostrar la imagen ampliada -->
-    <div id="modal" class="modal">
-        <span id="cerrar" class="cerrar">&times;</span>
-        <img id="imagenAmpliada" class="imagen-ampliada" src="" alt="Imagen Ampliada">
-    </div>
+            <form action="{{ url_for('admin.borrar_foto') }}" method="post">
+                <input type="hidden" name="nombre_archivo" value="{{ imagen }}">
+                <button type="submit" class="btn-borrar"
+                    onclick="return confirm('¿Seguro que quieres borrar esta foto?')">×</button>
+            </form>
 
-    <!-- Controles de paginación -->
-    <div class="paginacion">
-        {% if page > 1 %}
-            <a href="{{ url_for('fotos', page=page-1) }}" class="flecha">← Anterior</a>
-        {% endif %}
-
-        <span>Página {{ page }} de {{ total_pages }}</span>
-
-        {% if page < total_pages %}
-            <a href="{{ url_for('fotos', page=page+1) }}" class="flecha">Siguiente →</a>
+            <form action="{{ url_for('admin.renombrar_foto') }}" method="post" class="form-modificar">
+                <input type="hidden" name="nombre_actual" value="{{ imagen }}">
+                <input type="number" name="nuevo_orden" placeholder="Nº" class="input-orden" required
+                    title="Pon un número para ordenar">
+                <button type="submit" class="btn-modificar">Mover</button>
+            </form>
+        </div>
         {% endif %}
     </div>
+    {% endfor %}
+</div>
 
-    <!-- Enlazamos el archivo JS -->
-    <script src="{{ url_for('static', filename='fotos.js') }}"></script>
+<div id="modal" class="modal">
+    <span id="cerrar" class="cerrar">&times;</span>
+    <img id="imagenAmpliada" class="imagen-ampliada" src="" alt="Imagen Ampliada">
+</div>
+
+<div class="paginacion">
+    {% if page > 1 %}
+    <a href="{{ url_for('fotos', page=page-1) }}" class="flecha">← Anterior</a>
+    {% endif %}
+
+    <span>Página {{ page }} de {{ total_pages }}</span>
+
+    {% if page < total_pages %} <a href="{{ url_for('fotos', page=page+1) }}" class="flecha">Siguiente →</a>
+        {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='fotos.js') }}"></script>
 {% endblock %}
-
-
-
-

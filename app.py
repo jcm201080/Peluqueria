@@ -52,9 +52,25 @@ def fotos():
     folder = os.path.join(app.static_folder, "img/fotos")
     if not os.path.exists(folder):
         return "Carpeta de fotos no encontrada", 404
-        
-    imagenes = [f"img/fotos/{img}" for img in os.listdir(folder) if img.endswith(('png', 'jpg', 'jpeg', 'gif'))]
+
+    # 1. Leemos los archivos
+    archivos = [f for f in os.listdir(folder) if f.endswith(('png', 'jpg', 'jpeg', 'gif'))]
     
+    # 2. ORDEN NUMÉRICO: Intentamos convertir el nombre a entero para ordenar
+    # Si el nombre no es un número (ej: "logo.png"), lo mandamos al final (0)
+    def extraer_numero(nombre_archivo):
+        nombre_sin_ext = nombre_archivo.rsplit('.', 1)[0]
+        try:
+            return int(nombre_sin_ext)
+        except ValueError:
+            return 0
+
+    archivos.sort(key=extraer_numero, reverse=True) 
+    
+    # 3. Construimos las rutas usando la lista ya ORDENADA NUMÉRICAMENTE
+    imagenes = [f"img/fotos/{img}" for img in archivos]
+    
+    # 4. Paginación (igual que antes)
     page = request.args.get('page', 1, type=int)
     per_page = 20
     total_pages = (len(imagenes) + per_page - 1) // per_page
