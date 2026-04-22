@@ -3,3 +3,5 @@ instance/
 *.pyc
 __pycache__/
 .env
+
+static/img/fotos/*
