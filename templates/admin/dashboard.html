@@ -10,42 +10,57 @@
     <p>Bienvenido, <strong>{{ current_user.nombre }}</strong></p>
 
     <section>
-        <h3>📅 Próximas Citas</h3>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th>Servicio</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cita in citas %}
-                <tr>
-                    <td>{{ cita.fecha }}</td>
-                    <td>{{ cita.hora.strftime('%H:%M') }}</td>
-                    <td>
-                        {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}
-                        <small style="color: #888;">({{ 'Reg.' if cita.usuario_id else 'Inv.' }})</small>
-                    </td>
-                    <td>{{ cita.telefono_cliente }}</td>
-                    <td>{{ cita.servicio }}</td>
-                    <td>
-                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}"
-                            onclick="return confirm('¿Borrar cita de {{ cita.nombre_invitado or cita.cliente_rel.nombre }}?')"
-                            class="btn-delete">Eliminar</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" style="text-align:center;">No hay citas pendientes.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h3>📅 Gestión de Citas</h3>
+
+        <section class="admin-card">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h3>📅 Próximas Citas</h3>
+
+                <form action="{{ url_for('admin.dashboard') }}" method="GET" style="display: flex; gap: 5px;">
+                    <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
+                    <button type="submit" class="btn-save">Buscar</button>
+                    {% if fecha_actual %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn-delete"
+                        style="text-decoration: none; padding: 8px;">Limpiar</a>
+                    {% endif %}
+                </form>
+                
+            </div>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Servicio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas %}
+                    <tr>
+                        <td>{{ cita.fecha }}</td>
+                        <td>{{ cita.hora.strftime('%H:%M') }}</td>
+                        <td>{{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}</td>
+                        <td>{{ cita.telefono_cliente }}</td>
+                        <td>{{ cita.servicio }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}" class="btn-delete"
+                                onclick="return confirm('¿Borrar cita?')">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center;">No hay citas para mostrar.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+       
     </section>
 
     <div class="grid-admin">

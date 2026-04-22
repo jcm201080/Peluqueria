@@ -5,6 +5,7 @@ from database.models import db, Cita, Peluquero, Servicio, Configuracion
 from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
+from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -15,20 +16,34 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 @login_required
 def dashboard():
     if not current_user.es_admin:
-        return "Acceso Denegado: No tienes permisos de administrador.", 403
+        return "Acceso Denegado", 403
     
-    # Obtenemos todos los datos necesarios para las secciones del dashboard
-    todas_citas = Cita.query.order_by(Cita.fecha, Cita.hora).all()
+    # 1. Capturamos la fecha del buscador (si existe)
+    fecha_busqueda = request.args.get('fecha_busqueda')
+    
+    query = Cita.query
+
+    if fecha_busqueda:
+        # Si el usuario eligió una fecha, filtramos solo esas
+        query = query.filter(Cita.fecha == fecha_busqueda)
+    else:
+        # Opcional: Si no hay búsqueda, mostrar de hoy en adelante para no ver citas viejas
+        hoy = datetime.now().strftime('%Y-%m-%d')
+        query = query.filter(Cita.fecha >= hoy)
+
+    # Ordenamos siempre por fecha y hora
+    todas_citas = query.order_by(Cita.fecha, Cita.hora).all()
+    
     lista_peluqueros = Peluquero.query.all()
     lista_servicios = Servicio.query.all()
-    # Obtenemos la primera fila de configuración (la única que debería existir)
     config = Configuracion.query.first()
     
     return render_template('admin/dashboard.html', 
                            citas=todas_citas, 
                            peluqueros=lista_peluqueros,
                            servicios=lista_servicios,
-                           config=config)
+                           config=config,
+                           fecha_actual=fecha_busqueda) # Pasamo
 
 # --- GESTIÓN DE CITAS ---
 
