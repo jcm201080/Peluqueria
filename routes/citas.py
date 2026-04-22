@@ -1,7 +1,7 @@
-from flask import Blueprint, request, redirect, url_for, flash
+from flask import Blueprint, request, redirect, url_for, flash, jsonify
 from flask_login import current_user
 from database.models import db, Cita, Peluquero, Servicio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 citas_bp = Blueprint('citas', __name__)
 
@@ -94,3 +94,55 @@ def reservar():
         print(f"❌ ERROR CRÍTICO: {str(e)}")
         flash(f"Error al procesar la reserva: {e}")
         return redirect(url_for('contacto'))
+
+
+
+def generar_franjas(inicio_str, fin_str):
+    """Genera lista de horas cada 30 min entre dos strings 'HH:MM'"""
+    franjas = []
+    fmt = '%H:%M'
+    try:
+        actual = datetime.strptime(inicio_str, fmt)
+        fin = datetime.strptime(fin_str, fmt)
+        while actual < fin:
+            franjas.append(actual.strftime(fmt))
+            actual += timedelta(minutes=30)
+    except:
+        pass
+    return franjas
+
+@citas_bp.route('/api/disponibilidad')
+def check_disponibilidad():
+    fecha_str = request.args.get('fecha')
+    if not fecha_str:
+        return jsonify([])
+
+    try:
+        dia_semana = str(datetime.strptime(fecha_str, '%Y-%m-%d').weekday())
+        peluqueros = Peluquero.query.filter_by(activo=True).all()
+        horas_libres = set()
+
+        for p in peluqueros:
+            # 1. ¿Trabaja este peluquero este día de la semana?
+            if dia_semana in p.dias_laborables.split(','):
+                
+                # 2. Generamos franjas REALES de su horario de mañana y tarde
+                franjas_manana = generar_franjas(p.h_inicio_manana, p.h_fin_manana)
+                franjas_tarde = generar_franjas(p.h_inicio_tarde, p.h_fin_tarde)
+                todas_sus_franjas = franjas_manana + franjas_tarde
+                
+                # 3. Miramos qué tiene ya ocupado
+                fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+                citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
+                horas_cogidas = [c.hora.strftime('%H:%M') for c in citas_hoy]
+                
+                # 4. Solo añadimos las horas que están en su horario Y no están cogidas
+                for f in todas_sus_franjas:
+                    if f not in horas_cogidas:
+                        horas_libres.add(f)
+
+        # Devolvemos la lista limpia y ordenada
+        return jsonify(sorted(list(horas_libres)))
+    except Exception as e:
+        print(f"Error en API: {e}")
+        return jsonify([]), 500

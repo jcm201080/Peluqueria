@@ -1,13 +1,14 @@
 import os
 from flask import Flask, render_template, request
 from database.models import db, Usuario, Peluquero, Servicio, Cita
-from routes.citas import citas_bp
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from routes.admin import admin_bp
 from routes.auth import auth_bp
 
 from datetime import datetime, timedelta
+
+from routes.citas import citas_bp
 
 
 
