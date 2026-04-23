@@ -78,8 +78,17 @@
         {% block contenido %}{% endblock %}
     </section>
 
-    <footer>
-        <p>&copy; 2026 Parra-Barber. Todos los derechos reservados.</p>
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Parra-Barber. Todos los derechos reservados.</p>
+
+            <div class="footer-social">
+                <a href="https://www.instagram.com/parrabarber/" target="_blank" rel="noopener noreferrer"
+                    class="instagram-link">
+                    <i class="fab fa-instagram"></i> @parrabarber
+                </a>
+            </div>
+        </div>
     </footer>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
