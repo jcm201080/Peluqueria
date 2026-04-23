@@ -7,10 +7,22 @@ citas_bp = Blueprint('citas', __name__)
 
 @citas_bp.route('/reservar', methods=['POST'])
 def reservar():
-    print("\n--- INICIO DE RESERVA INTELIGENTE ---")
+    print("\n--- INICIO DE RESERVA ---")
     
-    # 1. Identificar al usuario
-    if current_user.is_authenticated:
+    # 1. Capturar datos del formulario
+    fecha_str = request.form.get('fecha')
+    hora_str = request.form.get('hora')
+    servicio = request.form.get('servicio')
+    # CAPTURAMOS EL PELUQUERO (si viene de gestión diaria)
+    peluquero_id_manual = request.form.get('peluquero_id') 
+
+    # 2. Identificar al usuario/cliente
+    # Si el admin está logueado y hay un nombre en el form, es reserva manual
+    if current_user.is_authenticated and current_user.es_admin and request.form.get('nombre'):
+        nombre = f"Admin: {request.form.get('nombre')}"
+        telefono = request.form.get('telefono', 'S/N')
+        usuario_id = None
+    elif current_user.is_authenticated:
         nombre = current_user.nombre
         telefono = current_user.telefono
         usuario_id = current_user.id
@@ -18,11 +30,6 @@ def reservar():
         nombre = request.form.get('nombre')
         telefono = request.form.get('telefono')
         usuario_id = None
-
-    # 2. Capturar datos del formulario
-    fecha_str = request.form.get('fecha')
-    hora_str = request.form.get('hora')
-    servicio = request.form.get('servicio')
 
     try:
         # Conversión de formatos
@@ -32,40 +39,40 @@ def reservar():
         except ValueError:
             hora_obj = datetime.strptime(hora_str, '%H:%M:%S').time()
 
-        # 3. Lógica de asignación de Peluquero
-        # ¿Qué día de la semana es? (0=Lunes, 1=Martes... 5=Sábado, 6=Domingo)
-        dia_semana_index = str(fecha_obj.weekday()) 
-
-        # Buscamos peluqueros que trabajen ese día de la semana
-        peluqueros_que_curran = Peluquero.query.filter(
-            Peluquero.activo == True,
-            Peluquero.dias_laborables.contains(dia_semana_index)
-        ).all()
-
         peluquero_asignado_id = None
 
-        for p in peluqueros_que_curran:
-            # Comprobar si la hora elegida está dentro de SU horario de mañana o tarde
-            # Convertimos las horas de la DB (string) a objeto time para comparar
-            h_inicio_m = datetime.strptime(p.h_inicio_manana, '%H:%M').time()
-            h_fin_m = datetime.strptime(p.h_fin_manana, '%H:%M').time()
-            h_inicio_t = datetime.strptime(p.h_inicio_tarde, '%H:%M').time()
-            h_fin_t = datetime.strptime(p.h_fin_tarde, '%H:%M').time()
+        # 3. LÓGICA DE ASIGNACIÓN
+        # SI EL ADMIN ELIGIÓ UNO ESPECÍFICO:
+        if peluquero_id_manual:
+            peluquero_asignado_id = int(peluquero_id_manual)
+            print(f"Reserva manual por admin para peluquero ID: {peluquero_asignado_id}")
+        
+        # SI ES CLIENTE (ASIGNACIÓN AUTOMÁTICA):
+        else:
+            dia_semana_index = str(fecha_obj.weekday()) 
+            peluqueros_que_curran = Peluquero.query.filter(
+                Peluquero.activo == True,
+                Peluquero.dias_laborables.contains(dia_semana_index)
+            ).all()
 
-            esta_en_horario = (h_inicio_m <= hora_obj < h_fin_m) or (h_inicio_t <= hora_obj < h_fin_t)
+            for p in peluqueros_que_curran:
+                h_inicio_m = datetime.strptime(p.h_inicio_manana, '%H:%M').time()
+                h_fin_m = datetime.strptime(p.h_fin_manana, '%H:%M').time()
+                h_inicio_t = datetime.strptime(p.h_inicio_tarde, '%H:%M').time()
+                h_fin_t = datetime.strptime(p.h_fin_tarde, '%H:%M').time()
 
-            if esta_en_horario:
-                # Si está en su horario, ver si ya tiene una cita a esa misma hora
-                cita_existente = Cita.query.filter_by(
-                    fecha=fecha_obj, 
-                    hora=hora_obj, 
-                    peluquero_id=p.id
-                ).first()
+                esta_en_horario = (h_inicio_m <= hora_obj < h_fin_m) or (h_inicio_t <= hora_obj < h_fin_t)
 
-                if not cita_existente:
-                    # ¡Bingo! Este peluquero trabaja y está libre
-                    peluquero_asignado_id = p.id
-                    break # Dejamos de buscar, ya tenemos uno
+                if esta_en_horario:
+                    cita_existente = Cita.query.filter_by(
+                        fecha=fecha_obj, 
+                        hora=hora_obj, 
+                        peluquero_id=p.id
+                    ).first()
+
+                    if not cita_existente:
+                        peluquero_asignado_id = p.id
+                        break 
 
         # 4. Finalizar reserva
         if peluquero_asignado_id:
@@ -73,7 +80,7 @@ def reservar():
                 fecha=fecha_obj,
                 hora=hora_obj,
                 peluquero_id=peluquero_asignado_id,
-                servicio=servicio,
+                servicio=servicio if servicio else "Reserva Manual",
                 usuario_id=usuario_id,
                 nombre_invitado=nombre if not usuario_id else None,
                 telefono_cliente=telefono
@@ -81,20 +88,22 @@ def reservar():
             db.session.add(nueva_cita)
             db.session.commit()
             
-            print(f"✅ RESERVA OK: Asignada a Peluquero ID {peluquero_asignado_id}")
-            flash(f"¡Cita confirmada para el {fecha_str} a las {hora_str}!")
+            flash(f"✅ Cita confirmada para {nombre}")
+            
+            # Si es admin, volvemos a la gestión diaria
+            if current_user.is_authenticated and current_user.es_admin:
+                return redirect(url_for('admin.gestion_diaria', fecha_busqueda=fecha_str))
+            
             return redirect(url_for('contacto'))
         else:
-            print("❌ ERROR: No hay peluqueros disponibles en ese horario.")
-            flash("Lo sentimos, no hay hueco disponible a esa hora o el centro está cerrado.")
+            flash("Lo sentimos, no hay hueco disponible.")
             return redirect(url_for('contacto'))
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ ERROR CRÍTICO: {str(e)}")
-        flash(f"Error al procesar la reserva: {e}")
+        print(f"❌ ERROR: {str(e)}")
+        flash(f"Error: {e}")
         return redirect(url_for('contacto'))
-
 
 
 def generar_franjas(inicio_str, fin_str):

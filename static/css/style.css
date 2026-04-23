@@ -54,6 +54,11 @@ nav ul li a {
     font-size: 18px;
 }
 
+/* Añade esto a tu archivo style.css */
+nav ul li a.active {
+    color: #d4a373 !important;
+    font-weight: bold;
+}
 /* Estilo del logo */
 .logo {
     display: block;

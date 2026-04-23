@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Parra-Barber{% endblock %}</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.jpeg') }}">
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
     <header>
@@ -19,25 +21,43 @@
         </div>
         <nav>
             <ul>
-                <li><a href="{{ url_for('index') }}">Inicio</a></li>
-                <li><a href="{{ url_for('servicios') }}">Servicios</a></li>
-                <li><a href="{{ url_for('fotos') }}">Fotos</a></li>
-                <li><a href="{{ url_for('contacto') }}">Contacto/Citas</a></li>
+                <li>
+                    <a href="{{ url_for('index') }}"
+                        class="{{ 'active' if request.endpoint == 'index' else '' }}">Inicio</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('servicios') }}"
+                        class="{{ 'active' if request.endpoint == 'servicios' else '' }}">Servicios</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('fotos') }}"
+                        class="{{ 'active' if request.endpoint == 'fotos' else '' }}">Fotos</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('contacto') }}"
+                        class="{{ 'active' if request.endpoint == 'contacto' else '' }}">Contacto/Citas</a>
+                </li>
 
                 {# Lógica de autenticación #}
                 {% if current_user.is_authenticated %}
-                    
-                    {# Si es Administrador #}
-                    {% if current_user.es_admin %}
-                        <li><a href="{{ url_for('admin.dashboard') }}" style="color: #d4a373; font-weight: bold;">⚙️ Admin</a></li>
-                    {% endif %}
 
-                    {# Opción para cerrar sesión común a todos #}
-                    <li><a href="{{ url_for('auth.logout') }}">Salir ({{ current_user.nombre }})</a></li>
-                
+                {# Si es Administrador #}
+                {% if current_user.es_admin %}
+                <li>
+                    <a href="{{ url_for('admin.dashboard') }}"
+                        class="{{ 'active' if request.endpoint == 'admin.dashboard' else '' }}">⚙️ Admin</a>
+                </li>
+                {% endif %}
+
+                {# Opción para cerrar sesión #}
+                <li><a href="{{ url_for('auth.logout') }}">Salir ({{ current_user.nombre }})</a></li>
+
                 {% else %}
-                    {# Si no está logueado #}
-                    <li><a href="{{ url_for('auth.login') }}">Entrar</a></li>
+                {# Si no está logueado #}
+                <li>
+                    <a href="{{ url_for('auth.login') }}"
+                        class="{{ 'active' if request.endpoint == 'auth.login' else '' }}">Entrar</a>
+                </li>
                 {% endif %}
             </ul>
         </nav>
@@ -45,13 +65,13 @@
 
     {# Sección para mensajes flash (errores, avisos de login, etc) #}
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for message in messages %}
-            <div class="flash-item">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for message in messages %}
+        <div class="flash-item">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <section id="contenido">
@@ -64,7 +84,8 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     {% if request.path == '/contacto' %}
-        <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>´
+    <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>´
     {% endif %}
 </body>
+
 </html>

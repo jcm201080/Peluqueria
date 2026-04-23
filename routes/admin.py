@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
 from datetime import datetime
+from routes.citas import generar_franjas
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -18,32 +19,30 @@ def dashboard():
     if not current_user.es_admin:
         return "Acceso Denegado", 403
     
-    # 1. Capturamos la fecha del buscador (si existe)
+    tab = request.args.get('tab', 'citas')
     fecha_busqueda = request.args.get('fecha_busqueda')
     
-    query = Cita.query
-
+    # 1. Lógica para la TABLA DE CITAS (Mostrar todas las próximas)
     if fecha_busqueda:
-        # Si el usuario eligió una fecha, filtramos solo esas
-        query = query.filter(Cita.fecha == fecha_busqueda)
+        # Si el admin busca una fecha, filtramos solo ese día
+        fecha_obj = datetime.strptime(fecha_busqueda, '%Y-%m-%d').date()
+        citas_para_mostrar = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
+        fecha_para_input = fecha_busqueda
     else:
-        # Opcional: Si no hay búsqueda, mostrar de hoy en adelante para no ver citas viejas
-        hoy = datetime.now().strftime('%Y-%m-%d')
-        query = query.filter(Cita.fecha >= hoy)
+        # COMPORTAMIENTO ORIGINAL: Mostrar todas las citas de hoy en adelante
+        citas_para_mostrar = Cita.query.filter(Cita.fecha >= datetime.now().date()).order_by(Cita.fecha, Cita.hora).all()
+        fecha_para_input = datetime.now().strftime('%Y-%m-%d')
 
-    # Ordenamos siempre por fecha y hora
-    todas_citas = query.order_by(Cita.fecha, Cita.hora).all()
-    
+    # 2. Lógica para el resto de pestañas (Servicios, Peluqueros, etc.)
     lista_peluqueros = Peluquero.query.all()
     lista_servicios = Servicio.query.all()
-    config = Configuracion.query.first()
     
     return render_template('admin/dashboard.html', 
-                           citas=todas_citas, 
+                           citas=citas_para_mostrar, 
                            peluqueros=lista_peluqueros,
                            servicios=lista_servicios,
-                           config=config,
-                           fecha_actual=fecha_busqueda) # Pasamo
+                           fecha_actual=fecha_para_input,
+                           active_tab=tab)
 
 # --- GESTIÓN DE CITAS ---
 
@@ -252,3 +251,43 @@ def renombrar_foto():
         flash(f"❌ Error al renombrar: {str(e)}")
     
     return redirect(url_for('fotos'))
+
+
+@admin_bp.route('/gestion-diaria')
+@login_required
+def gestion_diaria():
+    if not current_user.es_admin:
+        return "Acceso Denegado", 403
+
+    fecha_str = request.args.get('fecha_busqueda')
+    if not fecha_str:
+        fecha_str = datetime.now().strftime('%Y-%m-%d')
+    
+    fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+    dia_semana_index = str(fecha_obj.weekday())
+
+    # Citas ya reservadas
+    citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
+
+    # Calcular huecos libres
+    peluqueros = Peluquero.query.filter_by(activo=True).all()
+    huecos_libres = {}
+    
+    for p in peluqueros:
+        if dia_semana_index in p.dias_laborables.split(','):
+            franjas = generar_franjas(p.h_inicio_manana, p.h_fin_manana) + \
+                      generar_franjas(p.h_inicio_tarde, p.h_fin_tarde)
+            
+            ocupadas = [c.hora.strftime('%H:%M') for c in Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()]
+            
+            for f in franjas:
+                if f not in ocupadas:
+                    if f not in huecos_libres:
+                        huecos_libres[f] = []
+                    huecos_libres[f].append(p)
+
+    return render_template('admin/gestion_citas.html',
+                           citas=citas,
+                           horas_libres=sorted(huecos_libres.keys()),
+                           huecos_detalles=huecos_libres,
+                           fecha_actual=fecha_str)

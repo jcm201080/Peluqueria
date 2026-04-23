@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión Diaria - Parra-Barber{% endblock %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-container">
+    <h1 class="admin-title">Panel de Control</h1>
+    
+    <nav class="admin-tabs">
+        <a href="{{ url_for('admin.dashboard', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link active">⚡ Gestión Diaria</a>
+        <a href="{{ url_for('admin.dashboard', tab='servicios') }}" class="tab-link">💰 Servicios</a>
+        <a href="{{ url_for('admin.dashboard', tab='horarios') }}" class="tab-link">⏰ Horarios</a>
+    </nav>
+
+    <section class="admin-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+            <h3>⚡ Disponibilidad y Reservas Rápidas</h3>
+            <form action="{{ url_for('admin.gestion_diaria') }}" method="GET" style="display: flex; gap: 5px;">
+                <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
+                <button type="submit" class="btn-save">Ver Día</button>
+            </form>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Estado</th>
+                    <th>Cliente / Peluquero</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# 1. OCUPADAS #}
+                {% for cita in citas %}
+                <tr style="background-color: rgba(212, 163, 115, 0.1);">
+                    <td><strong>{{ cita.hora.strftime('%H:%M') }}</strong></td>
+                    <td><span style="color: #ff6b6b; font-weight: bold;">🔴 OCUPADO</span></td>
+                    <td>
+                        {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }} 
+                        <small style="color: #888;">(Peluquero ID: {{ cita.peluquero_id }})</small>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion') }}" class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {# 2. LIBRES #}
+                {% for hora in horas_libres %}
+                <tr>
+                    <td>{{ hora }}</td>
+                    <td><span style="color: #2ecc71;">🟢 LIBRE</span></td>
+                    <form action="{{ url_for('citas.reservar') }}" method="POST">
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <select name="peluquero_id" style="padding: 4px; background: #222; color: white; border: 1px solid #444;">
+                                    {% for p in huecos_detalles[hora] %}
+                                        <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="text" name="nombre" placeholder="Nombre cliente" required style="flex-grow: 1; padding: 4px; background: #111; color: white; border: 1px solid #444;">
+                            </div>
+                        </td>
+                        <td>
+                            <input type="hidden" name="fecha" value="{{ fecha_actual }}">
+                            <input type="hidden" name="hora" value="{{ hora }}">
+                            <input type="hidden" name="servicio" value="Reserva Manual Admin">
+                            <button type="submit" class="btn-save" style="width: 100%;">Reservar</button>
+                        </td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="{{ url_for('admin.dashboard') }}" style="color: #888; text-decoration: none;">← Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

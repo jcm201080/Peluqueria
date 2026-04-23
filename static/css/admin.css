@@ -82,3 +82,40 @@
         overflow-x: auto;
     }
 }
+
+/* Navegación por pestañas */
+.admin-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-link {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background: #222;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.tab-link:hover {
+    background: #333;
+}
+
+.tab-link.active {
+    background: #d4a373;
+    color: #000;
+}
+
+/* Ajustes para que las tarjetas ocupen el ancho completo en pestañas */
+.admin-container .admin-card {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
