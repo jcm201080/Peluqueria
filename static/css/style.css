@@ -526,43 +526,55 @@ footer {
     font-size: 35px;
 }
 
-/* Estilos para el Footer */
+/* Estilos para el Footer Optimizado */
 .main-footer {
     background-color: #1a1a1a;
     color: #ffffff;
-    padding: 30px 0;
-    text-align: center;
-    border-top: 1px solid #d4a373; /* El color dorado/bronce de tu marca */
-    margin-top: 50px;
+    padding: 15px 0; /* Reducido de 30px a 15px */
+    border-top: 1px solid #d4a373;
+    margin-top: 30px; /* Reducido de 50px a 30px */
 }
 
 .footer-content {
     display: flex;
-    flex-direction: column;
+    justify-content: center; /* Centrado base */
     align-items: center;
-    gap: 15px;
+    gap: 30px; /* Espacio horizontal entre texto e Instagram */
+    flex-wrap: wrap; /* Para que baje en móviles si no cabe */
+}
+
+.footer-content p {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 .instagram-link {
-    color: #d4a373; /* Color corporativo */
+    color: #d4a373;
     text-decoration: none;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.3s ease;
-    padding: 8px 15px;
-    border: 1px solid transparent;
-    border-radius: 5px;
-}
-
-.instagram-link i {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
 }
 
 .instagram-link:hover {
     color: #ffffff;
-    background-color: rgba(212, 163, 115, 0.1);
-    border-color: #d4a373;
-    transform: translateY(-2px);
+}
+
+/* --- AJUSTES PARA MÓVIL --- */
+@media (max-width: 600px) {
+    .main-footer {
+        padding: 10px 0; /* Aún más pequeño en móvil */
+    }
+
+    .footer-content {
+        flex-direction: column; /* Uno encima de otro pero pegaditos */
+        gap: 5px; /* Casi sin espacio entre las dos líneas */
+    }
+
+    .instagram-link {
+        padding: 4px 0; /* Menos espacio alrededor del link */
+    }
 }
