@@ -75,6 +75,15 @@
                     <td>{{ cita.telefono_cliente }}</td>
                     <td>{{ cita.servicio }}</td>
                     <td>
+                        {# Botón de WhatsApp Dinámico #}
+                        {% set telefono = cita.cliente_rel.telefono if cita.usuario_id else cita.telefono_invitado
+                        %}
+                        {% if telefono %}
+                        <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita..."
+                            target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        {% endif %}
                         <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}" class="btn-delete"
                             onclick="return confirm('¿Borrar cita?')">Eliminar</a>
                     </td>

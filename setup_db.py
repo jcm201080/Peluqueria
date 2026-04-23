@@ -23,7 +23,7 @@ def setup_inicial():
                         dia_semana=dia,
                         trabaja=True if dia < 5 else (True if dia == 5 else False), # L-V trabaja, S trabaja, D cerrado
                         h_inicio_m="10:00", h_fin_m="14:00",
-                        h_inicio_t="16:00", h_fin_t="20:00"
+                        h_inicio_t="17:00", h_fin_t="21:30"
                     )
                     db.session.add(nuevo_dia)
             print("✅ Peluqueros y horarios base (7 días) añadidos.")

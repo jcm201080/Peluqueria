@@ -7,7 +7,7 @@
 
 <div class="admin-container">
     <h1 class="admin-title">Panel de Control</h1>
-    
+
     <nav class="admin-tabs">
         <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
         <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link active">⚡ Gestión Diaria</a>
@@ -18,7 +18,8 @@
     </nav>
 
     <section class="admin-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
             <h3>⚡ Disponibilidad y Reservas Rápidas</h3>
             <form action="{{ url_for('admin.gestion_diaria') }}" method="GET" style="display: flex; gap: 5px;">
                 <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
@@ -42,11 +43,24 @@
                     <td><strong>{{ cita.hora.strftime('%H:%M') }}</strong></td>
                     <td><span style="color: #ff6b6b; font-weight: bold;">🔴 OCUPADO</span></td>
                     <td>
-                        {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }} 
+                        {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}
                         <small style="color: #888;">(Peluquero ID: {{ cita.peluquero_id }})</small>
                     </td>
                     <td>
-                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion') }}" class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
+                        <div class="acciones-container">
+                            {# Botón de WhatsApp Dinámico #}
+                            {% set telefono = cita.cliente_rel.telefono if cita.usuario_id else cita.telefono_invitado
+                            %}
+                            {% if telefono %}
+                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita..."
+                                target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            {% endif %}
+
+                            <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion') }}"
+                                class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -55,16 +69,24 @@
                 {% for hora in horas_libres %}
                 <tr>
                     <td>{{ hora }}</td>
-                    <td><span style="color: #2ecc71;">🟢 LIBRE</span></td>
+                    <td>
+                        {# Calculamos cuántos peluqueros hay disponibles en esta hora #}
+                        {% set cantidad_libres = huecos_detalles[hora]|length %}
+
+                        <span class="status-badge {{ 'multiple' if cantidad_libres > 1 else 'single' }}">
+                            🟢 LIBRE ({{ cantidad_libres }})
+                        </span>
+                    </td>
                     <form action="{{ url_for('citas.reservar') }}" method="POST">
                         <td>
                             <div style="display: flex; gap: 5px;">
-                                <select name="peluquero_id" style="padding: 4px; background: #222; color: white; border: 1px solid #444;">
+                                <select name="peluquero_id" class="select-admin">
                                     {% for p in huecos_detalles[hora] %}
-                                        <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                    <option value="{{ p.id }}">{{ p.nombre }}</option>
                                     {% endfor %}
                                 </select>
-                                <input type="text" name="nombre" placeholder="Nombre cliente" required style="flex-grow: 1; padding: 4px; background: #111; color: white; border: 1px solid #444;">
+                                <input type="text" name="nombre" placeholder="Nombre cliente" required
+                                    class="input-admin">
                             </div>
                         </td>
                         <td>

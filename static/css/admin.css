@@ -196,3 +196,73 @@
     background: #e74c3c;
     box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
 }
+
+
+/* Contenedor de botones en la tabla */
+.acciones-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Botón de WhatsApp Estilizado */
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.3s ease;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+/* Ajuste para que la tabla sea legible en móvil si hay muchos botones */
+@media (max-width: 600px) {
+    .acciones-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Badge de estado dinámico */
+.status-badge {
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+/* Color normal cuando solo queda uno */
+.status-badge.single {
+    color: #2ecc71;
+}
+
+/* Color especial o resalte cuando ambos están libres */
+.status-badge.multiple {
+    color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+/* Limpieza de inputs en la tabla */
+.select-admin, .input-admin {
+    padding: 4px;
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px;
+}
+
+.input-admin {
+    background: #111;
+    flex-grow: 1;
+}
