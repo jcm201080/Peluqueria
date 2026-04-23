@@ -10,16 +10,16 @@
 
     {% set active_tab = request.args.get('tab', 'citas') %}
     <nav class="admin-tabs">
-        <a href="{{ url_for('admin.dashboard', tab='citas') }}"
-            class="tab-link {{ 'active' if active_tab == 'citas' }}">📅 Citas</a>
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
+            Citas</a>
         <a href="{{ url_for('admin.gestion_diaria') }}"
             class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' }}">⚡ Gestión Diaria</a>
 
-        <a href="{{ url_for('admin.dashboard', tab='servicios') }}"
+        <a href="{{ url_for('admin.index', tab='servicios') }}"
             class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
-        <a href="{{ url_for('admin.dashboard', tab='horarios') }}"
+        <a href="{{ url_for('admin.index', tab='horarios') }}"
             class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
-        <a href="{{ url_for('admin.dashboard', tab='ajustes') }}"
+        <a href="{{ url_for('admin.index', tab='ajustes') }}"
             class="tab-link {{ 'active' if active_tab == 'ajustes' }}">⚙️ Ajustes</a>
     </nav>
 
@@ -30,12 +30,12 @@
         <div
             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
             <h3>📅 Próximas Citas</h3>
-            <form action="{{ url_for('admin.dashboard') }}" method="GET" style="display: flex; gap: 5px;">
+            <form action="{{ url_for('admin.index') }}" method="GET" style="display: flex; gap: 5px;">
                 <input type="hidden" name="tab" value="citas">
                 <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
                 <button type="submit" class="btn-save">Buscar</button>
                 {% if request.args.get('fecha_busqueda') %}
-                <a href="{{ url_for('admin.dashboard', tab='citas') }}" class="btn-delete"
+                <a href="{{ url_for('admin.index', tab='citas') }}" class="btn-delete"
                     style="text-decoration: none; padding: 8px;">Limpiar</a>
                 {% endif %}
             </form>
@@ -112,28 +112,87 @@
 
     {% elif active_tab == 'horarios' %}
     <section class="admin-card">
-        <h3>⏰ Horarios de Peluqueros</h3>
-        {% for p in peluqueros %}
-        <div style="margin-bottom: 20px; padding: 20px; border: 1px solid #333; border-radius: 8px;">
-            <h4 style="color: #d4a373; margin-top: 0;">{{ p.nombre }}</h4>
-            <form action="{{ url_for('admin.actualizar_horario_peluquero', id=p.id) }}" method="POST">
-                <p>Mañana: <input type="time" name="h_im" value="{{ p.h_inicio_manana }}"> - <input type="time"
-                        name="h_fm" value="{{ p.h_fin_manana }}"></p>
-                <p>Tarde: <input type="time" name="h_it" value="{{ p.h_inicio_tarde }}"> - <input type="time"
-                        name="h_ft" value="{{ p.h_fin_tarde }}"></p>
+        <div class="header-seccion">
+            <h3>⏰ Gestión de Horarios por Peluquero</h3>
+            <p class="subtitle">Configura el horario específico para cada día de la semana.</p>
+        </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                    {% set laborables = p.dias_laborables.split(',') %}
-                    {% for i, dia in [('0','Lunes'), ('1','Martes'), ('2','Miércoles'), ('3','Jueves'), ('4','Viernes'),
-                    ('5','Sábado')] %}
-                    <label><input type="checkbox" name="dias" value="{{i}}" {{ 'checked' if i in laborables }}>
-                        {{dia}}</label>
+        {% for p in peluqueros %}
+        <div class="peluquero-config-box">
+            <h4>{{ p.nombre }}</h4>
+            <form action="{{ url_for('admin.actualizar_horario_detallado', id=p.id) }}" method="POST">
+                <div class="horarios-grid">
+                    {# Ordenamos los horarios por día de la semana 0-6 #}
+                    {% for h in p.horarios|sort(attribute='dia_semana') %}
+                    <div class="dia-col {{ 'dia-desconectado' if not h.trabaja }}">
+                        <div class="dia-header">
+                            <label>
+                                <input type="checkbox" name="trabaja_{{ h.dia_semana }}" {{ 'checked' if h.trabaja }}>
+                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
+                                'Domingo'] %}
+                                <strong>{{ nombres[h.dia_semana] }}</strong>
+                            </label>
+                        </div>
+
+                        <div class="turnos-inputs">
+                            <div class="turno-group">
+                                <span>Mañana:</span>
+                                <input type="time" name="h_im_{{ h.dia_semana }}" value="{{ h.h_inicio_m }}">
+                                <input type="time" name="h_fm_{{ h.dia_semana }}" value="{{ h.h_fin_m }}">
+                            </div>
+                            <div class="turno-group">
+                                <span>Tarde:</span>
+                                <input type="time" name="h_it_{{ h.dia_semana }}" value="{{ h.h_inicio_t }}">
+                                <input type="time" name="h_ft_{{ h.dia_semana }}" value="{{ h.h_fin_t }}">
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
-                <button type="submit" class="btn-save" style="width:100%; margin-top:15px;">Actualizar Horario</button>
+                <button type="submit" class="btn-save-full">Guardar Horario de {{ p.nombre }}</button>
             </form>
         </div>
         {% endfor %}
+    </section>
+
+    <section class="admin-card" style="margin-top: 30px;">
+        <h3>📅 Días Festivos y Cierres</h3>
+        <form action="{{ url_for('admin.añadir_festivo') }}" method="POST" class="form-inline">
+            <input type="date" name="fecha" required>
+            <input type="text" name="descripcion" placeholder="Ej: Festivo Nacional" required>
+            <button type="submit" class="btn-add">Bloquear Día</button>
+        </form>
+        <div class="festivos-list" style="margin-top: 20px;">
+            <h4>📅 Días bloqueados actualmente</h4>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in festivos %}
+                    <tr>
+                        <td>{{ f.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ f.descripcion }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.eliminar_festivo', id=f.id) }}" class="btn-delete"
+                                onclick="return confirm('¿Quieres volver a habilitar este día?')">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #888;">No hay festivos próximos programados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </section>
 
     {% elif active_tab == 'ajustes' %}

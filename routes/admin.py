@@ -1,7 +1,8 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-from database.models import db, Cita, Peluquero, Servicio, Configuracion
+from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario
+# Asegúrate de que ExcepcionHorario esté en esa lista ↑
 from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
@@ -15,32 +16,35 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 @admin_bp.route('/dashboard')
 @login_required
-def dashboard():
+def index():
     if not current_user.es_admin:
         return "Acceso Denegado", 403
     
     tab = request.args.get('tab', 'citas')
     fecha_busqueda = request.args.get('fecha_busqueda')
     
-    # 1. Lógica para la TABLA DE CITAS (Mostrar todas las próximas)
+    # 1. Lógica para la TABLA DE CITAS
     if fecha_busqueda:
-        # Si el admin busca una fecha, filtramos solo ese día
         fecha_obj = datetime.strptime(fecha_busqueda, '%Y-%m-%d').date()
         citas_para_mostrar = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
         fecha_para_input = fecha_busqueda
     else:
-        # COMPORTAMIENTO ORIGINAL: Mostrar todas las citas de hoy en adelante
         citas_para_mostrar = Cita.query.filter(Cita.fecha >= datetime.now().date()).order_by(Cita.fecha, Cita.hora).all()
         fecha_para_input = datetime.now().strftime('%Y-%m-%d')
 
-    # 2. Lógica para el resto de pestañas (Servicios, Peluqueros, etc.)
+    # 2. Lógica para el resto de pestañas
     lista_peluqueros = Peluquero.query.all()
     lista_servicios = Servicio.query.all()
+
+    # --- NUEVA LÓGICA PARA FESTIVOS ---
+    # Traemos los festivos de hoy en adelante para que aparezcan en la tabla
+    lista_festivos = ExcepcionHorario.query.filter(ExcepcionHorario.fecha >= datetime.now().date()).order_by(ExcepcionHorario.fecha).all()
     
     return render_template('admin/dashboard.html', 
                            citas=citas_para_mostrar, 
                            peluqueros=lista_peluqueros,
                            servicios=lista_servicios,
+                           festivos=lista_festivos,  # <--- IMPORTANTE: Pasamos la lista aquí
                            fecha_actual=fecha_para_input,
                            active_tab=tab)
 
@@ -53,7 +57,7 @@ def eliminar_cita(id):
     db.session.delete(cita)
     db.session.commit()
     flash("Cita eliminada correctamente.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 # --- GESTIÓN DE SERVICIOS ---
 
@@ -68,7 +72,7 @@ def nuevo_servicio():
         db.session.add(nuevo)
         db.session.commit()
         flash(f"Servicio '{nombre}' añadido.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 @admin_bp.route('/servicio/eliminar/<int:id>')
 @login_required
@@ -77,7 +81,7 @@ def eliminar_servicio(id):
     db.session.delete(serv)
     db.session.commit()
     flash("Servicio eliminado.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 # --- GESTIÓN DE HORARIOS ---
 
@@ -96,7 +100,7 @@ def actualizar_horarios():
     
     db.session.commit()
     flash("Horarios actualizados correctamente.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 
 # --- GESTIÓN DE SERVICIOS (MODIFICAR) ---
@@ -109,7 +113,7 @@ def editar_servicio(id):
     servicio.precio = float(request.form.get('precio'))
     db.session.commit()
     flash(f"Servicio '{servicio.nombre}' modificado correctamente.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 # --- GESTIÓN DE HORARIOS POR PELUQUERO ---
 
@@ -125,7 +129,7 @@ def actualizar_horario_peluquero(id):
     
     db.session.commit()
     flash(f"Horario de {p.nombre} actualizado.")
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.index'))
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -253,41 +257,98 @@ def renombrar_foto():
     return redirect(url_for('fotos'))
 
 
-@admin_bp.route('/gestion-diaria')
+@admin_bp.route('/admin/gestion-diaria')
 @login_required
 def gestion_diaria():
     if not current_user.es_admin:
-        return "Acceso Denegado", 403
+        return redirect(url_for('index'))
 
-    fecha_str = request.args.get('fecha_busqueda')
-    if not fecha_str:
-        fecha_str = datetime.now().strftime('%Y-%m-%d')
-    
+    fecha_str = request.args.get('fecha_busqueda', datetime.now().strftime('%Y-%m-%d'))
     fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-    dia_semana_index = str(fecha_obj.weekday())
+    dia_semana_int = fecha_obj.weekday()
 
-    # Citas ya reservadas
+    # 1. Obtener citas ya existentes para ese día
     citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
 
-    # Calcular huecos libres
+    # 2. Calcular huecos libres usando la NUEVA estructura de HorarioPeluquero
     peluqueros = Peluquero.query.filter_by(activo=True).all()
-    huecos_libres = {}
-    
-    for p in peluqueros:
-        if dia_semana_index in p.dias_laborables.split(','):
-            franjas = generar_franjas(p.h_inicio_manana, p.h_fin_manana) + \
-                      generar_franjas(p.h_inicio_tarde, p.h_fin_tarde)
-            
-            ocupadas = [c.hora.strftime('%H:%M') for c in Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()]
-            
-            for f in franjas:
-                if f not in ocupadas:
-                    if f not in huecos_libres:
-                        huecos_libres[f] = []
-                    huecos_libres[f].append(p)
+    huecos_detalles = {} # { '10:00': [p1, p2], '10:30': [p1] }
 
-    return render_template('admin/gestion_citas.html',
-                           citas=citas,
-                           horas_libres=sorted(huecos_libres.keys()),
-                           huecos_detalles=huecos_libres,
+    for p in peluqueros:
+        # Buscamos el horario de este peluquero para el día de la semana actual
+        # Aquí es donde fallaba antes al buscar 'dias_laborables'
+        from database.models import HorarioPeluquero # Asegúrate de importar esto arriba
+        horario = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
+
+        if horario and horario.trabaja:
+            from routes.citas import generar_franjas
+            franjas = generar_franjas(horario.h_inicio_m, horario.h_fin_m) + \
+                      generar_franjas(horario.h_inicio_t, horario.h_fin_t)
+
+            for hora_f in franjas:
+                # Comprobar si ya tiene una cita a esa hora
+                hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
+                ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
+                
+                if not ocupado:
+                    if hora_f not in huecos_detalles:
+                        huecos_detalles[hora_f] = []
+                    huecos_detalles[hora_f].append(p)
+
+    horas_libres = sorted(huecos_detalles.keys())
+
+    return render_template('admin/gestion_citas.html', 
+                           citas=citas, 
+                           horas_libres=horas_libres, 
+                           huecos_detalles=huecos_detalles,
                            fecha_actual=fecha_str)
+
+
+@admin_bp.route('/actualizar_horario_detallado/<int:id>', methods=['POST'])
+@login_required
+def actualizar_horario_detallado(id):
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    peluquero = Peluquero.query.get_or_404(id)
+    
+    for h in peluquero.horarios:
+        # Recuperamos los datos del form para cada día
+        h.trabaja = True if request.form.get(f'trabaja_{h.dia_semana}') else False
+        h.h_inicio_m = request.form.get(f'h_im_{h.dia_semana}')
+        h.h_fin_m = request.form.get(f'h_fm_{h.dia_semana}')
+        h.h_inicio_t = request.form.get(f'h_it_{h.dia_semana}')
+        h.h_fin_t = request.form.get(f'h_ft_{h.dia_semana}')
+    
+    db.session.commit()
+    flash(f"Horario de {peluquero.nombre} actualizado correctamente.")
+    return redirect(url_for('admin.index', tab='horarios'))
+
+@admin_bp.route('/añadir_festivo', methods=['POST'])
+@login_required
+def añadir_festivo():
+    # Lógica para guardar en la tabla ExcepcionHorario
+    fecha_str = request.form.get('fecha')
+    desc = request.form.get('descripcion')
+    nueva_excepcion = ExcepcionHorario(
+        fecha=datetime.strptime(fecha_str, '%Y-%m-%d').date(),
+        descripcion=desc,
+        es_cerrado=True
+    )
+    db.session.add(nueva_excepcion)
+    db.session.commit()
+    return redirect(url_for('admin.index', tab='horarios'))
+
+
+
+@admin_bp.route('/eliminar_festivo/<int:id>')
+@login_required
+def eliminar_festivo(id):
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    festivo = ExcepcionHorario.query.get_or_404(id)
+    db.session.delete(festivo)
+    db.session.commit()
+    flash("Día festivo eliminado. El calendario vuelve a la normalidad.")
+    return redirect(url_for('admin.index', tab='horarios'))

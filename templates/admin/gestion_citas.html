@@ -9,10 +9,12 @@
     <h1 class="admin-title">Panel de Control</h1>
     
     <nav class="admin-tabs">
-        <a href="{{ url_for('admin.dashboard', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
         <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link active">⚡ Gestión Diaria</a>
-        <a href="{{ url_for('admin.dashboard', tab='servicios') }}" class="tab-link">💰 Servicios</a>
-        <a href="{{ url_for('admin.dashboard', tab='horarios') }}" class="tab-link">⏰ Horarios</a>
+        <a href="{{ url_for('admin.index', tab='servicios') }}" class="tab-link">💰 Servicios</a>
+        <a href="{{ url_for('admin.index', tab='horarios') }}" class="tab-link">⏰ Horarios</a>
+        <a href="{{ url_for('admin.index', tab='ajustes') }}"
+            class="tab-link {{ 'active' if active_tab == 'ajustes' }}">⚙️ Ajustes</a>
     </nav>
 
     <section class="admin-card">
@@ -79,7 +81,7 @@
     </section>
 
     <div style="margin-top: 20px; text-align: center;">
-        <a href="{{ url_for('admin.dashboard') }}" style="color: #888; text-decoration: none;">← Volver al Dashboard</a>
+        <a href="{{ url_for('admin.index') }}" style="color: #888; text-decoration: none;">← Volver al Dashboard</a>
     </div>
 </div>
 {% endblock %}

@@ -119,3 +119,80 @@
     max-width: 900px;
     margin: 0 auto;
 }
+
+
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.dia-col {
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    border-top: 3px solid #d4a373;
+}
+
+.dia-desconectado {
+    opacity: 0.5;
+    border-top-color: #555;
+}
+
+.turno-group {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+}
+
+.turno-group input {
+    background: #333;
+    color: white;
+    border: 1px solid #444;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.btn-save-full {
+    background: #d4a373;
+    color: #1a1a1a;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.festivos-list {
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.festivos-list h4 {
+    color: #d4a373;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+/* Reutilizamos los estilos de tabla que ya tienes, 
+   pero aseguramos que los botones de eliminar festivos sean discretos */
+.btn-delete {
+    background: #c0392b;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+.btn-delete:hover {
+    background: #e74c3c;
+    box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+}

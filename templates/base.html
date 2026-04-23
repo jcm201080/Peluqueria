@@ -44,8 +44,8 @@
                 {# Si es Administrador #}
                 {% if current_user.es_admin %}
                 <li>
-                    <a href="{{ url_for('admin.dashboard') }}"
-                        class="{{ 'active' if request.endpoint == 'admin.dashboard' else '' }}">⚙️ Admin</a>
+                    <a href="{{ url_for('admin.index') }}"
+                        class="{{ 'active' if request.endpoint == 'admin.index' else '' }}">⚙️ Admin</a>
                 </li>
                 {% endif %}
 
