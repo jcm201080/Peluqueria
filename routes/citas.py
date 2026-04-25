@@ -137,33 +137,15 @@ def reservar():
             db.session.add(nueva_cita)
             db.session.commit()
             
-            # --- LÓGICA DE WHATSAPP ---
-            # Si el que reserva NO es el admin, lo mandamos a WhatsApp
-            if not (current_user.is_authenticated and current_user.es_admin):
-                telefono_negocio = "34633013315" # Tu número con prefijo
-                fecha_bonita = fecha_obj.strftime('%d/%m/%Y')
-                hora_bonita = hora_obj.strftime('%H:%M')
-                
-                texto = (f"¡Hola Parra-Barber! 👋\n"
-                         f"He reservado una cita:\n"
-                         f"👤 *Nombre:* {nombre}\n"
-                         f"✂️ *Servicio:* {servicio}\n"
-                         f"📅 *Día:* {fecha_bonita}\n"
-                         f"⏰ *Hora:* {hora_bonita}\n"
-                         f"¿Me confirmas la cita?")
-                
-                # Codificamos el texto para URL
-                mensaje_url = urllib.parse.quote(texto)
-                whatsapp_url = f"https://api.whatsapp.com/send?phone={telefono_negocio}&text={mensaje_url}"
-                
-                # Usamos una categoría de flash específica si quieres darle estilo en HTML
-                flash("✅ ¡Cita guardada! Redirigiendo a WhatsApp para confirmar...", "success")
-                return redirect(whatsapp_url)
-            
-            else:
+            # --- REDIRECCIÓN TRAS GUARDAR LA CITA ---
+            if current_user.is_authenticated and current_user.es_admin:
                 # Si es el ADMIN quien reserva desde su panel
                 flash(f"✅ Cita confirmada para {nombre}", "success")
                 return redirect(url_for('admin.gestion_diaria', fecha_busqueda=fecha_str))
+            else:
+                # Si es un cliente normal, le mostramos el éxito y lo devolvemos a contacto
+                flash("✅ ¡Cita guardada correctamente! Puedes ver tus reservas activas más arriba.", "success")
+                return redirect(url_for('contacto'))
 
         else:
             # Si el bucle termina y peluquero_asignado_id sigue siendo None
