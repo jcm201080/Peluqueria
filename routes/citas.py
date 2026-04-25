@@ -2,6 +2,8 @@ from flask import Blueprint, request, redirect, url_for, flash, jsonify
 from flask_login import current_user
 from database.models import db, Cita, Peluquero, Servicio, HorarioPeluquero, ExcepcionHorario
 from datetime import datetime, timedelta
+import urllib.parse
+
 
 citas_bp = Blueprint('citas', __name__)
 
@@ -72,7 +74,7 @@ def reservar():
     servicio = request.form.get('servicio')
     peluquero_id_manual = request.form.get('peluquero_id') 
 
-    # Lógica de identificación de usuario (se mantiene similar)
+    # Lógica de identificación de usuario (se mantiene intacta)
     if current_user.is_authenticated and current_user.es_admin and request.form.get('nombre'):
         nombre = f"Admin: {request.form.get('nombre')}"
         telefono = request.form.get('telefono', 'S/N')
@@ -86,6 +88,7 @@ def reservar():
         telefono = request.form.get('telefono')
         usuario_id = None
 
+    # Usamos un solo bloque try-except general para cazar cualquier error
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
         hora_obj = datetime.strptime(hora_str[:5], '%H:%M').time()
@@ -97,7 +100,7 @@ def reservar():
         if peluquero_id_manual:
             peluquero_asignado_id = int(peluquero_id_manual)
         else:
-            # Búsqueda automática de peluquero disponible con el NUEVO sistema
+            # Búsqueda automática de peluquero disponible
             peluqueros = Peluquero.query.filter_by(activo=True).all()
             for p in peluqueros:
                 horario_dia = HorarioPeluquero.query.filter_by(
@@ -120,6 +123,7 @@ def reservar():
                             peluquero_asignado_id = p.id
                             break
 
+        # Si encontramos un peluquero disponible
         if peluquero_asignado_id:
             nueva_cita = Cita(
                 fecha=fecha_obj,
@@ -132,16 +136,42 @@ def reservar():
             )
             db.session.add(nueva_cita)
             db.session.commit()
-            flash(f"✅ Cita confirmada para {nombre}")
             
-            if current_user.is_authenticated and current_user.es_admin:
+            # --- LÓGICA DE WHATSAPP ---
+            # Si el que reserva NO es el admin, lo mandamos a WhatsApp
+            if not (current_user.is_authenticated and current_user.es_admin):
+                telefono_negocio = "34633013315" # Tu número con prefijo
+                fecha_bonita = fecha_obj.strftime('%d/%m/%Y')
+                hora_bonita = hora_obj.strftime('%H:%M')
+                
+                texto = (f"¡Hola Parra-Barber! 👋\n"
+                         f"He reservado una cita:\n"
+                         f"👤 *Nombre:* {nombre}\n"
+                         f"✂️ *Servicio:* {servicio}\n"
+                         f"📅 *Día:* {fecha_bonita}\n"
+                         f"⏰ *Hora:* {hora_bonita}\n"
+                         f"¿Me confirmas la cita?")
+                
+                # Codificamos el texto para URL
+                mensaje_url = urllib.parse.quote(texto)
+                whatsapp_url = f"https://api.whatsapp.com/send?phone={telefono_negocio}&text={mensaje_url}"
+                
+                # Usamos una categoría de flash específica si quieres darle estilo en HTML
+                flash("✅ ¡Cita guardada! Redirigiendo a WhatsApp para confirmar...", "success")
+                return redirect(whatsapp_url)
+            
+            else:
+                # Si es el ADMIN quien reserva desde su panel
+                flash(f"✅ Cita confirmada para {nombre}", "success")
                 return redirect(url_for('admin.gestion_diaria', fecha_busqueda=fecha_str))
+
+        else:
+            # Si el bucle termina y peluquero_asignado_id sigue siendo None
+            flash("Lo sentimos, no hay hueco disponible con ese profesional en este horario.", "error")
             return redirect(url_for('contacto'))
-        
-        flash("Lo sentimos, no hay hueco disponible con ese profesional.")
-        return redirect(url_for('contacto'))
 
     except Exception as e:
+        # Si algo falla en la base de datos o al transformar la fecha
         db.session.rollback()
-        flash(f"Error al reservar: {e}")
+        flash(f"Error al reservar: {e}", "error")
         return redirect(url_for('contacto'))

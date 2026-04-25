@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request
 from database.models import db, Usuario, Peluquero, Servicio, Cita
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_bcrypt import Bcrypt
 from routes.admin import admin_bp
 from routes.auth import auth_bp
@@ -86,40 +86,38 @@ def fotos():
     return render_template('fotos.html', imagenes=imagenes_pagina, page=page, total_pages=total_pages)
 
 
+# app.py (o donde tengas la ruta /contacto)
 @app.route('/contacto')
 def contacto():
     servicios = Servicio.query.all()
     
-    # Diccionarios de traducción
+    # 1. BUSCAR PRÓXIMA CITA DEL USUARIO
+    proxima_cita = None
+    if current_user.is_authenticated:
+        # Buscamos la cita más cercana (hoy o en el futuro)
+        proxima_cita = Cita.query.filter(
+            Cita.usuario_id == current_user.id,
+            Cita.fecha >= datetime.now().date()
+        ).order_by(Cita.fecha.asc(), Cita.hora.asc()).first()
+
+    # --- Tu lógica de días (se mantiene igual, está muy bien) ---
     dias_es = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
     meses_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
-
     dias_disponibles = []
-    # Aumentamos el rango un poco (ej. a 12) para que, aunque quitemos domingos, 
-    # siempre muestre aproximadamente 10 días útiles al cliente.
     for i in range(12):
         fecha = datetime.now() + timedelta(days=i)
-        
-        # 0=Lunes, 6=Domingo. 
-        # Si es 6 (Domingo), usamos 'continue' para saltar esta vuelta del bucle.
-        if fecha.weekday() == 6:
-            continue
-            
-        # Obtenemos el nombre del día y del mes en español usando el índice
-        nombre_dia = dias_es[fecha.weekday()]
-        nombre_mes = meses_es[fecha.month - 1]
-        numero_dia = fecha.day
-
+        if fecha.weekday() == 6: continue
         dias_disponibles.append({
             'valor': fecha.strftime('%Y-%m-%d'),
-            'texto': f"{nombre_dia}, {numero_dia} {nombre_mes}"
+            'texto': f"{dias_es[fecha.weekday()]}, {fecha.day} {meses_es[fecha.month - 1]}"
         })
-        
-        # Opcional: Si quieres que siempre salgan exactamente 10 días en la lista
-        if len(dias_disponibles) == 10:
-            break
-        
-    return render_template('contacto.html', servicios=servicios, dias=dias_disponibles)
+        if len(dias_disponibles) == 10: break
+    
+    # IMPORTANTE: Pasamos 'proxima_cita' al template
+    return render_template('contacto.html', 
+                           servicios=servicios, 
+                           dias=dias_disponibles, 
+                           proxima_cita=proxima_cita)
 
 @app.context_processor
 def inject_config():

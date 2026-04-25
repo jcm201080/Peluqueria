@@ -55,7 +55,7 @@ nav ul li a {
 
 /* Añade esto a tu archivo style.css */
 nav ul li a.active {
-    color: var(--color-principal) !important;
+    color: #d4a373 !important;
     font-weight: bold;
 }
 /* Estilo del logo */
@@ -143,6 +143,10 @@ footer {
     border-radius: 10px;
 }
 
+.tlfno{
+    color: white;
+}
+
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {
@@ -220,7 +224,7 @@ footer {
 
 .btn-reservar {
 
-    background-color: var(--color-principal) !important;
+    background-color: #d4a373 !important;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -531,7 +535,7 @@ footer {
     background-color: #1a1a1a;
     color: #ffffff;
     padding: 15px 0; /* Reducido de 30px a 15px */
-    color: var(--color-principal) !important;
+    color: #d4a373;
     margin-top: 30px; /* Reducido de 50px a 30px */
 }
 
@@ -549,7 +553,7 @@ footer {
 }
 
 .instagram-link {
-    color: var(--color-principal) !important;
+    color: #d4a373;
     text-decoration: none;
     font-weight: 500;
     display: flex;
@@ -577,4 +581,42 @@ footer {
     .instagram-link {
         padding: 4px 0; /* Menos espacio alrededor del link */
     }
+}
+
+
+/* Ticket de próxima cita para el cliente */
+.ticket-proxima-cita {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid var(--color-principal, #d4a373);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.ticket-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--color-principal, #d4a373);
+}
+
+.ticket-header h4 {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ticket-body p {
+    margin: 5px 0;
+    color: #444;
+}
+
+.ticket-nota {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #888 !important;
+    margin-top: 10px !important;
 }

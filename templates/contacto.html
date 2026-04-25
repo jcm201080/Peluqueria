@@ -7,10 +7,23 @@
         <p><strong>José Ángel Castaño Lozano</strong></p>
         <p>Fuentes de León (Badajoz)</p>
         <p>Calle Lorenzo Chamorro, CP 06280</p>
-        <p>📞 <a href="tel:+34633013315">633 013 315</a></p>
+        <p>📞 <a href="tel:+34633013315" class="tlfno">633 013 315</a></p>
 
         <hr>
-
+        {% if proxima_cita %}
+        <div class="ticket-proxima-cita">
+            <div class="ticket-header">
+                <span class="ticket-icon">📅</span>
+                <h4>Tu próxima cita reservada</h4>
+            </div>
+            <div class="ticket-body">
+                <p><strong>Servicio:</strong> {{ proxima_cita.servicio }}</p>
+                <p><strong>Día:</strong> {{ proxima_cita.fecha.strftime('%d/%m/%Y') }}</p>
+                <p><strong>Hora:</strong> {{ proxima_cita.hora.strftime('%H:%M') }}</p>
+                <p class="ticket-nota">¡Te esperamos! Si no puedes venir, avísanos.</p>
+            </div>
+        </div>
+        {% endif %}
         <div class="reserva-form">
             {% if current_user.is_authenticated %}
             <h3>Hola, {{ current_user.nombre }}</h3>

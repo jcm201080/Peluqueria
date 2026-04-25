@@ -437,3 +437,34 @@ def guardar_ajustes():
 
     flash('¡Ajustes actualizados!', 'success')
     return redirect(url_for('admin.index', tab='ajustes'))
+
+# reset
+
+
+# Valores por defecto (Hardcoded para seguridad)
+DEFAULT_CONFIG = {
+    "nombre_negocio": "Parra-Barber",
+    "lema": "Tu estilo, nuestra pasión",
+    "color_principal": "#d4a373",
+    "color_fondo": "#111111",
+    "color_footer": "#000000",
+    "instagram_user": "parrabarber",
+    "logo_img": "img/logo.jpeg",
+    "logo_texto_img": "img/logo.jpeg",
+    "ia_prompt": "Eres un experto en peluquería masculina y estilismo..."
+}
+
+@admin_bp.route('/ajustes/reset', methods=['POST'])
+def reset_ajustes():
+    try:
+        # Ruta al archivo JSON (ajusta según tu estructura)
+        config_path = os.path.join(os.getcwd(), 'config_web.json')
+        
+        with open(config_path, 'w', encoding='utf-8') as f:
+            json.dump(DEFAULT_CONFIG, f, indent=4, ensure_ascii=False)
+            
+        flash('Configuración restablecida con éxito', 'success')
+    except Exception as e:
+        flash(f'Error al restablecer: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.ajustes'))

@@ -1,24 +1,11 @@
 {
     "nombre_negocio": "Parra-Barber",
     "lema": "Tu estilo, nuestra pasión",
-    "color_principal": "#d4a373",
-    "color_fondo": "#'#111111'",
+    "color_principal": "#111111",
+    "color_fondo": "#111111",
     "color_footer": "#000000",
     "instagram_user": "parrabarber",
     "logo_img": "img/logo.jpeg",
     "logo_texto_img": "img/logo.jpeg",
-    "ia_prompt": ""
+    "ia_prompt": "Eres un experto en peluquería masculina y estilismo..."
 }
-
-// Por defecto:
-// {
-//     "nombre_negocio": "Parra-Barber",
-//     "lema": "Tu estilo, nuestra pasión",
-//     "color_principal": "#d4a373",
-//     "color_fondo": "#'#111111'",
-//     "color_footer": "#000000",
-//     "instagram_user": "parrabarber",
-//     "logo_img": "img/logo_sistema.png",
-//     "logo_texto_img": "img/logo.jpeg",
-//     "ia_prompt": ""
-// }
