@@ -4,7 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Parra-Barber{% endblock %}</title>
+    <title>{% block title %}{{ web.nombre_negocio }}{% endblock %}</title>
+
+    <style>
+        :root {
+            --color-principal: {
+                    {
+                    config_global.color_principal if config_global else '#d4a373'
+                }
+            }
+
+            ;
+
+            --color-fondo: {
+                    {
+                    config_global.color_fondo if config_global else '#111111'
+                }
+            }
+
+            ;
+        }
+
+        body {
+            background-color: var(--color-fondo);
+        }
+
+        .btn-propio {
+            background-color: var(--color-principal);
+        }
+
+        /* Usa estas variables en todo tu CSS */
+    </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.jpeg') }}">
@@ -80,10 +110,9 @@
 
     <footer class="main-footer">
         <div class="footer-content container">
-            <p>&copy; 2026 Parra-Barber. Todos los derechos reservados.</p>
-            <a href="https://www.instagram.com/parrabarber/" target="_blank" rel="noopener noreferrer"
-                class="instagram-link">
-                <i class="fab fa-instagram"></i> @parrabarber
+            <p>&copy; 2026 {{ web.nombre_negocio }}. Todos los derechos reservados.</p>
+            <a href="https://www.instagram.com/{{ web.instagram_user }}/" target="_blank" class="instagram-link">
+                <i class="fab fa-instagram"></i> @{{ web.instagram_user }}
             </a>
         </div>
     </footer>

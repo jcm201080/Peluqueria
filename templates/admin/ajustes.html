@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Ajustes - {{ config.nombre_negocio }}{% endblock %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ajustes.css') }}">
+<div class="admin-container">
+    <h1 class="admin-title">Configuración del Sitio</h1>
+
+    <nav class="admin-tabs">
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link">⚡ Gestión Diaria</a>
+        <a href="{{ url_for('admin.index', tab='servicios') }}" class="tab-link">💰 Servicios</a>
+        <a href="{{ url_for('admin.index', tab='horarios') }}" class="tab-link">⏰ Horarios</a>
+        <a href="{{ url_for('admin.ajustes') }}" class="tab-link active">⚙️ Ajustes</a>
+    </nav>
+
+    <section class="admin-card">
+        <form action="{{ url_for('admin.ajustes') }}" method="POST" enctype="multipart/form-data">
+            
+            <div class="ajuste-grupo">
+                <h4>🎨 Identidad Visual</h4>
+                <div class="input-field">
+                    <label>Nombre del Negocio:</label>
+                    <input type="text" name="nombre_negocio" value="{{ config.nombre_negocio }}" required>
+                </div>
+                
+                <div class="input-field">
+                    <label>Logo Actual:</label>
+                    <img src="{{ url_for('static', filename=config.logo_img) }}" alt="Logo" style="height: 50px; margin-bottom: 10px; width: auto;">
+                    <input type="file" name="logo" accept="image/*">
+                </div>
+            </div>
+
+            <div class="ajuste-grupo">
+                <h4>🖌️ Colores del Tema</h4>
+                <div style="display: flex; gap: 20px;">
+                    <div class="input-field">
+                        <label>Color Principal (Botones/Títulos):</label>
+                        <input type="color" name="color_principal" value="{{ config.color_principal }}">
+                    </div>
+                    <div class="input-field">
+                        <label>Color de Fondo:</label>
+                        <input type="color" name="color_secundario" value="{{ config.color_fondo }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="ajuste-grupo">
+                <h4>🤖 Inteligencia Artificial</h4>
+                <div class="input-field-ia">
+                    <label>Personalidad de la IA:</label>
+                    <textarea name="ia_prompt" rows="5">{{ config.ia_prompt }}</textarea>
+                    <small style="color: #666; margin-top: 5px;">Define cómo responderá el chatbot a tus clientes.</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save-full">💾 Guardar Configuración Global</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

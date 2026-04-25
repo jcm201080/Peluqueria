@@ -1,0 +1,112 @@
+/* static/css/admin.css */
+.admin-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.admin-title {
+    color: var(--color-principal, #d4a373);
+    text-align: center;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #333;
+    overflow-x: auto;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #888;
+    border-radius: 5px 5px 0 0;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.tab-link.active {
+    background: #222;
+    color: white;
+    border-bottom: 3px solid #d4a373;
+}
+
+.admin-card {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.ajuste-grupo {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.ajuste-grupo h4 {
+    color: #d4a373;
+    margin-bottom: 1.5rem;
+}
+
+.input-field {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    max-width: 200px;
+}
+.input-field-ia {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.input-field input[type="text"],
+.input-field textarea {
+    padding: 12px;
+    background: #000;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+}
+.input-field-ia label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.input-field-ia input[type="text"],
+.input-field-ia textarea {
+    padding: 12px;
+    background: #000;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 6px;
+}
+
+.btn-save-full {
+    width: 100%;
+    padding: 15px;
+    background: #d4a373;
+    border: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-save-full:hover {
+    background: #b88b5c;
+    transform: translateY(-2px);
+}

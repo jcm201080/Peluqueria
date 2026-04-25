@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 
 from routes.citas import citas_bp
 
+import json
+
+
 
 
 
@@ -117,6 +120,20 @@ def contacto():
             break
         
     return render_template('contacto.html', servicios=servicios, dias=dias_disponibles)
+
+@app.context_processor
+def inject_config():
+    try:
+        with open('config_web.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+    except Exception:
+        # Valores por defecto si el archivo falla
+        config = {
+            "nombre_negocio": "Parra-Barber", 
+            "color_principal": "#d4a373",
+            "color_fondo": "#1a1a1a"
+        }
+    return dict(web=config)
 
 # 4. Registro de Blueprints
 app.register_blueprint(citas_bp)

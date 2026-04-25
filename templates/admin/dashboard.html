@@ -19,8 +19,9 @@
             class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
         <a href="{{ url_for('admin.index', tab='horarios') }}"
             class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
-        <a href="{{ url_for('admin.index', tab='ajustes') }}"
-            class="tab-link {{ 'active' if active_tab == 'ajustes' }}">⚙️ Ajustes</a>
+        <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' }}">
+            ⚙️ Ajustes
+        </a>
     </nav>
 
     <p style="text-align: center;">Bienvenido, <strong>{{ current_user.nombre }}</strong></p>

@@ -1,5 +1,6 @@
 import os
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+import json
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario
 # Asegúrate de que ExcepcionHorario esté en esa lista ↑
@@ -352,3 +353,87 @@ def eliminar_festivo(id):
     db.session.commit()
     flash("Día festivo eliminado. El calendario vuelve a la normalidad.")
     return redirect(url_for('admin.index', tab='horarios'))
+
+
+
+def obtener_ruta_json():
+    return os.path.join(current_app.root_path, 'config_web.json')
+
+def leer_config():
+    ruta = obtener_ruta_json()
+    try:
+        with open(ruta, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Valores por defecto por si el archivo falla
+        return {
+            "nombre_negocio": "Parra-Barber",
+            "color_principal": "#d4a373",
+            "color_fondo": "#111111",
+            "ia_prompt": "Eres un experto barbero..."
+        }
+
+#Página de ajustes:
+
+
+
+@admin_bp.route('/ajustes', methods=['GET', 'POST'])
+@login_required
+def ajustes():
+    if not current_user.es_admin:
+        return "Acceso denegado", 403
+
+    config_data = leer_config()
+
+    if request.method == 'POST':
+        # Actualizamos el diccionario con los datos del formulario
+        config_data['nombre_negocio'] = request.form.get('nombre_negocio')
+        config_data['color_principal'] = request.form.get('color_principal')
+        config_data['color_fondo'] = request.form.get('color_secundario')
+        config_data['ia_prompt'] = request.form.get('ia_prompt')
+
+        # Gestión del Logo
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename != '':
+                # Usamos un nombre fijo para el logo del sistema o uno basado en timestamp
+                logo_filename = 'logo_sistema.png'
+                path = os.path.join(current_app.static_folder, 'img', logo_filename)
+                file.save(path)
+                config_data['logo_img'] = f'img/{logo_filename}'
+
+        # Guardar en el JSON
+        try:
+            with open(obtener_ruta_json(), 'w', encoding='utf-8') as f:
+                json.dump(config_data, f, indent=4, ensure_ascii=False)
+            flash('✅ Configuración actualizada correctamente', 'success')
+        except Exception as e:
+            flash(f'❌ Error al guardar: {str(e)}', 'error')
+
+        return redirect(url_for('admin.ajustes'))
+
+    return render_template('admin/ajustes.html', config=config_data)
+
+@admin_bp.route('/ajustes/guardar', methods=['POST'])
+def guardar_ajustes():
+    json_path = os.path.join(current_app.root_path, 'config_web.json')
+    
+    # Recogemos los datos del formulario
+    nuevos_ajustes = {
+        "nombre_negocio": request.form.get('nombre_negocio'),
+        "color_principal": request.form.get('color_principal'),
+        "color_fondo": request.form.get('color_secundario'), # Ajustado a tu HTML
+        "color_footer": "#000000", # Puedes añadir un input para esto también
+        "ia_prompt": request.form.get('ia_prompt'),
+        "lema": "Tu estilo, nuestra pasión", # Valores que no están en el form aún
+        "instagram_user": "parrabarber",
+        "logo_img": "img/favicon1.jpeg",
+        "logo_texto_img": "img/logo.jpeg"
+    }
+
+    # Escribimos en el JSON
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(nuevos_ajustes, f, indent=4, ensure_ascii=False)
+
+    flash('¡Ajustes actualizados!', 'success')
+    return redirect(url_for('admin.index', tab='ajustes'))

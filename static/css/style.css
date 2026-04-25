@@ -55,7 +55,7 @@ nav ul li a {
 
 /* Añade esto a tu archivo style.css */
 nav ul li a.active {
-    color: #d4a373 !important;
+    color: var(--color-principal) !important;
     font-weight: bold;
 }
 /* Estilo del logo */
@@ -73,7 +73,7 @@ nav ul li a.active {
 }
 
 footer {
-    background-color: black;
+    background-color: var(--color-footer);
     padding: 10px;
     position: fixed;
     bottom: 0;
@@ -220,7 +220,7 @@ footer {
 
 .btn-reservar {
 
-    background-color: #d4a373;
+    background-color: var(--color-principal) !important;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -531,7 +531,7 @@ footer {
     background-color: #1a1a1a;
     color: #ffffff;
     padding: 15px 0; /* Reducido de 30px a 15px */
-    border-top: 1px solid #d4a373;
+    color: var(--color-principal) !important;
     margin-top: 30px; /* Reducido de 50px a 30px */
 }
 
@@ -549,7 +549,7 @@ footer {
 }
 
 .instagram-link {
-    color: #d4a373;
+    color: var(--color-principal) !important;
     text-decoration: none;
     font-weight: 500;
     display: flex;
