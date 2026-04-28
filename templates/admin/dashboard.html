@@ -19,6 +19,10 @@
             class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
         <a href="{{ url_for('admin.index', tab='horarios') }}"
             class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
+        <a href="{{ url_for('admin.gestionar_clientes') }}"
+            class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">
+            👥 Clientes
+        </a>
         <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' }}">
             ⚙️ Ajustes
         </a>

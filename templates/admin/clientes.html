@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/clientes.css') }}">
+
+<div class="admin-container">
+    <h1 class="admin-title">Panel de Administración</h1>
+
+    <nav class="admin-tabs">
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'citas' else '' }}">📅 Citas</a>
+        <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' else '' }}">⚡ Gestión Diaria</a>
+        <a href="{{ url_for('admin.index', tab='servicios') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'servicios' else '' }}">💰 Servicios</a>
+        <a href="{{ url_for('admin.index', tab='horarios') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'horarios' else '' }}">⏰ Horarios</a>
+        <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' else '' }}">⚙️ Ajustes</a>
+        <a href="{{ url_for('admin.gestionar_clientes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">👥 Clientes</a>
+    </nav>
+
+    <div class="admin-section">
+        <h2>Gestión de Clientes</h2>
+        <p>Aquí puedes ver y corregir los datos de contacto de tus clientes registrados.</p>
+
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Teléfono actual</th>
+                        <th>Nueva Corrección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.nombre }}</td>
+                        <td>
+                            <a href="https://wa.me/34{{ cliente.telefono }}" target="_blank" class="wa-link" title="Enviar WhatsApp directo">
+                                {{ cliente.telefono }} <span class="wa-icon">📱</span>
+                            </a>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('admin.editar_cliente', id=cliente.id) }}" method="POST" class="inline-form">
+                                <input type="tel" name="telefono" placeholder="Ej: 600000000" pattern="[6789][0-9]{8}" class="input-mini" required>
+                                <button type="submit" class="btn-save">Actualizar</button>
+                            </form>
+                        </td>
+                        <td>
+                            <span class="status-badge">Activo</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

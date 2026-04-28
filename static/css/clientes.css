@@ -1,0 +1,37 @@
+.admin-table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #2a2a2a;
+    color: white;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    text-align: center;
+}
+
+.wa-link {
+    color: #25D366; /* Verde WhatsApp */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.input-mini {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #d4af37;
+    background: #1a1a1a;
+    color: white;
+    width: 100px;
+}
+
+.btn-save {
+    background: #d4af37;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}

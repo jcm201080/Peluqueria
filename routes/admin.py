@@ -2,7 +2,8 @@ import os
 import json
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario
+# Modifica tu línea de imports así:
+from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario, Usuario
 # Asegúrate de que ExcepcionHorario esté en esa lista ↑
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -468,3 +469,33 @@ def reset_ajustes():
         flash(f'Error al restablecer: {str(e)}', 'error')
         
     return redirect(url_for('admin.ajustes'))
+
+
+
+
+@admin_bp.route('/clientes')
+@login_required
+def gestionar_clientes():
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    # Ahora 'Usuario' ya funcionará porque lo hemos importado arriba
+    clientes = Usuario.query.filter_by(es_admin=False).all()
+    return render_template('admin/clientes.html', clientes=clientes)
+
+@admin_bp.route('/clientes/editar/<int:id>', methods=['POST'])
+@login_required
+def editar_cliente(id):
+    if not current_user.es_admin: 
+        flash("No tienes permiso para hacer eso", "error")
+        return redirect(url_for('index'))
+    
+    cliente = Usuario.query.get_or_404(id)
+    nuevo_telefono = request.form.get('telefono')
+    
+    if nuevo_telefono:
+        cliente.telefono = nuevo_telefono
+        db.session.commit()
+        flash(f"Teléfono de {cliente.nombre} actualizado correctamente", "success")
+    
+    return redirect(url_for('admin.gestionar_clientes'))
