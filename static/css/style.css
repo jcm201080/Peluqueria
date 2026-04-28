@@ -237,6 +237,37 @@ footer {
     width: 90%;
 }
 
+/* Contenedor principal del aviso */
+.login-prompt {
+    margin: 20px 0;
+    text-align: center; /* O left, según tu diseño */
+}
+
+.login-prompt p {
+    color: #ffffff; /* Texto normal en blanco */
+    font-size: 1.1rem; /* Un poco más grande que el texto base */
+}
+
+/* El enlace destacado "Inicia sesión" */
+.btn-highlight {
+    color: #ffcc00; /* Un tono dorado/amarillo para resaltar sobre el blanco */
+    font-size: 1.4rem; /* Letra notablemente más grande */
+    font-weight: bold;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-bottom: 2px solid #ffcc00; /* Subrayado elegante */
+    transition: all 0.3s ease; /* Animación suave */
+    display: inline-block;
+}
+
+/* Efecto al pasar el ratón (Hover) */
+.btn-highlight:hover {
+    color: #ffffff;
+    background-color: #ffcc00; /* Se convierte en un botón sólido */
+    border-radius: 5px;
+    transform: scale(1.1); /* Crece un poquito */
+    box-shadow: 0px 4px 15px rgba(255, 204, 0, 0.4);
+}
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {
