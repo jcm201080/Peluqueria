@@ -1,20 +1,24 @@
 {% extends "base.html" %}
 
 {% block contenido %}
+<section class="servicios-seccion">
     <h2>Nuestros Servicios</h2>
     <p>Cortes de cabello, afeitado clásico y más.</p>
 
     <div class="cuadro-precios">
-        <h3><span class="blanco">Nuestros</span> <span class="negro">Precios</span></h3>
-        <ul>
-            {% for servicio in servicios %}
-            <li>
-                <span>{{ servicio.nombre }}</span> 
-                <span>{{ servicio.precio }} €</span>
-            </li>
-            {% else %}
-            <li><span>No hay servicios disponibles</span></li>
-            {% endfor %}
-        </ul>
+        <div class="overlay-precios">
+            <h3><span class="blanco">Nuestros</span> <span class="negro">Precios</span></h3>
+            <ul class="lista-servicios">
+                {% for servicio in servicios %}
+                <li>
+                    <span class="servicio-nombre">{{ servicio.nombre }}</span> 
+                    <span class="servicio-precio">{{ servicio.precio }} €</span>
+                </li>
+                {% else %}
+                <li class="sin-servicios">No hay servicios disponibles</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
+</section>
 {% endblock %}
