@@ -80,15 +80,26 @@
                     <td>{{ cita.telefono_cliente }}</td>
                     <td>{{ cita.servicio }}</td>
                     <td>
-                        {# Botón de WhatsApp Dinámico #}
-                        {% set telefono = cita.cliente_rel.telefono if cita.usuario_id else cita.telefono_invitado
-                        %}
+                        {# 1. Determinamos el teléfono a usar #}
+                        {% set telefono = "" %}
+                        {% if cita.usuario_id and cita.cliente_rel.telefono %}
+                        {% set telefono = cita.cliente_rel.telefono %}
+                        {% elif cita.telefono_cliente and cita.telefono_cliente != 'S/N' %}
+                        {% set telefono = cita.telefono_cliente %}
+                        {% endif %}
+
+                        {# 2. Determinamos el nombre para el mensaje #}
+                        {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id else (cita.nombre_invitado if
+                        cita.nombre_invitado else 'Cliente') %}
+
+                        {# 3. Mostramos el botón solo si hay un teléfono válido #}
                         {% if telefono %}
-                        <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita..."
+                        <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita%20del%20día%20{{ cita.fecha }}%20a%20las%20{{ cita.hora.strftime('%H:%M') }}..."
                             target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                         {% endif %}
+
                         <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}" class="btn-delete"
                             onclick="return confirm('¿Borrar cita?')">Eliminar</a>
                     </td>

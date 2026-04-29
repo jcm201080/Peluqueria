@@ -13,6 +13,10 @@
         <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link active">⚡ Gestión Diaria</a>
         <a href="{{ url_for('admin.index', tab='servicios') }}" class="tab-link">💰 Servicios</a>
         <a href="{{ url_for('admin.index', tab='horarios') }}" class="tab-link">⏰ Horarios</a>
+        <a href="{{ url_for('admin.gestionar_clientes') }}"
+            class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">
+            👥 Clientes
+        </a>
         <a href="{{ url_for('admin.index', tab='ajustes') }}"
             class="tab-link {{ 'active' if active_tab == 'ajustes' }}">⚙️ Ajustes</a>
     </nav>
@@ -47,16 +51,25 @@
                         <small style="color: #888;">(Peluquero ID: {{ cita.peluquero_id }})</small>
                     </td>
                     <td>
-                        <div class="acciones-container">
-                            {# Botón de WhatsApp Dinámico #}
-                            {% set telefono = cita.cliente_rel.telefono if cita.usuario_id else cita.telefono_invitado
-                            %}
+                        <div class="acciones-container" style="display: flex; gap: 8px; align-items: center;">
+                            {# --- Lógica Unificada de WhatsApp --- #}
+                            {% set telefono = "" %}
+                            {% if cita.usuario_id and cita.cliente_rel.telefono %}
+                            {% set telefono = cita.cliente_rel.telefono %}
+                            {% elif cita.telefono_cliente and cita.telefono_cliente != 'S/N' %}
+                            {% set telefono = cita.telefono_cliente %}
+                            {% endif %}
+
+                            {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id else (cita.nombre_invitado if
+                            cita.nombre_invitado else 'Cliente') %}
+
                             {% if telefono %}
-                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita..."
+                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita%20del%20día%20{{ cita.fecha }}%20a%20las%20{{ cita.hora.strftime('%H:%M') }}..."
                                 target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
+                                <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i>
                             </a>
                             {% endif %}
+                            {# --- Fin WhatsApp --- #}
 
                             <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion') }}"
                                 class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
