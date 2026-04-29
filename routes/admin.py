@@ -52,13 +52,27 @@ def index():
 
 # --- GESTIÓN DE CITAS ---
 
+# Busca la ruta de eliminar y cámbiala por esta:
 @admin_bp.route('/cita/eliminar/<int:id>')
 @login_required
 def eliminar_cita(id):
+    if not current_user.es_admin:
+        return "Acceso Denegado", 403
+        
     cita = Cita.query.get_or_404(id)
+    # Guardamos la fecha antes de borrarla para saber a dónde volver
+    fecha_cita = cita.fecha.strftime('%Y-%m-%d')
+    
     db.session.delete(cita)
     db.session.commit()
+    
     flash("Cita eliminada correctamente.")
+    
+    # Si venimos de la gestión diaria, volvemos a la misma fecha
+    origen = request.args.get('origen')
+    if origen == 'gestion':
+        return redirect(url_for('admin.gestion_diaria', fecha_busqueda=fecha_cita))
+    
     return redirect(url_for('admin.index'))
 
 # --- GESTIÓN DE SERVICIOS ---
@@ -499,3 +513,42 @@ def editar_cliente(id):
         flash(f"Teléfono de {cliente.nombre} actualizado correctamente", "success")
     
     return redirect(url_for('admin.gestionar_clientes'))
+
+
+@admin_bp.route('/añadir-horario-especial', methods=['POST'])
+@login_required
+def añadir_horario_especial():
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+
+    fecha_str = request.form.get('fecha')
+    p_id = request.form.get('peluquero_id')
+    h_im = request.form.get('h_im')
+    h_fm = request.form.get('h_fm')
+    h_it = request.form.get('h_it')
+    h_ft = request.form.get('h_ft')
+
+    try:
+        fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        peluquero_id = int(p_id) if p_id != "todos" else None
+
+        # IMPORTANTE: es_cerrado=False para que sea HORARIO ESPECIAL y no BLOQUEO
+        nueva_excepcion = ExcepcionHorario(
+            fecha=fecha_obj,
+            peluquero_id=peluquero_id,
+            es_cerrado=False,  # <--- AQUÍ ESTÁ LA CLAVE
+            h_inicio_m=h_im,
+            h_fin_m=h_fm,
+            h_inicio_t=h_it,
+            h_fin_t=h_ft,
+            descripcion="Horario Especial"
+        )
+        
+        db.session.add(nueva_excepcion)
+        db.session.commit()
+        flash(f"✅ Horario especial añadido para el día {fecha_str}", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Error: {e}", "error")
+
+    return redirect(url_for('admin.index', tab='horarios'))

@@ -40,6 +40,9 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.jpeg') }}">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#d4a373">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 
 <body>
@@ -94,11 +97,14 @@
     </header>
 
     {# Sección para mensajes flash (errores, avisos de login, etc) #}
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-messages">
-        {% for message in messages %}
-        <div class="flash-item">{{ message }}</div>
+        {% for category, message in messages %}
+        {# Añadimos la categoría como clase CSS y el filtro |safe #}
+        <div class="flash-item {{ category }}">
+            {{ message|safe }}
+        </div>
         {% endfor %}
     </div>
     {% endif %}
@@ -121,6 +127,16 @@
     {% if request.path == '/contacto' %}
     <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>´
     {% endif %}
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("/static/sw.js")
+                    .then(reg => console.log('SW registrado', reg))
+                    .catch(err => console.log('SW error', err));
+            });
+        }
+    </script>
 </body>
 
 </html>

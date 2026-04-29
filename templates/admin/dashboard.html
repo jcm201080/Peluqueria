@@ -234,6 +234,83 @@
     </section>
     {% endif %} -->
 
+    <section class="admin-card" style="margin-top: 30px; border: 2px solid #d4a373;">
+        <h3>🌟 Horarios Especiales (Días Concretos)</h3>
+        <p class="subtitle">Usa esto para días sueltos que no siguen el horario normal.</p>
+
+        <form action="{{ url_for('admin.añadir_horario_especial') }}" method="POST" class="admin-form-especial">
+            <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="date" name="fecha" required class="input-admin" style="flex: 1;">
+                <select name="peluquero_id" class="select-admin" style="flex: 1;">
+                    <option value="todos">Todos los peluqueros</option>
+                    {% for p in peluqueros %}
+                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="turnos-inputs-especial"
+                style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 15px;">
+                <div class="turno-group">
+                    <strong>Mañana:</strong>
+                    <input type="time" name="h_im" value="09:00"> a <input type="time" name="h_fm" value="14:00">
+                </div>
+                <div class="turno-group">
+                    <strong>Tarde:</strong>
+                    <input type="time" name="h_it" value="16:00"> a <input type="time" name="h_ft" value="20:00">
+                </div>
+            </div>
+            <button type="submit" class="btn-save-full"
+                style="width: 100%; background-color: #d4a373; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+                Activar Horario Especial
+            </button>
+        </form>
+
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #444;">
+
+        <h4>📋 Horarios Especiales Activos</h4>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Peluquero</th>
+                    <th>Horario Mañana</th>
+                    <th>Horario Tarde</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# Filtramos las excepciones que NO son cierres (es_cerrado=False) #}
+                {% for ex in excepciones if not ex.es_cerrado %}
+                <tr>
+                    <td>{{ ex.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if ex.peluquero_id %}
+                        {{ ex.peluquero.nombre }}
+                        {% else %}
+                        <span style="color: #d4a373;">🌍 Todos</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ex.h_inicio_m }} - {{ ex.h_fin_m }}</td>
+                    <td>{{ ex.h_inicio_t }} - {{ ex.h_fin_t }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.eliminar_festivo', id=ex.id) }}" class="btn-delete"
+                            onclick="return confirm('¿Eliminar este horario especial y volver al normal?')">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #888; padding: 20px;">
+                        No hay horarios especiales programados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
     <div style="margin-top: 40px; text-align: center;">
         <a href="{{ url_for('auth.logout') }}" class="btn-logout">Cerrar Sesión Segura</a>
     </div>

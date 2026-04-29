@@ -31,13 +31,7 @@ class HorarioPeluquero(db.Model):
     h_inicio_t = db.Column(db.String(5), default="16:00")
     h_fin_t = db.Column(db.String(5), default="20:00")
 
-class ExcepcionHorario(db.Model):
-    """ Para festivos, vacaciones o días que no se trabaja """
-    id = db.Column(db.Integer, primary_key=True)
-    peluquero_id = db.Column(db.Integer, db.ForeignKey('peluquero.id'), nullable=True) # NULL significa festivo para todos
-    fecha = db.Column(db.Date, nullable=False)
-    descripcion = db.Column(db.String(100)) # Ej: "Navidad", "Vacaciones Paco"
-    es_cerrado = db.Column(db.Boolean, default=True)
+
 
 class Cita(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,3 +55,17 @@ class Configuracion(db.Model):
     h_fin_manana = db.Column(db.String(5), default="14:00")
     h_inicio_tarde = db.Column(db.String(5), default="17:00")
     h_fin_tarde = db.Column(db.String(5), default="21:30")
+
+
+class ExcepcionHorario(db.Model):
+    """ Para festivos, vacaciones o días con horario especial """
+    id = db.Column(db.Integer, primary_key=True)
+    peluquero_id = db.Column(db.Integer, db.ForeignKey('peluquero.id'), nullable=True) 
+    fecha = db.Column(db.Date, nullable=False)
+    descripcion = db.Column(db.String(100))
+    es_cerrado = db.Column(db.Boolean, default=True) 
+    
+    h_inicio_m = db.Column(db.String(5), nullable=True, default="10:00")
+    h_fin_m = db.Column(db.String(5), nullable=True, default="14:00")
+    h_inicio_t = db.Column(db.String(5), nullable=True, default="16:00")
+    h_fin_t = db.Column(db.String(5), nullable=True, default="20:00")

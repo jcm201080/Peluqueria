@@ -31,30 +31,50 @@ def check_disponibilidad():
 
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        dia_semana_int = fecha_obj.weekday()  # 0=Lunes, 6=Domingo
+        dia_semana_int = fecha_obj.weekday()
 
-        # 1. Verificar si es un festivo global o día cerrado
-        festivo = ExcepcionHorario.query.filter_by(fecha=fecha_obj, es_cerrado=True).first()
-        if festivo:
-            return jsonify([]) # Todo cerrado
+        # 1. Verificar si hay un cierre total (festivo para todos)
+        cierre_total = ExcepcionHorario.query.filter_by(fecha=fecha_obj, es_cerrado=True, peluquero_id=None).first()
+        if cierre_total:
+            return jsonify([]) 
 
         peluqueros = Peluquero.query.filter_by(activo=True).all()
         horas_libres = set()
 
         for p in peluqueros:
-            # 2. Buscar el horario específico de este peluquero para ESTE día de la semana
-            horario_dia = HorarioPeluquero.query.filter_by(
-                peluquero_id=p.id, 
-                dia_semana=dia_semana_int
-            ).first()
+            # --- NUEVA LÓGICA DE PRIORIDAD ---
+            
+            # 2. ¿Tiene este peluquero una excepción (horario especial o cierre individual) para hoy?
+            excep = ExcepcionHorario.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).first()
+            
+            horario_a_usar = None
+            
+            if excep:
+                if not excep.es_cerrado:
+                    # Es un horario especial: creamos un objeto temporal con las horas de la excepción
+                    horario_a_usar = {
+                        'h_im': excep.h_inicio_m, 'h_fm': excep.h_fin_m,
+                        'h_it': excep.h_inicio_t, 'h_ft': excep.h_fin_t
+                    }
+                else:
+                    # El peluquero está de vacaciones o libre hoy, saltamos al siguiente peluquero
+                    continue
+            else:
+                # 3. Si no hay excepción, buscamos su horario normal de la semana
+                h_normal = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
+                if h_normal and h_normal.trabaja:
+                    horario_a_usar = {
+                        'h_im': h_normal.h_inicio_m, 'h_fm': h_normal.h_fin_m,
+                        'h_it': h_normal.h_inicio_t, 'h_ft': h_normal.h_fin_t
+                    }
 
-            if horario_dia and horario_dia.trabaja:
-                # 3. Generar franjas según su horario de ese día
-                franjas_m = generar_franjas(horario_dia.h_inicio_m, horario_dia.h_fin_m)
-                franjas_t = generar_franjas(horario_dia.h_inicio_t, horario_dia.h_fin_t)
+            # 4. Si tenemos un horario definido (normal o especial), generamos las franjas
+            if horario_a_usar:
+                franjas_m = generar_franjas(horario_a_usar['h_im'], horario_a_usar['h_fm'])
+                franjas_t = generar_franjas(horario_a_usar['h_it'], horario_a_usar['h_ft'])
                 todas_sus_franjas = franjas_m + franjas_t
                 
-                # 4. Filtrar las ya ocupadas
+                # 5. Filtrar las ya ocupadas
                 citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
                 horas_cogidas = [c.hora.strftime('%H:%M') for c in citas_hoy]
                 
@@ -63,6 +83,7 @@ def check_disponibilidad():
                         horas_libres.add(f)
 
         return jsonify(sorted(list(horas_libres)))
+
     except Exception as e:
         print(f"❌ Error en API Disponibilidad: {e}")
         return jsonify([]), 500
@@ -143,8 +164,21 @@ def reservar():
                 flash(f"✅ Cita confirmada para {nombre}", "success")
                 return redirect(url_for('admin.gestion_diaria', fecha_busqueda=fecha_str))
             else:
-                # Si es un cliente normal, le mostramos el éxito y lo devolvemos a contacto
-                flash("✅ ¡Cita guardada correctamente! Puedes ver tus reservas activas más arriba.", "success")
+                # --- AQUÍ LA MEJORA PARA CLIENTES E INVITADOS ---
+                # Formateamos la fecha para que sea más legible (dd/mm/aaaa)
+                # En citas.py, dentro de reservar():
+
+                fecha_bonita = fecha_obj.strftime('%d/%m/%Y')
+
+                mensaje_confirmacion = (
+                    f"<strong>✅ ¡Cita confirmada para {nombre}!</strong><br>"
+                    f"📞 <b>Teléfono:</b> {telefono}<br>"
+                    f"📅 <b>Día:</b> {fecha_bonita} a las 🕒 {hora_str}h.<br><br>"
+                    f"⚠️ <i>Si no puede venir, por favor avise con antelación.</i>"
+                )
+
+                flash(mensaje_confirmacion, "success") # "success" suele poner el fondo verde en CSS
+                
                 return redirect(url_for('contacto'))
 
         else:

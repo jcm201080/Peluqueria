@@ -624,7 +624,7 @@ footer {
 }
 
 .flash-item{
-    color: red;
+    color: rgb(206, 174, 174);
     font-size: 35px;
 }
 
@@ -717,4 +717,33 @@ footer {
     font-style: italic;
     color: #888 !important;
     margin-top: 10px !important;
+}
+
+/* Alerta */
+
+.alerta-confirmacion {
+    background-color: #d4edda; /* Verde clarito */
+    color: #155724;            /* Verde oscuro */
+    border: 2px solid #c3e6cb;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.alerta-contenido {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.icono-check {
+    font-size: 2em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.alerta-confirmacion strong {
+    font-size: 1.3em;
 }
