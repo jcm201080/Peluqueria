@@ -10,6 +10,11 @@
 
     {% set active_tab = request.args.get('tab', 'citas') %}
     <nav class="admin-tabs">
+        <!-- NUEVA PESTAÑA V2 AÑADIDA -->
+        <a href="{{ url_for('admin.gestion_diaria_v2') }}"
+           class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' else '' }}">
+           🚀 Gestión V2
+        </a>
         <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
             Citas</a>
         <a href="{{ url_for('admin.gestion_diaria') }}"

@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, request
 from flask_login import login_required, current_user
 # Modifica tu línea de imports así:
 from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario, Usuario
@@ -8,8 +8,8 @@ from database.models import db, Cita, Peluquero, Servicio, Configuracion, Horari
 from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
-from datetime import datetime
 from routes.citas import generar_franjas
+from datetime import datetime, timedelta
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -552,3 +552,78 @@ def añadir_horario_especial():
         flash(f"❌ Error: {e}", "error")
 
     return redirect(url_for('admin.index', tab='horarios'))
+
+
+@admin_bp.route('/gestion-diaria-v2')
+@login_required
+def gestion_diaria_v2():
+    # Seguridad: solo admin
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+
+    # Obtenemos la fecha seleccionada o la de hoy
+    fecha_str = request.args.get('fecha_busqueda', datetime.now().strftime('%Y-%m-%d'))
+    fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+    dia_semana_int = fecha_obj.weekday()
+    
+    # 1. Generar la cuadrícula de 35 días (7 columnas x 5 filas)
+    dias_es = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+    dias_calendario = []
+    
+    for i in range(35):
+        fecha_iter = datetime.now() + timedelta(days=i)
+        dias_calendario.append({
+            'valor': fecha_iter.strftime('%Y-%m-%d'),
+            'texto': f"{dias_es[fecha_iter.weekday()]} {fecha_iter.day}"
+        })
+
+    # 2. OBTENER CITAS Y HUECOS DE LA BASE DE DATOS (Lógica de tu antigua gestión_diaria)
+    citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
+    peluqueros = Peluquero.query.filter_by(activo=True).all()
+    huecos_detalles = {}
+
+    for p in peluqueros:
+        horario = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
+
+        if horario and horario.trabaja:
+            franjas = generar_franjas(horario.h_inicio_m, horario.h_fin_m) + \
+                      generar_franjas(horario.h_inicio_t, horario.h_fin_t)
+
+            for hora_f in franjas:
+                hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
+                ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
+                
+                if not ocupado:
+                    if hora_f not in huecos_detalles:
+                        huecos_detalles[hora_f] = []
+                    huecos_detalles[hora_f].append(p)
+
+    horas_libres = sorted(huecos_detalles.keys())
+    
+    # 3. CREAR AGENDA UNIFICADA Y ORDENADA POR HORA
+    agenda_ordenada = []
+    
+    # Añadimos las ocupadas
+    for cita in citas:
+        agenda_ordenada.append({
+            'hora': cita.hora.strftime('%H:%M'),
+            'estado': 'ocupado',
+            'datos': cita
+        })
+        
+    # Añadimos las libres
+    for hora in horas_libres:
+        agenda_ordenada.append({
+            'hora': hora,
+            'estado': 'libre',
+            'peluqueros': huecos_detalles[hora]
+        })
+        
+    # Ordenamos la lista final de menor a mayor hora para que se intercalen cronológicamente
+    agenda_ordenada = sorted(agenda_ordenada, key=lambda x: x['hora'])
+
+    # 4. Enviar a la plantilla
+    return render_template('admin/gestion_diaria_v2.html', 
+                           fecha_actual=fecha_str,
+                           dias_calendario=dias_calendario,
+                           agenda=agenda_ordenada)

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Gestión Diaria - Parra-Barber{% endblock %}
+{% block title %}Gestión Diaria V2 - Parra-Barber{% endblock %}
 
 {% block contenido %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gestion_diaria_v2.css') }}">
 
 <div class="admin-container">
     <h1 class="admin-title">Panel de Control</h1>
@@ -33,13 +34,17 @@
     </nav>
 
     <section class="admin-card">
-        <div
-            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-            <h3>⚡ Disponibilidad y Reservas Rápidas</h3>
-            <form action="{{ url_for('admin.gestion_diaria') }}" method="GET" style="display: flex; gap: 5px;">
-                <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
-                <button type="submit" class="btn-save">Ver Día</button>
-            </form>
+        <h3 style="margin-bottom: 15px;">🗓️ Selecciona un día:</h3>
+
+        <!-- NUEVA CUADRÍCULA DE 35 DÍAS -->
+        <div class="calendario-grid-v2">
+            {% for d in dias_calendario %}
+            <a href="{{ url_for('admin.gestion_diaria_v2', fecha_busqueda=d.valor) }}"
+                class="dia-admin-btn {{ 'active' if d.valor == fecha_actual else '' }}">
+                <span class="dia-sem">{{ d.texto[:3] }}</span>
+                <span class="dia-num">{{ d.valor.split('-')[2] }}</span>
+            </a>
+            {% endfor %}
         </div>
 
         <table class="admin-table">
@@ -52,10 +57,14 @@
                 </tr>
             </thead>
             <tbody>
-                {# 1. OCUPADAS #}
-                {% for cita in citas %}
+                {# BUCLE ÚNICO ORDENADO CRONOLÓGICAMENTE #}
+                {% for item in agenda %}
+
+                {% if item.estado == 'ocupado' %}
+                {% set cita = item.datos %}
+                <!-- FILA DE CITA OCUPADA -->
                 <tr style="background-color: rgba(212, 163, 115, 0.1);">
-                    <td><strong>{{ cita.hora.strftime('%H:%M') }}</strong></td>
+                    <td><strong>{{ item.hora }}</strong></td>
                     <td><span style="color: #ff6b6b; font-weight: bold;">🔴 OCUPADO</span></td>
                     <td>
                         {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}
@@ -63,49 +72,41 @@
                     </td>
                     <td>
                         <div class="acciones-container" style="display: flex; gap: 8px; align-items: center;">
-                            {# --- Lógica Unificada de WhatsApp --- #}
-                            {% set telefono = "" %}
-                            {% if cita.usuario_id and cita.cliente_rel.telefono %}
-                            {% set telefono = cita.cliente_rel.telefono %}
-                            {% elif cita.telefono_cliente and cita.telefono_cliente != 'S/N' %}
-                            {% set telefono = cita.telefono_cliente %}
-                            {% endif %}
-
+                            {% set telefono = cita.cliente_rel.telefono if cita.usuario_id and cita.cliente_rel.telefono
+                            else (cita.telefono_cliente if cita.telefono_cliente and cita.telefono_cliente != 'S/N' else
+                            "") %}
                             {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id else (cita.nombre_invitado if
                             cita.nombre_invitado else 'Cliente') %}
 
                             {% if telefono %}
-                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita%20del%20día%20{{ cita.fecha }}%20a%20las%20{{ cita.hora.strftime('%H:%M') }}..."
+                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber..."
                                 target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
                                 <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i>
                             </a>
                             {% endif %}
-                            {# --- Fin WhatsApp --- #}
 
-                            <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion') }}"
+                            <!-- Importante: origen='gestion_v2' para que al borrar vuelva a esta misma página -->
+                            <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion_v2') }}"
                                 class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
                         </div>
                     </td>
                 </tr>
-                {% endfor %}
 
-                {# 2. LIBRES #}
-                {% for hora in horas_libres %}
+                {% else %}
+                <!-- FILA DE HORA LIBRE -->
                 <tr>
-                    <td>{{ hora }}</td>
+                    <td><strong>{{ item.hora }}</strong></td>
                     <td>
-                        {# Calculamos cuántos peluqueros hay disponibles en esta hora #}
-                        {% set cantidad_libres = huecos_detalles[hora]|length %}
-
+                        {% set cantidad_libres = item.peluqueros|length %}
                         <span class="status-badge {{ 'multiple' if cantidad_libres > 1 else 'single' }}">
                             🟢 LIBRE ({{ cantidad_libres }})
                         </span>
                     </td>
-                    <form action="{{ url_for('citas.reservar') }}" method="POST">
+                    <form action="{{ url_for('citas.reservar') }}" method="POST" style="display: contents;">
                         <td>
                             <div style="display: flex; gap: 5px;">
                                 <select name="peluquero_id" class="select-admin">
-                                    {% for p in huecos_detalles[hora] %}
+                                    {% for p in item.peluqueros %}
                                     <option value="{{ p.id }}">{{ p.nombre }}</option>
                                     {% endfor %}
                                 </select>
@@ -115,19 +116,36 @@
                         </td>
                         <td>
                             <input type="hidden" name="fecha" value="{{ fecha_actual }}">
-                            <input type="hidden" name="hora" value="{{ hora }}">
+                            <input type="hidden" name="hora" value="{{ item.hora }}">
                             <input type="hidden" name="servicio" value="Reserva Manual Admin">
+                            <input type="hidden" name="origen" value="gestion_v2">
                             <button type="submit" class="btn-save" style="width: 100%;">Reservar</button>
                         </td>
                     </form>
+                </tr>
+                {% endif %}
+
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #888;">No hay horarios registrados para este día.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </section>
-
-    <div style="margin-top: 20px; text-align: center;">
-        <a href="{{ url_for('admin.index') }}" style="color: #888; text-decoration: none;">← Volver al Dashboard</a>
-    </div>
 </div>
+
+<!-- IMPORTAMOS EL SCRIPT PARA EL SCROLL -->
+<script src="{{ url_for('static', filename='js/admin_scroll.js') }}"></script>
+
+<!-- Pequeño script para asegurar que el carrusel hace scroll automático hacia el día seleccionado -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const diaActivo = document.querySelector('.dia-admin-btn.active');
+        if (diaActivo) {
+            diaActivo.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    });
+</script>
 {% endblock %}
