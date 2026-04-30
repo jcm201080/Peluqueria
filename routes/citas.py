@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template
 from flask_login import current_user
 from database.models import db, Cita, Peluquero, Servicio, HorarioPeluquero, ExcepcionHorario
 from datetime import datetime, timedelta
@@ -6,6 +6,18 @@ import urllib.parse
 
 
 citas_bp = Blueprint('citas', __name__)
+
+
+def obtener_dias_proximos(num_dias=10):
+    """Genera la lista de días para el selector (Evita errores de NameError)"""
+    dias = []
+    for i in range(num_dias):
+        fecha = datetime.now() + timedelta(days=i)
+        dias.append({
+            'valor': fecha.strftime('%Y-%m-%d'),
+            'texto': fecha.strftime('%A, %d %b').capitalize()
+        })
+    return dias
 
 def generar_franjas(inicio_str, fin_str):
     """Genera lista de horas cada 30 min entre dos strings 'HH:MM'"""
@@ -191,3 +203,27 @@ def reservar():
         db.session.rollback()
         flash(f"Error al reservar: {e}", "error")
         return redirect(url_for('contacto'))
+
+
+@citas_bp.route('/buscar-cita', methods=['POST'])
+def buscar_cita():
+    telefono = request.form.get('telefono_buscar', '').strip()
+    
+    # IMPORTANTE: Cargamos servicios y días para que el formulario de reserva no aparezca vacío
+    servicios = Servicio.query.all()
+    dias = obtener_dias_proximos()
+
+    if not telefono:
+        flash("Por favor, introduce un número de teléfono.", "error")
+        return redirect(url_for('contacto'))
+
+    # Buscamos las citas en la base de datos
+    citas_encontradas = Cita.query.filter_by(telefono_cliente=telefono).order_by(Cita.fecha.desc()).all()
+    
+    # Renderizamos la misma página de contacto pasando los resultados
+    return render_template('contacto.html', 
+                           citas_buscadas=citas_encontradas, 
+                           telefono_buscado=telefono,
+                           busqueda_realizada=True, # Esto sirve para saber si mostrar el mensaje de "No hay citas"
+                           servicios=servicios,
+                           dias=dias)

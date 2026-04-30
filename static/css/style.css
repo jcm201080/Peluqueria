@@ -132,7 +132,42 @@ footer {
     padding: 20px;
     margin-bottom: 150px;
 }
+/* Estilos del Buscador de Citas */
+.buscador-citas {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    margin-bottom: 20px;
+}
 
+.card-cita {
+    background: #222;
+    padding: 15px;
+    border-left: 4px solid #d4af37; /* Color dorado */
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.aviso-sin-citas {
+    background: #3b1616;
+    color: #ff8080;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #631717;
+}
+
+.btn-buscar {
+    background-color: #d4af37;
+    color: black;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
 /* Estilo para la dirección */
 .contacto .direccion {
     text-align: left;

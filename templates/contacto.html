@@ -24,6 +24,41 @@
             </div>
         </div>
         {% endif %}
+
+        <!-- Sección de Búsqueda de Citas -->
+        <div class="buscador-citas">
+            <h3>🔎 Mis Reservas</h3>
+            <form action="{{ url_for('citas.buscar_cita') }}" method="POST" class="form-inline">
+                <div class="form-group-inline">
+                    <input type="tel" name="telefono_buscar" placeholder="Tu teléfono (ej: 633013315)"
+                        pattern="[6789][0-9]{8}" value="{{ telefono_buscado if telefono_buscado else '' }}" required>
+                    <button type="submit" class="btn-buscar">Buscar</button>
+                </div>
+            </form>
+
+            {% if busqueda_realizada %}
+            {% if citas_buscadas %}
+            <div class="resultados-busqueda">
+                <h4>Citas para el {{ telefono_buscado }}:</h4>
+                <div class="grid-citas">
+                    {% for cita in citas_buscadas %}
+                    <div class="card-cita">
+                        <p><strong>📅 Fecha:</strong> {{ cita.fecha.strftime('%d/%m/%Y') }}</p>
+                        <p><strong>🕒 Hora:</strong> {{ cita.hora.strftime('%H:%M') }}</p>
+                        <p><strong>✂️ Servicio:</strong> {{ cita.servicio }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="aviso-sin-citas">
+                <p>❌ No tienes citas reservadas con el teléfono <strong>{{ telefono_buscado }}</strong>.</p>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <hr class="separador-pro">
         <div class="reserva-form">
             {% if current_user.is_authenticated %}
             <h3>Hola, {{ current_user.nombre }}</h3>
