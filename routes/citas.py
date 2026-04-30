@@ -8,7 +8,7 @@ import urllib.parse
 citas_bp = Blueprint('citas', __name__)
 
 
-def obtener_dias_proximos(num_dias=10):
+def obtener_dias_proximos(num_dias=15):
     """Genera la lista de días para el selector (Evita errores de NameError)"""
     dias = []
     for i in range(num_dias):
@@ -227,3 +227,11 @@ def buscar_cita():
                            busqueda_realizada=True, # Esto sirve para saber si mostrar el mensaje de "No hay citas"
                            servicios=servicios,
                            dias=dias)
+
+
+@citas_bp.route('/api/dias-ocupados')
+def dias_ocupados():
+    # Consultamos excepciones de cierre total en la DB
+    cierres = ExcepcionHorario.query.filter_by(es_cerrado=True, peluquero_id=None).all()
+    fechas_bloqueadas = [c.fecha.strftime('%Y-%m-%d') for c in cierres]
+    return jsonify(fechas_bloqueadas)

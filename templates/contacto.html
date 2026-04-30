@@ -104,21 +104,33 @@
 
                 {# FECHA DINÁMICA (Próximos 10 días enviados desde el servidor) #}
                 <div class="form-group">
-                    <label>Fecha:</label>
-                    <select name="fecha" id="fecha-reserva" required>
-                        <option value="" disabled selected>Elige un día</option>
+                    <label>Selecciona tu día:</label>
+                    <!-- Campo oculto que enviará la fecha al formulario al hacer clic en el calendario -->
+                    <input type="hidden" name="fecha" id="fecha-seleccionada" required>
+
+                    <div id="calendario-itv" class="calendario-grid">
                         {% for dia in dias %}
-                        <option value="{{ dia.valor }}">{{ dia.texto }}</option>
+                        <div class="dia-itv" data-fecha="{{ dia.valor }}"
+                            onclick="seleccionarDia(this, '{{ dia.valor }}')">
+                            <span class="dia-nombre">{{ dia.texto[:3] }}</span>
+                            <span class="dia-numero">{{ dia.valor.split('-')[2] }}</span>
+                        </div>
                         {% endfor %}
-                    </select>
+                    </div>
                 </div>
 
-                {# HORA DINÁMICA (Intervalos de 30 min) #}
-                <div class="form-group">
-                    <label>Hora:</label>
-                    <select name="hora" id="hora-reserva" required disabled>
-                        <option value="" disabled selected>Selecciona primero un día</option>
-                    </select>
+                {# HORA DINÁMICA (Cuadrícula de botones) #}
+                <!-- Contenedor oculto por defecto. Se mostrará al seleccionar un día -->
+                <div class="form-group" id="grupo-horas" style="display: none;">
+                    <label>Selecciona tu hora:</label>
+                    
+                    <!-- Input invisible pero validable por HTML5 -->
+                    <input type="text" name="hora" id="hora-seleccionada" required 
+                           style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+                    
+                    <div id="contenedor-horas" class="horas-grid">
+                        <!-- El JavaScript inyectará aquí los botones de las horas -->
+                    </div>
                 </div>
 
                 <!-- <div class="form-group">

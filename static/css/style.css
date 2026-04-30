@@ -168,6 +168,103 @@ footer {
     font-weight: bold;
     cursor: pointer;
 }
+/* Contenedor del calendario tipo ITV */
+/* ESTILOS PARA EL CALENDARIO DE CITAS */
+/* ESTILOS PARA EL CALENDARIO DE CITAS */
+.calendario-grid {
+    display: grid;
+    /* Obligamos a que sean exactamente 3 columnas del mismo ancho */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 12px; /* Un poco de separación respirable entre los botones */
+    margin-bottom: 20px;
+    /* Opcional: si en pantallas gigantes se ven muy anchos, puedes limitar el ancho máximo del contenedor */
+    max-width: 100%; 
+}
+
+.dia-itv {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: #2c2c2c; /* Color de fondo base para tu diseño oscuro */
+    color: #fff;
+}
+
+/* ESTILOS PARA LA CUADRÍCULA DE HORAS */
+.horas-grid {
+    display: grid;
+    /* Crea tantas columnas como quepan, con un mínimo de 70px de ancho */
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.hora-btn {
+    padding: 10px 5px;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: transparent;
+    border: 1px solid #28a745; /* Borde verde por defecto para horas libres */
+    color: #fff; 
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.hora-btn:hover {
+    background-color: rgba(40, 167, 69, 0.2); /* Fondo verde semitransparente al pasar el ratón */
+}
+
+/* Estado de la hora cuando el usuario hace clic */
+.hora-btn.active {
+    background-color: #e0a800; /* Amarillo/Dorado a juego con el día seleccionado */
+    border-color: #e0a800;
+    color: #000;
+}
+
+/* Estado: Disponible (Verde) */
+.dia-itv.disponible {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.dia-itv.disponible:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+
+/* Estado: Ocupado / Sin huecos (Rojo) */
+.dia-itv.ocupado {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Estado: Seleccionado (Dorado/Destacado) */
+.dia-itv.active {
+    background-color: #e0a800; 
+    border-color: #e0a800;
+    color: #000;
+    font-weight: bold;
+}
+
+.dia-nombre {
+    display: block;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+.dia-numero {
+    display: block;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 5px;
+}
 /* Estilo para la dirección */
 .contacto .direccion {
     text-align: left;

@@ -87,6 +87,7 @@ def fotos():
 
 
 # app.py (o donde tengas la ruta /contacto)
+# app.py (o tu archivo de rutas)
 @app.route('/contacto')
 def contacto():
     servicios = Servicio.query.all()
@@ -100,20 +101,29 @@ def contacto():
             Cita.fecha >= datetime.now().date()
         ).order_by(Cita.fecha.asc(), Cita.hora.asc()).first()
 
-    # --- Tu lógica de días (se mantiene igual, está muy bien) ---
+    # --- Lógica de días actualizada para 15 días (3 columnas x 5 filas) ---
     dias_es = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
     meses_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    
     dias_disponibles = []
-    for i in range(12):
+    
+    # CAMBIO 1: Ampliamos el rango de búsqueda a 30 días vista
+    for i in range(30): 
         fecha = datetime.now() + timedelta(days=i)
-        if fecha.weekday() == 6: continue
+        
+        # Si es domingo (índice 6), lo saltamos
+        if fecha.weekday() == 6: 
+            continue 
+            
         dias_disponibles.append({
             'valor': fecha.strftime('%Y-%m-%d'),
             'texto': f"{dias_es[fecha.weekday()]}, {fecha.day} {meses_es[fecha.month - 1]}"
         })
-        if len(dias_disponibles) == 10: break
+        
+        # CAMBIO 2: Detenemos el bucle al conseguir exactamente 15 días hábiles
+        if len(dias_disponibles) == 15: 
+            break
     
-    # IMPORTANTE: Pasamos 'proxima_cita' al template
     return render_template('contacto.html', 
                            servicios=servicios, 
                            dias=dias_disponibles, 
