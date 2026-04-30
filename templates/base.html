@@ -7,22 +7,10 @@
     <title>{% block title %}{{ web.nombre_negocio }}{% endblock %}</title>
 
     <style>
+        /* Único CSS inline permitido porque inyecta variables dinámicas de Python */
         :root {
-            --color-principal: {
-                    {
-                    config_global.color_principal if config_global else '#d4a373'
-                }
-            }
-
-            ;
-
-            --color-fondo: {
-                    {
-                    config_global.color_fondo if config_global else '#111111'
-                }
-            }
-
-            ;
+            --color-principal: {{ config_global.color_principal if config_global else '#d4a373' }};
+            --color-fondo: {{ config_global.color_fondo if config_global else '#111111' }};
         }
 
         body {
@@ -32,13 +20,12 @@
         .btn-propio {
             background-color: var(--color-principal);
         }
-
-        /* Usa estas variables en todo tu CSS */
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.jpeg') }}">
 
+    <!-- Hoja de estilos externa separada -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#d4a373">
@@ -49,8 +36,13 @@
 
     <header>
         <div class="header-content">
-            <img src="{{ url_for('static', filename='img/favicon1.jpeg') }}" alt="Logo" class="logo">
-            <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="Logo" class="logo">
+            {# Condición: Mostrar favicon1.jpeg SOLO si estamos en la ruta 'index' #}
+            {% if request.endpoint == 'index' %}
+            <img src="{{ url_for('static', filename='img/favicon1.jpeg') }}" alt="Logo Principal" class="logo">
+            {% endif %}
+            
+            {# Este logo se mantiene visible en todas las páginas #}
+            <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="Logo Secundario" class="logo">
         </div>
         <nav>
             <ul>
@@ -96,12 +88,11 @@
         </nav>
     </header>
 
-    {# Sección para mensajes flash (errores, avisos de login, etc) #}
+    {# Sección para mensajes flash #}
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-messages">
         {% for category, message in messages %}
-        {# Añadimos la categoría como clase CSS y el filtro |safe #}
         <div class="flash-item {{ category }}">
             {{ message|safe }}
         </div>
@@ -123,9 +114,12 @@
         </div>
     </footer>
 
+    <!-- Scripts separados -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
     {% if request.path == '/contacto' %}
-    <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>´
+    <!-- Corregida la tilde suelta que había al final de esta línea -->
+    <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
     {% endif %}
 
     <script>
