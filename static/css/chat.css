@@ -1,0 +1,143 @@
+/* Contenedor principal */
+#chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+/* Botón flotante */
+#chatbot-toggle-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #333; /* Ajusta al color corporativo de tu web */
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+#chatbot-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Ventana del chat */
+#chatbot-window {
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.oculto {
+    display: none !important;
+}
+
+/* Cabecera */
+#chatbot-header {
+    background-color: #333; /* Ajusta al color corporativo */
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+#close-chat-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Área de mensajes */
+#chatbot-messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+
+.mensaje {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.mensaje.bot {
+    background-color: #e2e8f0;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+.mensaje.usuario {
+    background-color: #333; /* Color corporativo */
+    color: white;
+    align-self: flex-end;
+    margin-left: auto;
+    border-bottom-right-radius: 0;
+}
+
+/* Input y botón de enviar */
+#chatbot-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    background: white;
+}
+
+#chat-input-field {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 15px;
+    outline: none;
+}
+
+#send-chat-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* Estilos para los enlaces dentro del chat en static/css/chat.css */
+.mensaje a {
+    color: #ffd700; /* Un color dorado que resalte sobre el fondo oscuro */
+    text-decoration: underline;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.mensaje a:hover {
+    color: #ffffff;
+}
+
+/* Si quieres que el enlace parezca un botón dentro del chat */
+.mensaje.bot a {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: #333;
+    border-radius: 5px;
+    text-decoration: none;
+    border: 1px solid #ffd700;
+}

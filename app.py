@@ -5,6 +5,7 @@ from flask_login import LoginManager, current_user
 from flask_bcrypt import Bcrypt
 from routes.admin import admin_bp
 from routes.auth import auth_bp
+from routes.ia_routes import ia_bp
 
 from datetime import datetime, timedelta
 
@@ -12,7 +13,10 @@ from routes.citas import citas_bp
 
 import json
 
+from dotenv import load_dotenv
 
+# Cargar variables de entorno antes de iniciar Flask
+load_dotenv()
 
 
 
@@ -28,6 +32,7 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Límite de 20MB
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(ia_bp)
 
 
 # 3. Inicializamos extensiones con la app ya creada

@@ -37,6 +37,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.jpeg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
 
     <!-- Hoja de estilos externa separada -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -128,6 +129,33 @@
             </a>
         </div>
     </footer>
+
+    <!-- ESTRUCTURA DEL CHATBOT (Añadir antes de cerrar </body>) -->
+    <div id="chatbot-container">
+        <!-- Ventana del chat (Oculta por defecto) -->
+        <div id="chatbot-window" class="oculto">
+            <div id="chatbot-header">
+                <span>💈 Asistente Virtual</span>
+                <button id="close-chat-btn">&times;</button>
+            </div>
+            <div id="chatbot-messages" id="chat-box">
+                <div class="mensaje bot">¡Hola! Soy el asistente experto de Parra-Barber. ¿En qué puedo ayudarte hoy?
+                </div>
+            </div>
+            <div id="chatbot-input">
+                <input type="text" id="chat-input-field" placeholder="Escribe tu duda aquí...">
+                <button id="send-chat-btn">
+                    <i class="fas fa-paper-plane"></i> <!-- Si usas FontAwesome -->
+                </button>
+            </div>
+        </div>
+
+        <!-- Botón flotante -->
+        <button id="chatbot-toggle-btn">💬</button>
+    </div>
+
+    <!-- Enlace al archivo JavaScript -->
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 
     <!-- Scripts separados -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
