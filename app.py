@@ -16,8 +16,13 @@ import json
 from dotenv import load_dotenv
 
 # Cargar variables de entorno antes de iniciar Flask
+# Forzamos la carga del .env usando una ruta absoluta profesional
+base_dir = Path(__file__).resolve().parent
 load_dotenv()
-
+if not os.getenv("GROQ_API_KEY"):
+    print("❌ ERROR CRÍTICO: La clave de la IA no se ha cargado. Revisa el archivo .env")
+else:
+    print("✅ IA de Parra-Barber: Clave configurada correctamente.")
 
 
 
