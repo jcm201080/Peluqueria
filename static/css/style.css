@@ -20,12 +20,12 @@ header {
     align-items: center;
     justify-content: center;
     /* Eliminamos el fondo negro sólido para evitar el bloque oscuro al cargar */
-    background-color: #222; 
+    background-color: #222;
 }
 
 /* Contenedor del título para que siempre sea legible */
 header h1 {
-    background-color: rgba(0, 0, 0, 0.6); 
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 15px 25px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -33,10 +33,13 @@ header h1 {
 }
 
 nav {
-    margin-left: 20px; /* Mueve el menú más a la derecha */
+    margin-left: 20px;
+    /* Mueve el menú más a la derecha */
     margin-right: 50px;
-    width: 100%; /* Hacer que el nav ocupe todo el ancho disponible */
-    text-align: center; /* Centra el contenido del nav */
+    width: 100%;
+    /* Hacer que el nav ocupe todo el ancho disponible */
+    text-align: center;
+    /* Centra el contenido del nav */
 }
 
 nav ul {
@@ -45,7 +48,8 @@ nav ul {
 }
 
 nav ul li {
-    display: inline-block; /* Hace que los elementos del menú se comporten como bloques pero en línea */
+    display: inline-block;
+    /* Hace que los elementos del menú se comporten como bloques pero en línea */
     margin: 0 15px;
 }
 
@@ -60,13 +64,17 @@ nav ul li a.active {
     color: #d4a373 !important;
     font-weight: bold;
 }
+
 /* Estilo del logo */
 .logo {
     display: block;
-    margin: 10px auto; /* Centrar y dar espacio */
-    max-width: 140px; /* Reduce el tamaño del logo */
+    margin: 10px auto;
+    /* Centrar y dar espacio */
+    max-width: 140px;
+    /* Reduce el tamaño del logo */
     height: auto;
-    border-radius: 15px; /* Bordes redondeados */
+    border-radius: 15px;
+    /* Bordes redondeados */
 }
 
 #contenido {
@@ -87,44 +95,68 @@ footer {
 /* Media Query para pantallas pequeñas */
 @media (max-width: 768px) {
     header {
-        flex-direction: column; /* Coloca los elementos de header en columna */
-        height: auto; /* Ajusta la altura del header para pantallas pequeñas */
+        flex-direction: column;
+        /* Coloca los elementos de header en columna */
+        height: auto;
+        /* Ajusta la altura del header para pantallas pequeñas */
     }
 
     header h1 {
-        margin-bottom: 10px; /* Menos espacio entre el título y el logo */
+        margin-bottom: 10px;
+        /* Menos espacio entre el título y el logo */
     }
 
     .logo {
-        margin: 20px auto; /* Centrar el logo con más espacio */
-        max-width: 180px; /* Reducir el tamaño del logo */
+        margin: 20px auto;
+        /* Centrar el logo con más espacio */
+        max-width: 180px;
+        /* Reducir el tamaño del logo */
     }
 
     nav {
-        width: 100%; /* Hacer que el nav ocupe el ancho completo */
-        text-align: center; /* Centrar el menú */
-        margin: 0; /* Eliminar márgenes */
+        width: 100%;
+        /* Hacer que el nav ocupe el ancho completo */
+        text-align: center;
+        /* Centrar el menú */
+        margin: 0;
+        /* Eliminar márgenes */
     }
 
     nav ul {
-        display: block; /* Cambiar a bloque para apilar los elementos */
+        display: block;
+        /* Cambiar a bloque para apilar los elementos */
         margin: 0;
         padding: 0;
     }
 
     nav ul li {
-        display: block; /* Cada enlace será un bloque en vez de en línea */
-        margin: 10px 0; /* Espaciado entre los elementos del menú */
+        display: block;
+        /* Cada enlace será un bloque en vez de en línea */
+        margin: 10px 0;
+        /* Espaciado entre los elementos del menú */
     }
 }
 
+/*flas*/
+.flash-messages {
+    color: white;
 
+}
+
+.maximo {
+    display: flex;
+    justify-content: center;
+    /* Centrado horizontal */
+    align-items: center;
+}
 
 /*contacto*/
 .contacto {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
-    gap: 20px; /* Espacio entre columnas */
+    grid-template-columns: 1fr 1fr;
+    /* Dos columnas iguales */
+    gap: 20px;
+    /* Espacio entre columnas */
     align-items: center;
     justify-content: center;
     max-width: 80%;
@@ -132,6 +164,7 @@ footer {
     padding: 20px;
     margin-bottom: 150px;
 }
+
 /* Estilos del Buscador de Citas */
 .buscador-citas {
     background: rgba(255, 255, 255, 0.05);
@@ -144,7 +177,8 @@ footer {
 .card-cita {
     background: #222;
     padding: 15px;
-    border-left: 4px solid #d4af37; /* Color dorado */
+    border-left: 4px solid #d4af37;
+    /* Color dorado */
     margin-top: 10px;
     border-radius: 5px;
 }
@@ -168,17 +202,19 @@ footer {
     font-weight: bold;
     cursor: pointer;
 }
+
 /* Contenedor del calendario tipo ITV */
 /* ESTILOS PARA EL CALENDARIO DE CITAS */
 /* ESTILOS PARA EL CALENDARIO DE CITAS */
 .calendario-grid {
     display: grid;
     /* Obligamos a que sean exactamente 3 columnas del mismo ancho */
-    grid-template-columns: repeat(5, 1fr); 
-    gap: 12px; /* Un poco de separación respirable entre los botones */
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    /* Un poco de separación respirable entre los botones */
     margin-bottom: 20px;
     /* Opcional: si en pantallas gigantes se ven muy anchos, puedes limitar el ancho máximo del contenedor */
-    max-width: 100%; 
+    max-width: 100%;
 }
 
 .dia-itv {
@@ -188,7 +224,8 @@ footer {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
-    background-color: #2c2c2c; /* Color de fondo base para tu diseño oscuro */
+    background-color: #2c2c2c;
+    /* Color de fondo base para tu diseño oscuro */
     color: #fff;
 }
 
@@ -208,19 +245,22 @@ footer {
     cursor: pointer;
     transition: all 0.2s ease;
     background-color: transparent;
-    border: 1px solid #28a745; /* Borde verde por defecto para horas libres */
-    color: #fff; 
+    border: 1px solid #28a745;
+    /* Borde verde por defecto para horas libres */
+    color: #fff;
     font-weight: bold;
     font-size: 0.95em;
 }
 
 .hora-btn:hover {
-    background-color: rgba(40, 167, 69, 0.2); /* Fondo verde semitransparente al pasar el ratón */
+    background-color: rgba(40, 167, 69, 0.2);
+    /* Fondo verde semitransparente al pasar el ratón */
 }
 
 /* Estado de la hora cuando el usuario hace clic */
 .hora-btn.active {
-    background-color: #e0a800; /* Amarillo/Dorado a juego con el día seleccionado */
+    background-color: #e0a800;
+    /* Amarillo/Dorado a juego con el día seleccionado */
     border-color: #e0a800;
     color: #000;
 }
@@ -247,7 +287,7 @@ footer {
 
 /* Estado: Seleccionado (Dorado/Destacado) */
 .dia-itv.active {
-    background-color: #e0a800; 
+    background-color: #e0a800;
     border-color: #e0a800;
     color: #000;
     font-weight: bold;
@@ -265,11 +305,13 @@ footer {
     font-weight: bold;
     margin-top: 5px;
 }
+
 /* Estilo para la dirección */
 .contacto .direccion {
     text-align: left;
     font-size: 18px;
-    min-width: 300px; /* Para que no se haga muy pequeña */
+    min-width: 300px;
+    /* Para que no se haga muy pequeña */
 }
 
 /* Estilo para el mapa */
@@ -279,14 +321,15 @@ footer {
     border-radius: 10px;
 }
 
-.tlfno{
+.tlfno {
     color: white;
 }
 
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {
-        grid-template-columns: 1fr; /* Una sola columna en móviles */
+        grid-template-columns: 1fr;
+        /* Una sola columna en móviles */
         text-align: center;
     }
 
@@ -306,7 +349,8 @@ footer {
     flex: 1;
     text-align: left;
     font-size: 18px;
-    min-width: 300px; /* Evita que se haga demasiado pequeña */
+    min-width: 300px;
+    /* Evita que se haga demasiado pequeña */
 }
 
 /* Estilo para el mapa */
@@ -324,13 +368,15 @@ footer {
     flex-wrap: wrap;
     gap: 20px;
     padding: 20px;
-    color: white; /* Para que se lea sobre el fondo oscuro */
+    color: white;
+    /* Para que se lea sobre el fondo oscuro */
 }
 
 .direccion {
     flex: 1;
     min-width: 300px;
-    background: rgba(0, 0, 0, 0.7); /* Fondo semitransparente para legibilidad */
+    background: rgba(0, 0, 0, 0.7);
+    /* Fondo semitransparente para legibilidad */
     padding: 20px;
     border-radius: 10px;
 }
@@ -348,14 +394,16 @@ footer {
     margin-bottom: 5px;
 }
 
-.form-group input, .form-group select {
-    
+.form-group input,
+.form-group select {
+
     max-width: 90%;
     align-items: center;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    color: #333; /* Texto oscuro dentro de los inputs */
+    color: #333;
+    /* Texto oscuro dentro de los inputs */
 }
 
 .btn-reservar {
@@ -372,49 +420,63 @@ footer {
 /* Contenedor principal del aviso */
 .login-prompt {
     margin: 20px 0;
-    text-align: center; /* O left, según tu diseño */
+    text-align: center;
+    /* O left, según tu diseño */
 }
 
 .login-prompt p {
-    color: #ffffff; /* Texto normal en blanco */
-    font-size: 1.1rem; /* Un poco más grande que el texto base */
+    color: #ffffff;
+    /* Texto normal en blanco */
+    font-size: 1.1rem;
+    /* Un poco más grande que el texto base */
 }
 
 /* El enlace destacado "Inicia sesión" */
 .btn-highlight {
-    color: #ffcc00; /* Un tono dorado/amarillo para resaltar sobre el blanco */
-    font-size: 1.4rem; /* Letra notablemente más grande */
+    color: #ffcc00;
+    /* Un tono dorado/amarillo para resaltar sobre el blanco */
+    font-size: 1.4rem;
+    /* Letra notablemente más grande */
     font-weight: bold;
     text-decoration: none;
     padding: 5px 10px;
-    border-bottom: 2px solid #ffcc00; /* Subrayado elegante */
-    transition: all 0.3s ease; /* Animación suave */
+    border-bottom: 2px solid #ffcc00;
+    /* Subrayado elegante */
+    transition: all 0.3s ease;
+    /* Animación suave */
     display: inline-block;
 }
 
 /* Efecto al pasar el ratón (Hover) */
 .btn-highlight:hover {
     color: #ffffff;
-    background-color: #ffcc00; /* Se convierte en un botón sólido */
+    background-color: #ffcc00;
+    /* Se convierte en un botón sólido */
     border-radius: 5px;
-    transform: scale(1.1); /* Crece un poquito */
+    transform: scale(1.1);
+    /* Crece un poquito */
     box-shadow: 0px 4px 15px rgba(255, 204, 0, 0.4);
 }
+
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {
-        flex-direction: column; /* Cambia a diseño en columna */
+        flex-direction: column;
+        /* Cambia a diseño en columna */
         text-align: center;
     }
 
     .contacto .direccion {
-        text-align: center; /* Centra el texto en pantallas pequeñas */
+        text-align: center;
+        /* Centra el texto en pantallas pequeñas */
     }
 
     .contacto iframe {
-        width: 100%; /* Ajusta el mapa al ancho completo */
+        width: 100%;
+        /* Ajusta el mapa al ancho completo */
     }
 }
+
 /*Pagina index o principal*/
 /* Sección Hero */
 .hero-section {
@@ -440,38 +502,47 @@ footer {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: flex-end;    /* Empuja el botón al fondo */
-    justify-content: center;  /* Lo mantiene centrado horizontalmente */
-    padding-bottom: 30px;     /* Espacio desde el borde inferior de la foto */
-    background: rgba(0, 0, 0, 0.05); /* Oscurecimiento casi invisible */
+    align-items: flex-end;
+    /* Empuja el botón al fondo */
+    justify-content: center;
+    /* Lo mantiene centrado horizontalmente */
+    padding-bottom: 30px;
+    /* Espacio desde el borde inferior de la foto */
+    background: rgba(0, 0, 0, 0.05);
+    /* Oscurecimiento casi invisible */
 }
 
 /* Botón más estilizado y pequeño */
 .cta-button {
     background-color: #d4af37;
     color: #fff;
-    padding: 10px 22px;       /* Tamaño más contenido */
+    padding: 10px 22px;
+    /* Tamaño más contenido */
     text-decoration: none;
     font-weight: bold;
     border-radius: 4px;
-    font-size: 0.95rem;       /* Fuente más pequeña y elegante */
+    font-size: 0.95rem;
+    /* Fuente más pequeña y elegante */
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .cta-button:hover {
-    transform: translateY(-2px); /* Pequeña elevación */
+    transform: translateY(-2px);
+    /* Pequeña elevación */
     background-color: #bfa030;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
 /* Ajuste para móviles: un poco más compacto aún */
 @media (max-width: 768px) {
     .hero-overlay {
-        padding-bottom: 15px; /* Menos espacio en pantallas pequeñas */
+        padding-bottom: 15px;
+        /* Menos espacio en pantallas pequeñas */
     }
+
     .cta-button {
         font-size: 0.85rem;
         padding: 8px 18px;
@@ -491,9 +562,10 @@ footer {
     max-width: 700px;
     margin: 40px auto 150px auto;
     border-radius: 15px;
-    overflow: hidden; /* Para que el border-radius corte la imagen */
+    overflow: hidden;
+    /* Para que el border-radius corte la imagen */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    
+
     /* Configuración de la imagen de fondo */
     background-image: url('../img/fondo2.jpeg');
     background-size: cover;
@@ -503,7 +575,8 @@ footer {
 
 /* Capa oscura/translúcida para legibilidad */
 .overlay-precios {
-    background: rgba(214, 204, 191, 0.85); /* El color original #D2B48C con transparencia */
+    background: rgba(214, 204, 191, 0.85);
+    /* El color original #D2B48C con transparencia */
     padding: 40px;
     height: 100%;
 }
@@ -518,7 +591,7 @@ footer {
 
 .cuadro-precios .blanco {
     color: #ffffff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .cuadro-precios .negro {
@@ -568,9 +641,11 @@ footer {
     .cuadro-precios {
         width: 100%;
     }
+
     .overlay-precios {
         padding: 20px;
     }
+
     .lista-servicios li {
         font-size: 1rem;
     }
@@ -589,37 +664,46 @@ footer {
 .foto {
     position: relative;
     width: 100%;
-    height: 250px; /* Establece una altura fija para las fotos */
-    overflow: hidden; /* Asegura que el contenido que sobresalga sea ocultado */
+    height: 250px;
+    /* Establece una altura fija para las fotos */
+    overflow: hidden;
+    /* Asegura que el contenido que sobresalga sea ocultado */
     border-radius: 10px;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 .foto img {
     width: 100%;
-    height: 100%; /* Las imágenes ocuparán el 100% de la altura de su contenedor */
-    object-fit: cover; /* Asegura que la imagen cubra el área de su contenedor sin distorsionarse */
-    cursor: pointer; /* Indicamos que es una imagen clickeable */
+    height: 100%;
+    /* Las imágenes ocuparán el 100% de la altura de su contenedor */
+    object-fit: cover;
+    /* Asegura que la imagen cubra el área de su contenedor sin distorsionarse */
+    cursor: pointer;
+    /* Indicamos que es una imagen clickeable */
 }
 
 /* Modal */
 .modal {
-    display: none; /* Oculto por defecto */
+    display: none;
+    /* Oculto por defecto */
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro semi-transparente */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Fondo oscuro semi-transparente */
     justify-content: center;
     align-items: center;
 }
 
 .imagen-ampliada {
-    max-width: 80%; /* Limita el tamaño máximo de la imagen */
+    max-width: 80%;
+    /* Limita el tamaño máximo de la imagen */
     max-height: 80%;
-    object-fit: contain; /* Hace que la imagen se ajuste sin distorsión */
+    object-fit: contain;
+    /* Hace que la imagen se ajuste sin distorsión */
 }
 
 .cerrar {
@@ -634,7 +718,8 @@ footer {
 /* Solo mostrar el modal en pantallas grandes */
 @media (min-width: 768px) {
     .modal.mostrar {
-        display: flex; /* Solo se muestra si tiene la clase "mostrar" */
+        display: flex;
+        /* Solo se muestra si tiene la clase "mostrar" */
     }
 }
 
@@ -647,7 +732,8 @@ footer {
     text-decoration: none;
     font-size: 18px;
     padding: 10px 15px;
-    background: #8B4513; /* Marrón */
+    background: #8B4513;
+    /* Marrón */
     color: white;
     border-radius: 5px;
     margin: 0 10px;
@@ -656,6 +742,7 @@ footer {
 .flecha:hover {
     background: #A0522D;
 }
+
 /* Como funciona:
  Carga automática: Solo tienes que meter imágenes en static/img/fotos/ y se mostrarán.
 ✅ Paginación: Muestra 10 imágenes por página y navega con flechas.
@@ -670,7 +757,8 @@ footer {
 .admin-upload-section {
     margin-bottom: 30px;
     padding: 20px;
-    border: 2px dashed #8B4513; /* Usamos tu color marrón */
+    border: 2px dashed #8B4513;
+    /* Usamos tu color marrón */
     background-color: rgba(139, 69, 19, 0.1);
     border-radius: 10px;
 }
@@ -692,9 +780,11 @@ footer {
     justify-content: space-between;
     padding: 8px;
     box-sizing: border-box;
-    opacity: 0; /* Oculto por defecto */
+    opacity: 0;
+    /* Oculto por defecto */
     transition: opacity 0.3s ease;
-    pointer-events: none; /* No molesta al clickar la foto */
+    pointer-events: none;
+    /* No molesta al clickar la foto */
 }
 
 /* En móvil, que se vea siempre un poco; en PC, al pasar el ratón */
@@ -706,8 +796,9 @@ footer {
 
 @media (max-width: 768px) {
     .admin-controls-overlay {
-        opacity: 1; /* En móvil siempre visible para facilitar la gestión */
-        background: linear-gradient(to bottom, rgba(0,0,0,0.7) 30%, transparent, rgba(0,0,0,0.7) 100%);
+        opacity: 1;
+        /* En móvil siempre visible para facilitar la gestión */
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 30%, transparent, rgba(0, 0, 0, 0.7) 100%);
         pointer-events: auto;
     }
 }
@@ -723,7 +814,7 @@ footer {
     cursor: pointer;
     font-weight: bold;
     font-size: 18px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .form-modificar {
@@ -755,7 +846,7 @@ footer {
     font-weight: bold;
 }
 
-.flash-item{
+.flash-item {
     color: rgb(206, 174, 174);
     font-size: 35px;
 }
@@ -764,17 +855,22 @@ footer {
 .main-footer {
     background-color: #1a1a1a;
     color: #ffffff;
-    padding: 15px 0; /* Reducido de 30px a 15px */
+    padding: 15px 0;
+    /* Reducido de 30px a 15px */
     color: #d4a373;
-    margin-top: 30px; /* Reducido de 50px a 30px */
+    margin-top: 30px;
+    /* Reducido de 50px a 30px */
 }
 
 .footer-content {
     display: flex;
-    justify-content: center; /* Centrado base */
+    justify-content: center;
+    /* Centrado base */
     align-items: center;
-    gap: 30px; /* Espacio horizontal entre texto e Instagram */
-    flex-wrap: wrap; /* Para que baje en móviles si no cabe */
+    gap: 30px;
+    /* Espacio horizontal entre texto e Instagram */
+    flex-wrap: wrap;
+    /* Para que baje en móviles si no cabe */
 }
 
 .footer-content p {
@@ -800,16 +896,20 @@ footer {
 /* --- AJUSTES PARA MÓVIL --- */
 @media (max-width: 600px) {
     .main-footer {
-        padding: 10px 0; /* Aún más pequeño en móvil */
+        padding: 10px 0;
+        /* Aún más pequeño en móvil */
     }
 
     .footer-content {
-        flex-direction: column; /* Uno encima de otro pero pegaditos */
-        gap: 5px; /* Casi sin espacio entre las dos líneas */
+        flex-direction: column;
+        /* Uno encima de otro pero pegaditos */
+        gap: 5px;
+        /* Casi sin espacio entre las dos líneas */
     }
 
     .instagram-link {
-        padding: 4px 0; /* Menos espacio alrededor del link */
+        padding: 4px 0;
+        /* Menos espacio alrededor del link */
     }
 }
 
@@ -822,7 +922,7 @@ footer {
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .ticket-header {
@@ -854,15 +954,17 @@ footer {
 /* Alerta */
 
 .alerta-confirmacion {
-    background-color: #d4edda; /* Verde clarito */
-    color: #155724;            /* Verde oscuro */
+    background-color: #d4edda;
+    /* Verde clarito */
+    color: #155724;
+    /* Verde oscuro */
     border: 2px solid #c3e6cb;
     padding: 20px;
     margin: 20px auto;
     max-width: 600px;
     border-radius: 8px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .alerta-contenido {

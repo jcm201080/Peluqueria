@@ -9,8 +9,21 @@
     <style>
         /* Único CSS inline permitido porque inyecta variables dinámicas de Python */
         :root {
-            --color-principal: {{ config_global.color_principal if config_global else '#d4a373' }};
-            --color-fondo: {{ config_global.color_fondo if config_global else '#111111' }};
+            --color-principal: {
+                    {
+                    config_global.color_principal if config_global else '#d4a373'
+                }
+            }
+
+            ;
+
+            --color-fondo: {
+                    {
+                    config_global.color_fondo if config_global else '#111111'
+                }
+            }
+
+            ;
         }
 
         body {
@@ -40,7 +53,7 @@
             {% if request.endpoint == 'index' %}
             <img src="{{ url_for('static', filename='img/favicon1.jpeg') }}" alt="Logo Principal" class="logo">
             {% endif %}
-            
+
             {# Este logo se mantiene visible en todas las páginas #}
             <img src="{{ url_for('static', filename='img/logo.jpeg') }}" alt="Logo Secundario" class="logo">
         </div>
@@ -91,12 +104,14 @@
     {# Sección para mensajes flash #}
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div class="flash-messages">
-        {% for category, message in messages %}
-        <div class="flash-item {{ category }}">
-            {{ message|safe }}
+    <div class="buscador-citas maximo">
+        <div class="flash-messages card-cita">
+            {% for category, message in messages %}
+            <div class="flash-item {{ category }}">
+                {{ message|safe }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
     {% endif %}
     {% endwith %}
@@ -116,7 +131,7 @@
 
     <!-- Scripts separados -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    
+
     {% if request.path == '/contacto' %}
     <!-- Corregida la tilde suelta que había al final de esta línea -->
     <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
