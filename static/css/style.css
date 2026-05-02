@@ -75,14 +75,19 @@ nav ul li a.active {
 }
 
 /* ==========================================================================
-   PÁGINA PRINCIPAL (INDEX)
+   PÁGINA PRINCIPAL (INDEX) - HERO SECTION UNIFICADA
    ========================================================================== */
+
 .hero-section {
     position: relative;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     overflow: hidden;
+    /* Apilamos elementos (imagen y botón) en columna */
+    display: flex;
+    flex-direction: column;
+    background-color: #1a1a1a; 
 }
 
 .hero-image {
@@ -93,30 +98,34 @@ nav ul li a.active {
 }
 
 .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     width: 100%;
-    height: 100%;
+    /* Centramos el contenido dentro de la franja inferior */
     display: flex;
-    align-items: flex-end;
     justify-content: center;
-    padding-bottom: 30px;
-    background: rgba(0, 0, 0, 0.05);
+    align-items: center;
+    padding: 20px 0;
+    background: transparent;
 }
 
 .cta-button {
     background-color: #d4af37;
     color: #fff;
-    padding: 10px 22px;
+    /* Unificamos padding y tamaño de fuente */
+    padding: 12px 24px;
+    font-size: 14px;
     text-decoration: none;
     font-weight: bold;
     border-radius: 4px;
-    font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    /* Ajustes universales de tamaño y centrado */
+    height: auto;
+    width: 80%;
+    max-width: 300px;
+    box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
 }
 
 .cta-button:hover {
@@ -124,6 +133,19 @@ nav ul li a.active {
     background-color: #bfa030;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
+
+
+/* Quitamos el position absolute para que no pise la imagen */
+.hero-overlay {
+    position: relative;
+    padding: 20px 0;
+    /* Espacio arriba y abajo del botón */
+    background: transparent;
+    align-items: center;
+    /* Centramos el botón */
+}
+
+
 
 /* ==========================================================================
    PÁGINA DE CONTACTO Y RESERVAS
@@ -345,10 +367,30 @@ nav ul li a.active {
     margin-top: 5px;
 }
 
-.dia-itv.disponible { border-color: #28a745; background-color: rgba(40, 167, 69, 0.1); }
-.dia-itv.disponible:hover { background-color: #28a745; color: #fff; }
-.dia-itv.ocupado { border-color: #dc3545; background-color: rgba(220, 53, 69, 0.15); color: #888; cursor: not-allowed; opacity: 0.6; }
-.dia-itv.active { background-color: #e0a800; border-color: #e0a800; color: #000; font-weight: bold; }
+.dia-itv.disponible {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.dia-itv.disponible:hover {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.dia-itv.ocupado {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dia-itv.active {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #000;
+    font-weight: bold;
+}
 
 /* Cuadrícula de Horas */
 .horas-grid {
@@ -371,8 +413,15 @@ nav ul li a.active {
     font-size: 0.95em;
 }
 
-.hora-btn:hover { background-color: rgba(40, 167, 69, 0.2); }
-.hora-btn.active { background-color: #e0a800; border-color: #e0a800; color: #000; }
+.hora-btn:hover {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+
+.hora-btn.active {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #000;
+}
 
 /* ==========================================================================
    LOGIN / PROMPT
@@ -442,10 +491,21 @@ nav ul li a.active {
     letter-spacing: 2px;
 }
 
-.cuadro-precios .blanco { color: #ffffff; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); }
-.cuadro-precios .negro { color: #1a1a1a; }
+.cuadro-precios .blanco {
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-.lista-servicios { list-style: none; padding: 0; margin: 0; }
+.cuadro-precios .negro {
+    color: #1a1a1a;
+}
+
+.lista-servicios {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .lista-servicios li {
     font-size: 1.2rem;
     font-family: 'Arial', sans-serif;
@@ -456,11 +516,27 @@ nav ul li a.active {
     border-bottom: 1px solid rgba(0, 0, 0, 0.15);
     color: #333;
 }
-.lista-servicios li:last-child { border-bottom: none; }
 
-.servicio-nombre { font-weight: bold; text-align: left; }
-.servicio-precio { font-weight: 800; background: rgba(0, 0, 0, 0.05); padding: 5px 12px; border-radius: 5px; }
-.sin-servicios { font-style: italic; color: #666; }
+.lista-servicios li:last-child {
+    border-bottom: none;
+}
+
+.servicio-nombre {
+    font-weight: bold;
+    text-align: left;
+}
+
+.servicio-precio {
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 5px 12px;
+    border-radius: 5px;
+}
+
+.sin-servicios {
+    font-style: italic;
+    color: #666;
+}
 
 /* ==========================================================================
    PÁGINA GALERÍA
@@ -490,7 +566,11 @@ nav ul li a.active {
     cursor: pointer;
 }
 
-.paginacion { text-align: center; margin: 20px 0; }
+.paginacion {
+    text-align: center;
+    margin: 20px 0;
+}
+
 .flecha {
     text-decoration: none;
     font-size: 18px;
@@ -500,7 +580,10 @@ nav ul li a.active {
     border-radius: 5px;
     margin: 0 10px;
 }
-.flecha:hover { background: #A0522D; }
+
+.flecha:hover {
+    background: #A0522D;
+}
 
 /* Modal */
 .modal {
@@ -516,11 +599,24 @@ nav ul li a.active {
     align-items: center;
 }
 
-.imagen-ampliada { max-width: 80%; max-height: 80%; object-fit: contain; }
-.cerrar { position: absolute; top: 10px; right: 10px; font-size: 30px; color: white; cursor: pointer; }
+.imagen-ampliada {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
 
 @media (min-width: 768px) {
-    .modal.mostrar { display: flex; 
+    .modal.mostrar {
+        display: flex;
     }
 }
 
@@ -532,7 +628,11 @@ nav ul li a.active {
     background-color: rgba(139, 69, 19, 0.1);
     border-radius: 10px;
 }
-.admin-upload-section h3 { margin-top: 0; color: #f5a623; }
+
+.admin-upload-section h3 {
+    margin-top: 0;
+    color: #f5a623;
+}
 
 .admin-controls-overlay {
     position: absolute;
@@ -571,16 +671,52 @@ nav ul li a.active {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.form-modificar { background: rgba(0, 0, 0, 0.7); padding: 5px; border-radius: 5px; display: flex; gap: 5px; align-items: center; }
-.input-orden { width: 60px; padding: 4px; border-radius: 3px; border: 1px solid #8B4513; background: #222; color: white; }
-.btn-modificar { background: #f5a623; color: black; border: none; padding: 4px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; font-weight: bold; }
+.form-modificar {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.input-orden {
+    width: 60px;
+    padding: 4px;
+    border-radius: 3px;
+    border: 1px solid #8B4513;
+    background: #222;
+    color: white;
+}
+
+.btn-modificar {
+    background: #f5a623;
+    color: black;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
 
 /* ==========================================================================
    MENSAJES Y ALERTAS (FLASH)
    ========================================================================== */
-.flash-messages { color: white; }
-.maximo { display: flex; justify-content: center; align-items: center; }
-.flash-item { color: rgb(206, 174, 174); font-size: 35px; }
+.flash-messages {
+    color: white;
+}
+
+.maximo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flash-item {
+    color: rgb(206, 174, 174);
+    font-size: 35px;
+}
 
 .alerta-confirmacion {
     background-color: #d4edda;
@@ -593,19 +729,32 @@ nav ul li a.active {
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.alerta-contenido { font-size: 1.1em; line-height: 1.6; }
-.icono-check { font-size: 2em; display: block; margin-bottom: 10px; }
-.alerta-confirmacion strong { font-size: 1.3em; }
+
+.alerta-contenido {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.icono-check {
+    font-size: 2em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.alerta-confirmacion strong {
+    font-size: 1.3em;
+}
 
 /* ==========================================================================
    FOOTER - PROFESIONAL Y FIJO
    ========================================================================== */
 .main-footer {
-    background-color: #1a1a1a; /* Forzamos el color oscuro */
+    background-color: #1a1a1a;
+    /* Forzamos el color oscuro */
     border-top: 1px solid #333;
     padding: 15px 0;
     text-align: center;
-    
+
     /* Fijado abajo */
     position: fixed;
     bottom: 0;
@@ -636,7 +785,8 @@ nav ul li a.active {
     gap: 15px;
 }
 
-.instagram-link, .enlace-valorar {
+.instagram-link,
+.enlace-valorar {
     color: #d4a373;
     text-decoration: none;
     font-weight: 500;
@@ -644,7 +794,8 @@ nav ul li a.active {
     transition: color 0.3s ease;
 }
 
-.instagram-link:hover, .enlace-valorar:hover {
+.instagram-link:hover,
+.enlace-valorar:hover {
     color: #ffffff;
 }
 
@@ -656,18 +807,15 @@ nav ul li a.active {
    AJUSTES MÓVIL (MEDIA QUERY)
    ========================================================================== */
 @media (max-width: 768px) {
+
     /* IMPORTANTE: Añadir padding al body para que el footer no tape el contenido */
     body {
-        padding-bottom: 100px; 
-    }
-
-    .cta-button{
-        height: 3px;
-        font-size: 10px;
+        padding-bottom: 100px;
     }
 
     .footer-content {
-        flex-direction: column; /* Apila elementos */
+        flex-direction: column;
+        /* Apila elementos */
         gap: 8px;
     }
 
@@ -676,17 +824,22 @@ nav ul li a.active {
     }
 
     .footer-content p {
-        font-size: 0.75rem; /* Letra más chica */
+        font-size: 0.75rem;
+        /* Letra más chica */
     }
 
-    .instagram-link, .enlace-valorar {
-        font-size: 0.8rem; /* Letra más chica */
+    .instagram-link,
+    .enlace-valorar {
+        font-size: 0.8rem;
+        /* Letra más chica */
     }
 
     .separador {
-        display: none; /* Quitamos la barra "|" en móvil */
+        display: none;
+        /* Quitamos la barra "|" en móvil */
     }
-    .dia-itv{
+
+    .dia-itv {
         width: 24px;
         height: 40px;
         font-size: 12px;
@@ -695,14 +848,37 @@ nav ul li a.active {
 
 
 @media (max-width: 600px) {
+
     /* Servicios */
-    .cuadro-precios { width: 100%; }
-    .overlay-precios { padding: 20px; }
-    .lista-servicios li { font-size: 1rem; }
+    .cuadro-precios {
+        width: 100%;
+    }
+
+    .overlay-precios {
+        padding: 20px;
+    }
+
+    .lista-servicios li {
+        font-size: 1rem;
+    }
 
     /* Footer */
-    .main-footer { padding: 10px 0; }
-    .footer-content { flex-direction: column; gap: 8px; }
-    .footer-enlaces { font-size: 12px; gap: 8px; }
-    .instagram-link, .enlace-valorar { padding: 4px 0; }
+    .main-footer {
+        padding: 10px 0;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .footer-enlaces {
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .instagram-link,
+    .enlace-valorar {
+        padding: 4px 0;
+    }
 }
