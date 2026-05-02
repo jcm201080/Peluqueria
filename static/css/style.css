@@ -606,6 +606,12 @@ nav ul li a.active {
     margin-top: 30px;
     border-top: 1px solid #333;
     width: 100%;
+    /* --- Magia para fijarlo abajo --- */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Asegura que siempre esté por encima de fotos o textos */
 }
 
 .footer-content {
@@ -690,6 +696,6 @@ nav ul li a.active {
     /* Footer */
     .main-footer { padding: 10px 0; }
     .footer-content { flex-direction: column; gap: 8px; }
-    .footer-enlaces {  gap: 8px; }
+    .footer-enlaces { font-size: 12px; gap: 8px; }
     .instagram-link, .enlace-valorar { padding: 4px 0; }
 }
