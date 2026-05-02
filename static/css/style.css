@@ -661,6 +661,11 @@ nav ul li a.active {
         padding-bottom: 100px; 
     }
 
+    .cta-button{
+        height: 3px;
+        font-size: 10px;
+    }
+
     .footer-content {
         flex-direction: column; /* Apila elementos */
         gap: 8px;

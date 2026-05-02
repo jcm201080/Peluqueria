@@ -266,3 +266,23 @@
     background: #111;
     flex-grow: 1;
 }
+
+/*login*/
+.auth-form {
+    max-width: 400px;
+    margin: 50px auto;
+    color: white;
+}
+
+.forgot-password {
+    margin-top: 10px;
+}
+
+.forgot-password a {
+    color: #d4a373;
+    text-decoration: none; /* Opcional, para que quede más limpio */
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}

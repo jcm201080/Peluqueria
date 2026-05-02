@@ -65,16 +65,16 @@
                         class="{{ 'active' if request.endpoint == 'index' else '' }}">Inicio</a>
                 </li>
                 <li>
+                    <a href="{{ url_for('contacto') }}"
+                        class="{{ 'active' if request.endpoint == 'contacto' else '' }}">Contacto/Citas</a>
+                </li>
+                <li>
                     <a href="{{ url_for('servicios') }}"
                         class="{{ 'active' if request.endpoint == 'servicios' else '' }}">Servicios</a>
                 </li>
                 <li>
                     <a href="{{ url_for('fotos') }}"
                         class="{{ 'active' if request.endpoint == 'fotos' else '' }}">Fotos</a>
-                </li>
-                <li>
-                    <a href="{{ url_for('contacto') }}"
-                        class="{{ 'active' if request.endpoint == 'contacto' else '' }}">Contacto/Citas</a>
                 </li>
 
                 {# Lógica de autenticación #}
