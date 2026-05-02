@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/valorar.css') }}">
+
+<section class="seccion-valoracion">
+    <div class="contenedor-dos-columnas">
+        
+        <!-- Columna Izquierda: Estadísticas -->
+        <div class="estadisticas-valoracion">
+            <h2>Nota Media Global</h2>
+            <p class="texto-votos">Basado en {{ stats.total }} valoraciones de clientes reales.</p>
+            
+            <div class="stat-item">
+                <span>✂️ Servicio y Corte</span>
+                <span class="nota-numero">⭐ {{ stats.servicio }} / 5</span>
+            </div>
+            
+            <div class="stat-item">
+                <span>📱 Aplicación Web</span>
+                <span class="nota-numero">⭐ {{ stats.app }} / 5</span>
+            </div>
+            
+            <div class="stat-item">
+                <span>📅 Facilidad de Reserva</span>
+                <span class="nota-numero">⭐ {{ stats.reserva }} / 5</span>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Formulario (El que ya tenías) -->
+        <div class="tarjeta-valoracion">
+            <h2>¿Qué tal tu experiencia?</h2>
+            <p>3 preguntas rápidas para seguir mejorando para ti.</p>
+            
+            <form action="{{ url_for('views.valorar') }}" method="POST">
+                <!-- Pregunta 1: Servicio -->
+                <div class="pregunta-valoracion">
+                    <label>✂️ ¿Cómo valoras el corte y el servicio?</label>
+                    <div class="clasificacion-estrellas">
+                        <input type="radio" id="s5" name="estrellas_servicio" value="5" required/><label for="s5">★</label>
+                        <input type="radio" id="s4" name="estrellas_servicio" value="4" /><label for="s4">★</label>
+                        <input type="radio" id="s3" name="estrellas_servicio" value="3" /><label for="s3">★</label>
+                        <input type="radio" id="s2" name="estrellas_servicio" value="2" /><label for="s2">★</label>
+                        <input type="radio" id="s1" name="estrellas_servicio" value="1" /><label for="s1">★</label>
+                    </div>
+                </div>
+
+                <!-- Pregunta 2: Diseño de la web -->
+                <div class="pregunta-valoracion">
+                    <label>📱 ¿Qué te parece nuestra aplicación web?</label>
+                    <div class="clasificacion-estrellas">
+                        <input type="radio" id="a5" name="estrellas_app" value="5" required/><label for="a5">★</label>
+                        <input type="radio" id="a4" name="estrellas_app" value="4" /><label for="a4">★</label>
+                        <input type="radio" id="a3" name="estrellas_app" value="3" /><label for="a3">★</label>
+                        <input type="radio" id="a2" name="estrellas_app" value="2" /><label for="a2">★</label>
+                        <input type="radio" id="a1" name="estrellas_app" value="1" /><label for="a1">★</label>
+                    </div>
+                </div>
+
+                <!-- Pregunta 3: Facilidad de reserva -->
+                <div class="pregunta-valoracion">
+                    <label>📅 ¿Fue fácil reservar tu cita?</label>
+                    <div class="clasificacion-estrellas">
+                        <input type="radio" id="r5" name="estrellas_reserva" value="5" required/><label for="r5">★</label>
+                        <input type="radio" id="r4" name="estrellas_reserva" value="4" /><label for="r4">★</label>
+                        <input type="radio" id="r3" name="estrellas_reserva" value="3" /><label for="r3">★</label>
+                        <input type="radio" id="r2" name="estrellas_reserva" value="2" /><label for="r2">★</label>
+                        <input type="radio" id="r1" name="estrellas_reserva" value="1" /><label for="r1">★</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <textarea name="comentario" class="form-control text-area-valoracion" placeholder="Déjanos un comentario extra (opcional)..." rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-reservar">Enviar Valoración</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -11,12 +11,13 @@
     {% set active_tab = request.args.get('tab', 'citas') %}
     <nav class="admin-tabs">
         <!-- NUEVA PESTAÑA V2 AÑADIDA -->
+         <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
+            Citas</a>
         <a href="{{ url_for('admin.gestion_diaria_v2') }}"
            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' else '' }}">
            🚀 Gestión V2
         </a>
-        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
-            Citas</a>
+        
         <a href="{{ url_for('admin.gestion_diaria') }}"
             class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' }}">⚡ Gestión Diaria</a>
 
@@ -28,9 +29,13 @@
             class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">
             👥 Clientes
         </a>
-        <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' }}">
-            ⚙️ Ajustes
+        <a href="{{ url_for('admin.ver_valoraciones') }}" 
+           class="tab-link {{ 'active' if request.endpoint == 'admin.ver_valoraciones' else '' }}">
+            ⭐ Valoraciones
         </a>
+        <!-- <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' }}">
+            ⚙️ Ajustes
+        </a> -->
     </nav>
 
     <p style="text-align: center;">Bienvenido, <strong>{{ current_user.nombre }}</strong></p>

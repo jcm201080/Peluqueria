@@ -3,13 +3,14 @@ import json
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, request
 from flask_login import login_required, current_user
 # Modifica tu línea de imports así:
-from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario, Usuario
+from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario, Usuario, Valoracion
 # Asegúrate de que ExcepcionHorario esté en esa lista ↑
 from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
 from routes.citas import generar_franjas
 from datetime import datetime, timedelta
+from sqlalchemy import func # Necesario para hacer la media (AVG)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -627,3 +628,28 @@ def gestion_diaria_v2():
                            fecha_actual=fecha_str,
                            dias_calendario=dias_calendario,
                            agenda=agenda_ordenada)
+
+
+
+
+@admin_bp.route('/valoraciones')
+@login_required
+def ver_valoraciones():
+    # Seguridad: solo el admin puede entrar
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+
+    # 1. Obtener todas las valoraciones ordenadas de más nuevas a más viejas
+    lista_valoraciones = Valoracion.query.order_by(Valoracion.fecha.desc()).all()
+
+    # 2. Calcular la media de cada apartado para mostrar un resumen global
+    medias = db.session.query(
+        func.avg(Valoracion.estrellas_servicio).label('srv'),
+        func.avg(Valoracion.estrellas_app).label('app'),
+        func.avg(Valoracion.estrellas_reserva).label('res'),
+        func.count(Valoracion.id).label('total')
+    ).first()
+
+    return render_template('admin/valoraciones.html', 
+                           valoraciones=lista_valoraciones, 
+                           medias=medias)

@@ -69,3 +69,12 @@ class ExcepcionHorario(db.Model):
     h_fin_m = db.Column(db.String(5), nullable=True, default="14:00")
     h_inicio_t = db.Column(db.String(5), nullable=True, default="16:00")
     h_fin_t = db.Column(db.String(5), nullable=True, default="20:00")
+
+
+class Valoracion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    estrellas_servicio = db.Column(db.Integer, nullable=False)
+    estrellas_app = db.Column(db.Integer, nullable=False)
+    estrellas_reserva = db.Column(db.Integer, nullable=False)
+    comentario = db.Column(db.Text, nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)

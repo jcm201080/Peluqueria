@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Valoraciones - Panel Admin{% endblock %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/valoraciones.css') }}">
+
+<div class="admin-container">
+    <h1 class="admin-title">Panel de Control - Valoraciones</h1>
+
+    <!-- Pegamos tu menú de navegación exacto aquí (el que incluye la nueva pestaña) -->
+    <nav class="admin-tabs">
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.ver_valoraciones') }}" class="tab-link active">⭐ Valoraciones</a>
+    </nav>
+
+    <!-- Sección de Resumen Estadístico -->
+    <section class="admin-card">
+        <h3>📊 Resumen Global</h3>
+        <div class="stats-resumen">
+            <div class="stat-box">
+                <h4>Total Votos</h4>
+                <p class="resaltado">{{ medias.total if medias.total else 0 }}</p>
+            </div>
+            <div class="stat-box">
+                <h4>Servicio</h4>
+                <p>{{ "%.1f"|format(medias.srv) if medias.srv else 0 }} <small>/5</small></p>
+            </div>
+            <div class="stat-box">
+                <h4>Web/App</h4>
+                <p>{{ "%.1f"|format(medias.app) if medias.app else 0 }} <small>/5</small></p>
+            </div>
+            <div class="stat-box">
+                <h4>Reservas</h4>
+                <p>{{ "%.1f"|format(medias.res) if medias.res else 0 }} <small>/5</small></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Comentarios Individuales -->
+    <section class="admin-card" style="margin-top: 20px;">
+        <h3>💬 Feedback de Clientes</h3>
+        
+        <div class="grid-valoraciones">
+            {% for v in valoraciones %}
+            <div class="card-valoracion">
+                <div class="card-valoracion-header">
+                    📅 {{ v.fecha.strftime('%d/%m/%Y - %H:%M') }}
+                </div>
+                <div class="card-valoracion-body">
+                    <div class="notas-mini">
+                        <span>✂️ {{ v.estrellas_servicio }}</span>
+                        <span>📱 {{ v.estrellas_app }}</span>
+                        <span>📅 {{ v.estrellas_reserva }}</span>
+                    </div>
+                    
+                    {% if v.comentario %}
+                    <div class="comentario-texto">
+                        "{{ v.comentario }}"
+                    </div>
+                    {% else %}
+                    <div class="comentario-texto sin-comentario">
+                        El cliente no dejó ningún comentario escrito.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #888;">Aún no hay valoraciones registradas.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

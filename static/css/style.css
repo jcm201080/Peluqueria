@@ -1,3 +1,6 @@
+/* ==========================================================================
+   VARIABLES GLOBALES Y RESETEO
+   ========================================================================== */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -7,9 +10,14 @@ body {
     text-align: center;
 }
 
+#contenido {
+    margin-top: 50px;
+    margin-bottom: 120px;
+}
 
-
-/* Estilo del header mejorado */
+/* ==========================================================================
+   HEADER Y NAVEGACIÓN
+   ========================================================================== */
 header {
     background-size: cover;
     background-position: center;
@@ -19,11 +27,9 @@ header {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Eliminamos el fondo negro sólido para evitar el bloque oscuro al cargar */
     background-color: #222;
 }
 
-/* Contenedor del título para que siempre sea legible */
 header h1 {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 15px 25px;
@@ -32,14 +38,19 @@ header h1 {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.logo {
+    display: block;
+    margin: 10px auto;
+    max-width: 140px;
+    height: auto;
+    border-radius: 15px;
+}
+
 nav {
     margin-left: 20px;
-    /* Mueve el menú más a la derecha */
     margin-right: 50px;
     width: 100%;
-    /* Hacer que el nav ocupe todo el ancho disponible */
     text-align: center;
-    /* Centra el contenido del nav */
 }
 
 nav ul {
@@ -49,7 +60,6 @@ nav ul {
 
 nav ul li {
     display: inline-block;
-    /* Hace que los elementos del menú se comporten como bloques pero en línea */
     margin: 0 15px;
 }
 
@@ -59,113 +69,97 @@ nav ul li a {
     font-size: 18px;
 }
 
-/* Añade esto a tu archivo style.css */
 nav ul li a.active {
     color: #d4a373 !important;
     font-weight: bold;
 }
 
-/* Estilo del logo */
-.logo {
-    display: block;
-    margin: 10px auto;
-    /* Centrar y dar espacio */
-    max-width: 140px;
-    /* Reduce el tamaño del logo */
-    height: auto;
-    border-radius: 15px;
-    /* Bordes redondeados */
-}
-
-#contenido {
-    margin-top: 50px;
-    margin-bottom: 120px;
-}
-
-
-
-footer {
-    background-color: var(--color-footer);
-    padding: 10px;
-    position: fixed;
-    bottom: 0;
+/* ==========================================================================
+   PÁGINA PRINCIPAL (INDEX)
+   ========================================================================== */
+.hero-section {
+    position: relative;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
-/* Media Query para pantallas pequeñas */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        /* Coloca los elementos de header en columna */
-        height: auto;
-        /* Ajusta la altura del header para pantallas pequeñas */
-    }
-
-    header h1 {
-        margin-bottom: 10px;
-        /* Menos espacio entre el título y el logo */
-    }
-
-    .logo {
-        margin: 20px auto;
-        /* Centrar el logo con más espacio */
-        max-width: 180px;
-        /* Reducir el tamaño del logo */
-    }
-
-    nav {
-        width: 100%;
-        /* Hacer que el nav ocupe el ancho completo */
-        text-align: center;
-        /* Centrar el menú */
-        margin: 0;
-        /* Eliminar márgenes */
-    }
-
-    nav ul {
-        display: block;
-        /* Cambiar a bloque para apilar los elementos */
-        margin: 0;
-        padding: 0;
-    }
-
-    nav ul li {
-        display: block;
-        /* Cada enlace será un bloque en vez de en línea */
-        margin: 10px 0;
-        /* Espaciado entre los elementos del menú */
-    }
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }
 
-/*flas*/
-.flash-messages {
-    color: white;
-
-}
-
-.maximo {
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
+    align-items: flex-end;
     justify-content: center;
-    /* Centrado horizontal */
-    align-items: center;
+    padding-bottom: 30px;
+    background: rgba(0, 0, 0, 0.05);
 }
 
-/*contacto*/
+.cta-button {
+    background-color: #d4af37;
+    color: #fff;
+    padding: 10px 22px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    background-color: #bfa030;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   PÁGINA DE CONTACTO Y RESERVAS
+   ========================================================================== */
 .contacto {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* Dos columnas iguales */
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    /* Espacio entre columnas */
+    padding: 20px;
+    color: white;
     align-items: center;
     justify-content: center;
     max-width: 80%;
     margin: auto;
-    padding: 20px;
     margin-bottom: 150px;
 }
 
-/* Estilos del Buscador de Citas */
+.contacto .direccion {
+    flex: 1;
+    text-align: left;
+    font-size: 18px;
+    min-width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.contacto iframe {
+    flex: 1;
+    max-width: 100%;
+    height: 400px;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+/* Buscador de Citas y Tickets */
 .buscador-citas {
     background: rgba(255, 255, 255, 0.05);
     padding: 20px;
@@ -178,7 +172,6 @@ footer {
     background: #222;
     padding: 15px;
     border-left: 4px solid #d4af37;
-    /* Color dorado */
     margin-top: 10px;
     border-radius: 5px;
 }
@@ -203,128 +196,43 @@ footer {
     cursor: pointer;
 }
 
-/* Contenedor del calendario tipo ITV */
-/* ESTILOS PARA EL CALENDARIO DE CITAS */
-/* ESTILOS PARA EL CALENDARIO DE CITAS */
-.calendario-grid {
-    display: grid;
-    /* Obligamos a que sean exactamente 3 columnas del mismo ancho */
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-    /* Un poco de separación respirable entre los botones */
-    margin-bottom: 20px;
-    /* Opcional: si en pantallas gigantes se ven muy anchos, puedes limitar el ancho máximo del contenedor */
-    max-width: 100%;
-}
-
-.dia-itv {
-    padding: 10px;
+.ticket-proxima-cita {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #d4a373;
     border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    background-color: #2c2c2c;
-    /* Color de fondo base para tu diseño oscuro */
-    color: #fff;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* ESTILOS PARA LA CUADRÍCULA DE HORAS */
-.horas-grid {
-    display: grid;
-    /* Crea tantas columnas como quepan, con un mínimo de 70px de ancho */
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+.ticket-header {
+    display: flex;
+    align-items: center;
     gap: 10px;
-    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #d4a373;
 }
 
-.hora-btn {
-    padding: 10px 5px;
-    border-radius: 6px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background-color: transparent;
-    border: 1px solid #28a745;
-    /* Borde verde por defecto para horas libres */
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.95em;
-}
-
-.hora-btn:hover {
-    background-color: rgba(40, 167, 69, 0.2);
-    /* Fondo verde semitransparente al pasar el ratón */
-}
-
-/* Estado de la hora cuando el usuario hace clic */
-.hora-btn.active {
-    background-color: #e0a800;
-    /* Amarillo/Dorado a juego con el día seleccionado */
-    border-color: #e0a800;
-    color: #000;
-}
-
-/* Estado: Disponible (Verde) */
-.dia-itv.disponible {
-    border-color: #28a745;
-    background-color: rgba(40, 167, 69, 0.1);
-}
-
-.dia-itv.disponible:hover {
-    background-color: #28a745;
-    color: #fff;
-}
-
-/* Estado: Ocupado / Sin huecos (Rojo) */
-.dia-itv.ocupado {
-    border-color: #dc3545;
-    background-color: rgba(220, 53, 69, 0.15);
-    color: #888;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Estado: Seleccionado (Dorado/Destacado) */
-.dia-itv.active {
-    background-color: #e0a800;
-    border-color: #e0a800;
-    color: #000;
-    font-weight: bold;
-}
-
-.dia-nombre {
-    display: block;
-    font-size: 0.85em;
+.ticket-header h4 {
+    margin: 0;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.dia-numero {
-    display: block;
-    font-size: 1.4em;
-    font-weight: bold;
-    margin-top: 5px;
+.ticket-body p {
+    margin: 5px 0;
+    color: #444;
 }
 
-/* Estilo para la dirección */
-.contacto .direccion {
-    text-align: left;
-    font-size: 18px;
-    min-width: 300px;
-    /* Para que no se haga muy pequeña */
+.ticket-nota {
+    font-size: 0.85em;
+    font-style: italic;
+    color: #888 !important;
+    margin-top: 10px !important;
 }
 
-/* Estilo para el mapa */
-.contacto iframe {
-    width: 100%;
-    height: 300px;
-    border-radius: 10px;
-}
-
-.tlfno {
-    color: white;
-}
-/* Acciones de modificación y borrado de citas en contacto */
+/* Acciones Cita */
 .cita-acciones {
     display: flex;
     gap: 10px;
@@ -333,7 +241,7 @@ footer {
 }
 
 .btn-modificar {
-    background-color: #d4a373; /* Adaptado al color principal de tu web */
+    background-color: #d4a373;
     color: #111111;
     padding: 8px 15px;
     text-decoration: none;
@@ -363,73 +271,8 @@ footer {
 .btn-eliminar:hover {
     background-color: #a71d2a;
 }
-/* Ajuste para pantallas pequeñas */
-@media (max-width: 768px) {
-    .contacto {
-        grid-template-columns: 1fr;
-        /* Una sola columna en móviles */
-        text-align: center;
-    }
 
-    .contacto .direccion {
-        text-align: center;
-        max-width: 90%;
-    }
-
-    .contacto iframe {
-        width: 100%;
-    }
-    .calendario-grid {
-    display: grid;
-    /* Obligamos a que sean exactamente 3 columnas del mismo ancho */
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    /* Un poco de separación respirable entre los botones */
-    margin-bottom: 8px;
-    /* Opcional: si en pantallas gigantes se ven muy anchos, puedes limitar el ancho máximo del contenedor */
-    max-width: 80%;
-}
-}
-
-}
-
-/* Estilo para la dirección */
-.contacto .direccion {
-    flex: 1;
-    text-align: left;
-    font-size: 18px;
-    min-width: 300px;
-    /* Evita que se haga demasiado pequeña */
-}
-
-/* Estilo para el mapa */
-.contacto iframe {
-    flex: 1;
-    max-width: 100%;
-    height: 400px;
-    border-radius: 10px;
-    min-width: 300px;
-}
-
-/*Estilo Formulario reserva*/
-.contacto {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    color: white;
-    /* Para que se lea sobre el fondo oscuro */
-}
-
-.direccion {
-    flex: 1;
-    min-width: 300px;
-    background: rgba(0, 0, 0, 0.7);
-    /* Fondo semitransparente para legibilidad */
-    padding: 20px;
-    border-radius: 10px;
-}
-
+/* Formulario Reserva */
 .reserva-form {
     margin-top: 20px;
 }
@@ -445,18 +288,15 @@ footer {
 
 .form-group input,
 .form-group select {
-
     max-width: 90%;
     align-items: center;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
     color: #333;
-    /* Texto oscuro dentro de los inputs */
 }
 
 .btn-reservar {
-
     background-color: #d4a373 !important;
     color: white;
     padding: 10px 20px;
@@ -466,140 +306,109 @@ footer {
     width: 90%;
 }
 
-/* Contenedor principal del aviso */
+.tlfno {
+    color: white;
+}
+
+/* ==========================================================================
+   CALENDARIO DE CITAS
+   ========================================================================== */
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+.dia-itv {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+.dia-nombre {
+    display: block;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+.dia-numero {
+    display: block;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.dia-itv.disponible { border-color: #28a745; background-color: rgba(40, 167, 69, 0.1); }
+.dia-itv.disponible:hover { background-color: #28a745; color: #fff; }
+.dia-itv.ocupado { border-color: #dc3545; background-color: rgba(220, 53, 69, 0.15); color: #888; cursor: not-allowed; opacity: 0.6; }
+.dia-itv.active { background-color: #e0a800; border-color: #e0a800; color: #000; font-weight: bold; }
+
+/* Cuadrícula de Horas */
+.horas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.hora-btn {
+    padding: 10px 5px;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: transparent;
+    border: 1px solid #28a745;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+.hora-btn:hover { background-color: rgba(40, 167, 69, 0.2); }
+.hora-btn.active { background-color: #e0a800; border-color: #e0a800; color: #000; }
+
+/* ==========================================================================
+   LOGIN / PROMPT
+   ========================================================================== */
 .login-prompt {
     margin: 20px 0;
     text-align: center;
-    /* O left, según tu diseño */
 }
 
 .login-prompt p {
     color: #ffffff;
-    /* Texto normal en blanco */
     font-size: 1.1rem;
-    /* Un poco más grande que el texto base */
 }
 
-/* El enlace destacado "Inicia sesión" */
 .btn-highlight {
     color: #ffcc00;
-    /* Un tono dorado/amarillo para resaltar sobre el blanco */
     font-size: 1.4rem;
-    /* Letra notablemente más grande */
     font-weight: bold;
     text-decoration: none;
     padding: 5px 10px;
     border-bottom: 2px solid #ffcc00;
-    /* Subrayado elegante */
     transition: all 0.3s ease;
-    /* Animación suave */
     display: inline-block;
 }
 
-/* Efecto al pasar el ratón (Hover) */
 .btn-highlight:hover {
     color: #ffffff;
     background-color: #ffcc00;
-    /* Se convierte en un botón sólido */
     border-radius: 5px;
     transform: scale(1.1);
-    /* Crece un poquito */
     box-shadow: 0px 4px 15px rgba(255, 204, 0, 0.4);
 }
 
-/* Ajuste para pantallas pequeñas */
-@media (max-width: 768px) {
-    .contacto {
-        flex-direction: column;
-        /* Cambia a diseño en columna */
-        text-align: center;
-    }
-
-    .contacto .direccion {
-        text-align: center;
-        /* Centra el texto en pantallas pequeñas */
-    }
-
-    .contacto iframe {
-        width: 100%;
-        /* Ajusta el mapa al ancho completo */
-    }
-}
-
-/*Pagina index o principal*/
-/* Sección Hero */
-.hero-section {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    overflow: hidden;
-}
-
-.hero-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-}
-
-/* Capa para el botón: Ahora posicionado abajo */
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: flex-end;
-    /* Empuja el botón al fondo */
-    justify-content: center;
-    /* Lo mantiene centrado horizontalmente */
-    padding-bottom: 30px;
-    /* Espacio desde el borde inferior de la foto */
-    background: rgba(0, 0, 0, 0.05);
-    /* Oscurecimiento casi invisible */
-}
-
-/* Botón más estilizado y pequeño */
-.cta-button {
-    background-color: #d4af37;
-    color: #fff;
-    padding: 10px 22px;
-    /* Tamaño más contenido */
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    /* Fuente más pequeña y elegante */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.cta-button:hover {
-    transform: translateY(-2px);
-    /* Pequeña elevación */
-    background-color: #bfa030;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-/* Ajuste para móviles: un poco más compacto aún */
-@media (max-width: 768px) {
-    .hero-overlay {
-        padding-bottom: 15px;
-        /* Menos espacio en pantallas pequeñas */
-    }
-
-    .cta-button {
-        font-size: 0.85rem;
-        padding: 8px 18px;
-    }
-}
-
-
-/* Pagina servicios */
+/* ==========================================================================
+   PÁGINA SERVICIOS
+   ========================================================================== */
 .servicios-seccion {
     text-align: center;
     padding: 40px 20px;
@@ -612,20 +421,15 @@ footer {
     margin: 40px auto 150px auto;
     border-radius: 15px;
     overflow: hidden;
-    /* Para que el border-radius corte la imagen */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-
-    /* Configuración de la imagen de fondo */
     background-image: url('../img/fondo2.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-/* Capa oscura/translúcida para legibilidad */
 .overlay-precios {
     background: rgba(214, 204, 191, 0.85);
-    /* El color original #D2B48C con transparencia */
     padding: 40px;
     height: 100%;
 }
@@ -638,21 +442,10 @@ footer {
     letter-spacing: 2px;
 }
 
-.cuadro-precios .blanco {
-    color: #ffffff;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
+.cuadro-precios .blanco { color: #ffffff; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); }
+.cuadro-precios .negro { color: #1a1a1a; }
 
-.cuadro-precios .negro {
-    color: #1a1a1a;
-}
-
-.lista-servicios {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
+.lista-servicios { list-style: none; padding: 0; margin: 0; }
 .lista-servicios li {
     font-size: 1.2rem;
     font-family: 'Arial', sans-serif;
@@ -663,44 +456,15 @@ footer {
     border-bottom: 1px solid rgba(0, 0, 0, 0.15);
     color: #333;
 }
+.lista-servicios li:last-child { border-bottom: none; }
 
-.lista-servicios li:last-child {
-    border-bottom: none;
-}
+.servicio-nombre { font-weight: bold; text-align: left; }
+.servicio-precio { font-weight: 800; background: rgba(0, 0, 0, 0.05); padding: 5px 12px; border-radius: 5px; }
+.sin-servicios { font-style: italic; color: #666; }
 
-.servicio-nombre {
-    font-weight: bold;
-    text-align: left;
-}
-
-.servicio-precio {
-    font-weight: 800;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 5px 12px;
-    border-radius: 5px;
-}
-
-.sin-servicios {
-    font-style: italic;
-    color: #666;
-}
-
-/* Ajuste para móviles */
-@media (max-width: 600px) {
-    .cuadro-precios {
-        width: 100%;
-    }
-
-    .overlay-precios {
-        padding: 20px;
-    }
-
-    .lista-servicios li {
-        font-size: 1rem;
-    }
-}
-
-/* Estilos para la galería */
+/* ==========================================================================
+   PÁGINA GALERÍA
+   ========================================================================== */
 .galeria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -714,9 +478,7 @@ footer {
     position: relative;
     width: 100%;
     height: 250px;
-    /* Establece una altura fija para las fotos */
     overflow: hidden;
-    /* Asegura que el contenido que sobresalga sea ocultado */
     border-radius: 10px;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
 }
@@ -724,17 +486,25 @@ footer {
 .foto img {
     width: 100%;
     height: 100%;
-    /* Las imágenes ocuparán el 100% de la altura de su contenedor */
     object-fit: cover;
-    /* Asegura que la imagen cubra el área de su contenedor sin distorsionarse */
     cursor: pointer;
-    /* Indicamos que es una imagen clickeable */
 }
+
+.paginacion { text-align: center; margin: 20px 0; }
+.flecha {
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 15px;
+    background: #8B4513;
+    color: white;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+.flecha:hover { background: #A0522D; }
 
 /* Modal */
 .modal {
     display: none;
-    /* Oculto por defecto */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -742,80 +512,26 @@ footer {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-    /* Fondo oscuro semi-transparente */
     justify-content: center;
     align-items: center;
 }
 
-.imagen-ampliada {
-    max-width: 80%;
-    /* Limita el tamaño máximo de la imagen */
-    max-height: 80%;
-    object-fit: contain;
-    /* Hace que la imagen se ajuste sin distorsión */
-}
+.imagen-ampliada { max-width: 80%; max-height: 80%; object-fit: contain; }
+.cerrar { position: absolute; top: 10px; right: 10px; font-size: 30px; color: white; cursor: pointer; }
 
-.cerrar {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-}
-
-/* Solo mostrar el modal en pantallas grandes */
 @media (min-width: 768px) {
-    .modal.mostrar {
-        display: flex;
-        /* Solo se muestra si tiene la clase "mostrar" */
-    }
+    .modal.mostrar { display: flex; }
 }
 
-.paginacion {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.flecha {
-    text-decoration: none;
-    font-size: 18px;
-    padding: 10px 15px;
-    background: #8B4513;
-    /* Marrón */
-    color: white;
-    border-radius: 5px;
-    margin: 0 10px;
-}
-
-.flecha:hover {
-    background: #A0522D;
-}
-
-/* Como funciona:
- Carga automática: Solo tienes que meter imágenes en static/img/fotos/ y se mostrarán.
-✅ Paginación: Muestra 10 imágenes por página y navega con flechas.
-✅ Diseño con grid: Se adapta a diferentes tamaños de pantalla.
-✅ Imágenes con bordes redondeados y sombras para un efecto elegante.*/
-
-
-
-
-/* --- HERRAMIENTAS DE ADMIN EN GALERÍA --- */
-
+/* Herramientas de Admin en Galería */
 .admin-upload-section {
     margin-bottom: 30px;
     padding: 20px;
     border: 2px dashed #8B4513;
-    /* Usamos tu color marrón */
     background-color: rgba(139, 69, 19, 0.1);
     border-radius: 10px;
 }
-
-.admin-upload-section h3 {
-    margin-top: 0;
-    color: #f5a623;
-}
+.admin-upload-section h3 { margin-top: 0; color: #f5a623; }
 
 .admin-controls-overlay {
     position: absolute;
@@ -830,26 +546,14 @@ footer {
     padding: 8px;
     box-sizing: border-box;
     opacity: 0;
-    /* Oculto por defecto */
     transition: opacity 0.3s ease;
     pointer-events: none;
-    /* No molesta al clickar la foto */
 }
 
-/* En móvil, que se vea siempre un poco; en PC, al pasar el ratón */
 .foto:hover .admin-controls-overlay,
 .admin-controls-overlay:active {
     opacity: 1;
     pointer-events: auto;
-}
-
-@media (max-width: 768px) {
-    .admin-controls-overlay {
-        opacity: 1;
-        /* En móvil siempre visible para facilitar la gestión */
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 30%, transparent, rgba(0, 0, 0, 0.7) 100%);
-        pointer-events: auto;
-    }
 }
 
 .btn-borrar {
@@ -866,147 +570,20 @@ footer {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.form-modificar {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 5px;
-    border-radius: 5px;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
+.form-modificar { background: rgba(0, 0, 0, 0.7); padding: 5px; border-radius: 5px; display: flex; gap: 5px; align-items: center; }
+.input-orden { width: 60px; padding: 4px; border-radius: 3px; border: 1px solid #8B4513; background: #222; color: white; }
+.btn-modificar { background: #f5a623; color: black; border: none; padding: 4px 8px; border-radius: 3px; font-size: 12px; cursor: pointer; font-weight: bold; }
 
-.input-orden {
-    width: 60px;
-    padding: 4px;
-    border-radius: 3px;
-    border: 1px solid #8B4513;
-    background: #222;
-    color: white;
-}
-
-.btn-modificar {
-    background: #f5a623;
-    color: black;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 3px;
-    font-size: 12px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.flash-item {
-    color: rgb(206, 174, 174);
-    font-size: 35px;
-}
-
-/* Estilos para el Footer Optimizado */
-.main-footer {
-    background-color: #1a1a1a;
-    color: #ffffff;
-    padding: 15px 0;
-    /* Reducido de 30px a 15px */
-    color: #d4a373;
-    margin-top: 30px;
-    /* Reducido de 50px a 30px */
-}
-
-.footer-content {
-    display: flex;
-    justify-content: center;
-    /* Centrado base */
-    align-items: center;
-    gap: 30px;
-    /* Espacio horizontal entre texto e Instagram */
-    flex-wrap: wrap;
-    /* Para que baje en móviles si no cabe */
-}
-
-.footer-content p {
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.instagram-link {
-    color: #d4a373;
-    text-decoration: none;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-}
-
-.instagram-link:hover {
-    color: #ffffff;
-}
-
-/* --- AJUSTES PARA MÓVIL --- */
-@media (max-width: 600px) {
-    .main-footer {
-        padding: 10px 0;
-        /* Aún más pequeño en móvil */
-    }
-
-    .footer-content {
-        flex-direction: column;
-        /* Uno encima de otro pero pegaditos */
-        gap: 5px;
-        /* Casi sin espacio entre las dos líneas */
-    }
-
-    .instagram-link {
-        padding: 4px 0;
-        /* Menos espacio alrededor del link */
-    }
-}
-
-
-/* Ticket de próxima cita para el cliente */
-.ticket-proxima-cita {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-left: 5px solid var(--color-principal, #d4a373);
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.ticket-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    color: var(--color-principal, #d4a373);
-}
-
-.ticket-header h4 {
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ticket-body p {
-    margin: 5px 0;
-    color: #444;
-}
-
-.ticket-nota {
-    font-size: 0.85em;
-    font-style: italic;
-    color: #888 !important;
-    margin-top: 10px !important;
-}
-
-/* Alerta */
+/* ==========================================================================
+   MENSAJES Y ALERTAS (FLASH)
+   ========================================================================== */
+.flash-messages { color: white; }
+.maximo { display: flex; justify-content: center; align-items: center; }
+.flash-item { color: rgb(206, 174, 174); font-size: 35px; }
 
 .alerta-confirmacion {
     background-color: #d4edda;
-    /* Verde clarito */
     color: #155724;
-    /* Verde oscuro */
     border: 2px solid #c3e6cb;
     padding: 20px;
     margin: 20px auto;
@@ -1015,18 +592,104 @@ footer {
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+.alerta-contenido { font-size: 1.1em; line-height: 1.6; }
+.icono-check { font-size: 2em; display: block; margin-bottom: 10px; }
+.alerta-confirmacion strong { font-size: 1.3em; }
 
-.alerta-contenido {
-    font-size: 1.1em;
-    line-height: 1.6;
+/* ==========================================================================
+   FOOTER OPTIMIZADO Y LIMPIO
+   ========================================================================== */
+.main-footer {
+    background-color: var(--color-footer, #1a1a1a);
+    padding: 15px 0;
+    text-align: center;
+    margin-top: 30px;
+    border-top: 1px solid #333;
+    width: 100%;
 }
 
-.icono-check {
-    font-size: 2em;
-    display: block;
-    margin-bottom: 10px;
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.alerta-confirmacion strong {
-    font-size: 1.3em;
+.footer-content p {
+    margin: 0;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.footer-enlaces {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95rem;
+}
+
+.instagram-link, .enlace-valorar {
+    color: var(--color-principal, #d4a373);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+
+.instagram-link:hover, .enlace-valorar:hover {
+    color: #ffffff;
+}
+
+.separador {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES GLOBALES (Móviles)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Header */
+    header { flex-direction: column; height: auto; }
+    header h1 { margin-bottom: 10px; }
+    .logo { margin: 20px auto; max-width: 180px; }
+    
+    /* Navegación */
+    nav { width: 100%; text-align: center; margin: 0; }
+    nav ul { display: block; margin: 0; padding: 0; }
+    nav ul li { display: block; margin: 10px 0; }
+
+    /* Hero */
+    .hero-overlay { padding-bottom: 15px; }
+    .cta-button { font-size: 0.85rem; padding: 8px 18px; }
+
+    /* Contacto y Reservas */
+    .contacto { flex-direction: column; text-align: center; }
+    .contacto .direccion { text-align: center; max-width: 90%; }
+    .contacto iframe { width: 100%; }
+    .calendario-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 8px; max-width: 80%; margin: 0 auto; }
+    
+    /* Admin Gallery Controls */
+    .admin-controls-overlay {
+        opacity: 1;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 30%, transparent, rgba(0, 0, 0, 0.7) 100%);
+        pointer-events: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Servicios */
+    .cuadro-precios { width: 100%; }
+    .overlay-precios { padding: 20px; }
+    .lista-servicios li { font-size: 1rem; }
+
+    /* Footer */
+    .main-footer { padding: 10px 0; }
+    .footer-content { flex-direction: column; gap: 8px; }
+    .footer-enlaces {  gap: 8px; }
+    .instagram-link, .enlace-valorar { padding: 4px 0; }
 }

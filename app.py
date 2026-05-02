@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from routes.admin import admin_bp
 from routes.auth import auth_bp
 from routes.ia_routes import ia_bp
+from routes.views import views_bp
 
 from datetime import datetime, timedelta
 
@@ -33,6 +34,7 @@ app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # Límite de 20MB
 app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(ia_bp)
+app.register_blueprint(views_bp)
 
 
 # 3. Inicializamos extensiones con la app ya creada
