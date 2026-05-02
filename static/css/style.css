@@ -522,6 +522,7 @@ nav ul li a.active {
 @media (min-width: 768px) {
     .modal.mostrar { display: flex; 
     }
+}
 
 /* Herramientas de Admin en Galería */
 .admin-upload-section {
@@ -597,29 +598,30 @@ nav ul li a.active {
 .alerta-confirmacion strong { font-size: 1.3em; }
 
 /* ==========================================================================
-   FOOTER OPTIMIZADO Y LIMPIO
+   FOOTER - PROFESIONAL Y FIJO
    ========================================================================== */
 .main-footer {
-    background-color: var(--color-footer, #1a1a1a);
+    background-color: #1a1a1a; /* Forzamos el color oscuro */
+    border-top: 1px solid #333;
     padding: 15px 0;
     text-align: center;
-    margin-top: 30px;
-    border-top: 1px solid #333;
-    width: 100%;
-    /* --- Magia para fijarlo abajo --- */
+    
+    /* Fijado abajo */
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; /* Asegura que siempre esté por encima de fotos o textos */
+    z-index: 1000;
 }
 
 .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    flex-wrap: wrap;
 }
 
 .footer-content p {
@@ -630,19 +632,15 @@ nav ul li a.active {
 
 .footer-enlaces {
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 15px;
-    font-size: 0.95rem;
 }
 
 .instagram-link, .enlace-valorar {
-    color: var(--color-principal, #d4a373);
+    color: #d4a373;
     text-decoration: none;
     font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-size: 0.9rem;
     transition: color 0.3s ease;
 }
 
@@ -651,44 +649,45 @@ nav ul li a.active {
 }
 
 .separador {
-    color: #555;
-    font-size: 0.9rem;
+    color: #444;
 }
 
 /* ==========================================================================
-   MEDIA QUERIES GLOBALES (Móviles)
+   AJUSTES MÓVIL (MEDIA QUERY)
    ========================================================================== */
 @media (max-width: 768px) {
-    /* Header */
-    header { flex-direction: column; height: auto; }
-    header h1 { margin-bottom: 10px; }
-    .logo { margin: 20px auto; max-width: 180px; }
-    
-    /* Navegación */
-    nav { width: 100%; text-align: center; margin: 0; }
-    nav ul { display: block; margin: 0; padding: 0; }
-    nav ul li { display: block; margin: 10px 0; }
-
-    /* Hero */
-    .hero-overlay { padding-bottom: 15px; }
-    .cta-button { font-size: 0.85rem; padding: 8px 18px; }
-
-    /* Contacto y Reservas */
-    .contacto { flex-direction: column; text-align: center; }
-    .contacto .direccion { text-align: center; max-width: 90%; }
-    .contacto iframe { width: 100%; }
-    .calendario-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 8px; max-width: 80%; margin: 0 auto; }
-    
-    /* Admin Gallery Controls */
-    .admin-controls-overlay {
-        opacity: 1;
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 30%, transparent, rgba(0, 0, 0, 0.7) 100%);
-        pointer-events: auto;
+    /* IMPORTANTE: Añadir padding al body para que el footer no tape el contenido */
+    body {
+        padding-bottom: 100px; 
     }
-    
-    .dia-itv{width: 22px;}
+
+    .footer-content {
+        flex-direction: column; /* Apila elementos */
+        gap: 8px;
+    }
+
+    .footer-enlaces {
+        gap: 5px;
+    }
+
+    .footer-content p {
+        font-size: 0.75rem; /* Letra más chica */
+    }
+
+    .instagram-link, .enlace-valorar {
+        font-size: 0.8rem; /* Letra más chica */
+    }
+
+    .separador {
+        display: none; /* Quitamos la barra "|" en móvil */
+    }
+    .dia-itv{
+        width: 24px;
+        height: 40px;
+        font-size: 12px;
+    }
 }
-}
+
 
 @media (max-width: 600px) {
     /* Servicios */
