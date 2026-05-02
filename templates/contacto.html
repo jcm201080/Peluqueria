@@ -22,6 +22,16 @@
                 <p><strong>Hora:</strong> {{ proxima_cita.hora.strftime('%H:%M') }}</p>
                 <p class="ticket-nota">¡Te esperamos! Si no puedes venir, avísanos.</p>
             </div>
+            <div class="cita-acciones">
+                <a href="{{ url_for('citas.modificar_cita', id=proxima_cita.id) }}" class="btn-modificar">✏️
+                    Modificar</a>
+                <form action="{{ url_for('citas.eliminar_cita_cliente', id=proxima_cita.id) }}" method="POST"
+                    style="display:inline;">
+                    <button type="submit" class="btn-eliminar"
+                        onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌
+                        Anular</button>
+                </form>
+            </div>
         </div>
         {% endif %}
 
@@ -46,6 +56,18 @@
                         <p><strong>📅 Fecha:</strong> {{ cita.fecha.strftime('%d/%m/%Y') }}</p>
                         <p><strong>🕒 Hora:</strong> {{ cita.hora.strftime('%H:%M') }}</p>
                         <p><strong>✂️ Servicio:</strong> {{ cita.servicio }}</p>
+
+                        <div class="cita-acciones">
+                            <!-- AQUÍ ESTABA EL ERROR: Cambiamos proxima_cita.id por cita.id -->
+                            <a href="{{ url_for('citas.modificar_cita', id=cita.id) }}" class="btn-modificar">✏️
+                                Modificar</a>
+                            <form action="{{ url_for('citas.eliminar_cita_cliente', id=cita.id) }}" method="POST"
+                                style="display:inline;">
+                                <button type="submit" class="btn-eliminar"
+                                    onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌
+                                    Anular</button>
+                            </form>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -123,11 +145,11 @@
                 <!-- Contenedor oculto por defecto. Se mostrará al seleccionar un día -->
                 <div class="form-group" id="grupo-horas" style="display: none;">
                     <label>Selecciona tu hora:</label>
-                    
+
                     <!-- Input invisible pero validable por HTML5 -->
-                    <input type="text" name="hora" id="hora-seleccionada" required 
-                           style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
-                    
+                    <input type="text" name="hora" id="hora-seleccionada" required
+                        style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+
                     <div id="contenedor-horas" class="horas-grid">
                         <!-- El JavaScript inyectará aquí los botones de las horas -->
                     </div>

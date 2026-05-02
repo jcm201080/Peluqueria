@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<section class="contacto">
+    <div class="reserva-form" style="max-width: 600px; margin: 0 auto;">
+        <h2>Modificar Cita</h2>
+        <p>Cita actual: <strong>{{ cita.fecha.strftime('%d/%m/%Y') }}</strong> a las <strong>{{ cita.hora.strftime('%H:%M') }}</strong></p>
+        <hr class="separador-pro">
+
+        <form action="{{ url_for('citas.modificar_cita', id=cita.id) }}" method="POST">
+            
+            <div class="form-group">
+                <label>Servicio:</label>
+                <select name="servicio" required>
+                    {% for s in servicios %}
+                    <!-- Preseleccionamos el servicio que ya tenía -->
+                    <option value="{{ s.nombre }}" {% if s.nombre == cita.servicio %}selected{% endif %}>{{ s.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Aquí pegas exactamente el mismo código que tienes en contacto.html para el CALENDARIO (dias) y HORAS (JS) -->
+            <div class="form-group">
+                <label>Selecciona el nuevo día:</label>
+                <input type="hidden" name="fecha" id="fecha-seleccionada" required>
+                <div id="calendario-itv" class="calendario-grid">
+                    {% for dia in dias %}
+                    <div class="dia-itv" data-fecha="{{ dia.valor }}" onclick="seleccionarDia(this, '{{ dia.valor }}')">
+                        <span class="dia-nombre">{{ dia.texto[:3] }}</span>
+                        <span class="dia-numero">{{ dia.valor.split('-')[2] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group" id="grupo-horas" style="display: none;">
+                <label>Selecciona la nueva hora:</label>
+                <input type="text" name="hora" id="hora-seleccionada" required style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
+                <div id="contenedor-horas" class="horas-grid"></div>
+            </div>
+
+            <button type="submit" class="btn-reservar" style="background-color: #ff9800;">Confirmar Cambio</button>
+            <a href="{{ url_for('contacto') }}" class="btn-cancelar" style="display: block; text-align: center; margin-top: 15px; color: #fff;">Volver sin modificar</a>
+        </form>
+    </div>
+</section>
+
+<!-- Reutilizamos tu JS de reservas -->
+<script src="{{ url_for('static', filename='js/reservas.js') }}"></script>
+{% endblock %}

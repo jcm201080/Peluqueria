@@ -324,7 +324,45 @@ footer {
 .tlfno {
     color: white;
 }
+/* Acciones de modificación y borrado de citas en contacto */
+.cita-acciones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
 
+.btn-modificar {
+    background-color: #d4a373; /* Adaptado al color principal de tu web */
+    color: #111111;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+.btn-modificar:hover {
+    background-color: #b58555;
+    color: #fff;
+}
+
+.btn-eliminar {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-eliminar:hover {
+    background-color: #a71d2a;
+}
 /* Ajuste para pantallas pequeñas */
 @media (max-width: 768px) {
     .contacto {

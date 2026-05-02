@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import urllib.parse
 
 
+
 citas_bp = Blueprint('citas', __name__)
 
 
@@ -235,3 +236,60 @@ def dias_ocupados():
     cierres = ExcepcionHorario.query.filter_by(es_cerrado=True, peluquero_id=None).all()
     fechas_bloqueadas = [c.fecha.strftime('%Y-%m-%d') for c in cierres]
     return jsonify(fechas_bloqueadas)
+
+
+
+# Ruta para que el cliente anule su cita directamente
+@citas_bp.route('/eliminar-cliente/<int:id>', methods=['POST'])
+def eliminar_cita_cliente(id):
+    cita = Cita.query.get_or_404(id)
+    db.session.delete(cita)
+    db.session.commit()
+    flash("Tu cita ha sido anulada correctamente.", "success")
+    return redirect(url_for('contacto')) # Ajusta esto si tu vista de contacto se llama diferente
+
+
+# Ruta para mostrar el formulario de modificación y procesar el cambio
+@citas_bp.route('/modificar/<int:id>', methods=['GET', 'POST'])
+def modificar_cita(id):
+    cita = Cita.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        # 1. Recoger los nuevos datos del formulario
+        nuevo_servicio = request.form.get('servicio')
+        nueva_fecha = request.form.get('fecha')
+        nueva_hora = request.form.get('hora')
+        
+        # 2. Actualizar el registro existente en la base de datos
+        cita.servicio = nuevo_servicio
+        cita.fecha = datetime.strptime(nueva_fecha, '%Y-%m-%d').date()
+        cita.hora = datetime.strptime(nueva_hora, '%H:%M').time()
+        
+        db.session.commit()
+        
+        # 3. Preparar el mensaje de éxito profesional
+        # Formateamos para que el usuario lo lea de forma amigable
+        fecha_str = cita.fecha.strftime('%d/%m/%Y')
+        hora_str = cita.hora.strftime('%H:%M')
+        
+        
+        # Creamos el mensaje dinámico y lo enviamos al flash
+        mensaje = f"✅ La cita ha sido modificada al día {fecha_str} a las {hora_str}."
+        flash(mensaje, "success")
+        
+        # Redirigimos de vuelta a la vista correspondiente
+        return redirect(url_for('contacto'))
+        
+    # --- LÓGICA PARA EL MÉTODO GET (Mostrar formulario) ---
+    servicios = Servicio.query.all()
+    
+    # Generamos los próximos 10 días
+    dias_disponibles = []
+    for i in range(10):
+        fecha_iter = datetime.now() + timedelta(days=i)
+        dias_disponibles.append({
+            'valor': fecha_iter.strftime('%Y-%m-%d'),
+            'texto': fecha_iter.strftime('%A, %d %b').capitalize()
+        })
+        
+    return render_template('modificar_cita.html', cita=cita, servicios=servicios, dias=dias_disponibles)
