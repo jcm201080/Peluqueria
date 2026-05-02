@@ -130,10 +130,14 @@
                 <a href="https://www.instagram.com/{{ web.instagram_user }}/" target="_blank" class="instagram-link">
                     <i class="fab fa-instagram"></i> @{{ web.instagram_user }}
                 </a>
+
+                {# Solo visible para admin de momento #}
+                {% if current_user.es_admin %}
                 <span class="separador">|</span>
                 <a href="{{ url_for('views.valorar') }}" class="enlace-valorar" title="Valora nuestra aplicación">
                     ⭐ Valorar App
                 </a>
+                {% endif %}
             </div>
         </div>
     </footer>
