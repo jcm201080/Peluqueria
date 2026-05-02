@@ -1,38 +1,39 @@
 document.addEventListener('DOMContentLoaded', actualizarCalendario);
 
+// static/js/reservas.js
+
 async function actualizarCalendario() {
-    // 1. Verificamos cierres totales de la peluquería en la DB
-    const responseBloqueados = await fetch('/api/dias-ocupados');
-    const diasBloqueados = await responseBloqueados.json();
-
-    const diasElements = document.querySelectorAll('.dia-itv');
-    
-    // 2. Comprobamos la disponibilidad real de cada día visible
-    for (let el of diasElements) {
-        const fecha = el.getAttribute('data-fecha');
+    try {
+        // 1. Hacemos UNA ÚNICA petición al nuevo endpoint para obtener el resumen mensual
+        const responseResumen = await fetch('/api/disponibilidad-mensual');
+        const resumen = await responseResumen.json();
         
-        // Si el día entero está cerrado (festivo general)
-        if (diasBloqueados.includes(fecha)) {
-            marcarOcupado(el);
-            continue;
-        }
+        // Asumimos que la API devuelve un array de fechas ocupadas
+        const diasOcupadosCompletamente = resumen.dias_ocupados || []; 
+        
+        // 2. Además, podemos pedir los cierres totales si los mantienes en otra API
+        const responseBloqueados = await fetch('/api/dias-ocupados');
+        const diasBloqueados = await responseBloqueados.json();
 
-        // Si la peluquería está abierta, comprobamos si le quedan huecos a los peluqueros
-        try {
-            const responseHoras = await fetch(`/api/disponibilidad?fecha=${fecha}`);
-            const horasLibres = await responseHoras.json();
+        // Unimos ambos arrays para tener la lista completa de días sin citas
+        const todosLosDiasInactivos = [...new Set([...diasBloqueados, ...diasOcupadosCompletamente])];
 
-            if (horasLibres.length === 0) {
-                // No quedan citas libres ese día
-                marcarOcupado(el);
+        const diasElements = document.querySelectorAll('.dia-itv');
+        
+        // 3. Iteramos por el DOM, ¡pero SIN hacer peticiones fetch aquí!
+        for (let el of diasElements) {
+            const fecha = el.getAttribute('data-fecha');
+            
+            if (todosLosDiasInactivos.includes(fecha)) {
+                marcarOcupado(el); //[cite: 1]
             } else {
-                // Hay huecos, lo ponemos verde
-                marcarDisponible(el);
+                marcarDisponible(el); //[cite: 1]
             }
-        } catch (error) {
-            console.error("Error consultando disponibilidad:", error);
-            marcarOcupado(el); // Por seguridad, si falla la conexión lo marcamos bloqueado
         }
+    } catch (error) {
+        console.error("Error consultando disponibilidad:", error); //[cite: 1]
+        // Si falla, es mejor marcar todo como ocupado o mostrar un mensaje de error global
+        document.querySelectorAll('.dia-itv').forEach(marcarOcupado); 
     }
 }
 

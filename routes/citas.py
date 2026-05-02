@@ -36,70 +36,110 @@ def generar_franjas(inicio_str, fin_str):
         print(f"Error generando franjas: {e}")
     return franjas
 
+
+# --- NUEVA FUNCIÓN DE APOYO (HELPER) ---
+# Extraemos la lógica pesada aquí para reutilizarla y mantener las rutas limpias
+def obtener_horas_libres_por_fecha(fecha_obj):
+    """Devuelve un set con las horas libres para una fecha dada considerando todos los peluqueros."""
+    dia_semana_int = fecha_obj.weekday()
+
+    # 1. Verificar si hay un cierre total (festivo para todos)
+    cierre_total = ExcepcionHorario.query.filter_by(fecha=fecha_obj, es_cerrado=True, peluquero_id=None).first()
+    if cierre_total:
+        return set() # Set vacío significa 0 horas libres
+
+    peluqueros = Peluquero.query.filter_by(activo=True).all()
+    horas_libres = set()
+
+    for p in peluqueros:
+        # 2. ¿Tiene este peluquero una excepción para hoy?
+        excep = ExcepcionHorario.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).first()
+        horario_a_usar = None
+        
+        if excep:
+            if not excep.es_cerrado:
+                # Horario especial
+                horario_a_usar = {
+                    'h_im': excep.h_inicio_m, 'h_fm': excep.h_fin_m,
+                    'h_it': excep.h_inicio_t, 'h_ft': excep.h_fin_t
+                }
+            else:
+                # Peluquero libre hoy
+                continue
+        else:
+            # 3. Horario normal
+            h_normal = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
+            if h_normal and h_normal.trabaja:
+                horario_a_usar = {
+                    'h_im': h_normal.h_inicio_m, 'h_fm': h_normal.h_fin_m,
+                    'h_it': h_normal.h_inicio_t, 'h_ft': h_normal.h_fin_t
+                }
+
+        # 4. Generar franjas y filtrar ocupadas
+        if horario_a_usar:
+            franjas_m = generar_franjas(horario_a_usar['h_im'], horario_a_usar['h_fm'])
+            franjas_t = generar_franjas(horario_a_usar['h_it'], horario_a_usar['h_ft'])
+            todas_sus_franjas = franjas_m + franjas_t
+            
+            citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
+            horas_cogidas = [c.hora.strftime('%H:%M') for c in citas_hoy]
+            
+            for f in todas_sus_franjas:
+                if f not in horas_cogidas:
+                    horas_libres.add(f)
+
+    return horas_libres
+
+
+# --- RUTAS REFACTORIZADAS ---
+
 @citas_bp.route('/api/disponibilidad')
 def check_disponibilidad():
+    """Ruta original: Devuelve las horas libres de UN SOLO día específico."""
     fecha_str = request.args.get('fecha')
     if not fecha_str:
         return jsonify([])
 
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        dia_semana_int = fecha_obj.weekday()
-
-        # 1. Verificar si hay un cierre total (festivo para todos)
-        cierre_total = ExcepcionHorario.query.filter_by(fecha=fecha_obj, es_cerrado=True, peluquero_id=None).first()
-        if cierre_total:
-            return jsonify([]) 
-
-        peluqueros = Peluquero.query.filter_by(activo=True).all()
-        horas_libres = set()
-
-        for p in peluqueros:
-            # --- NUEVA LÓGICA DE PRIORIDAD ---
-            
-            # 2. ¿Tiene este peluquero una excepción (horario especial o cierre individual) para hoy?
-            excep = ExcepcionHorario.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).first()
-            
-            horario_a_usar = None
-            
-            if excep:
-                if not excep.es_cerrado:
-                    # Es un horario especial: creamos un objeto temporal con las horas de la excepción
-                    horario_a_usar = {
-                        'h_im': excep.h_inicio_m, 'h_fm': excep.h_fin_m,
-                        'h_it': excep.h_inicio_t, 'h_ft': excep.h_fin_t
-                    }
-                else:
-                    # El peluquero está de vacaciones o libre hoy, saltamos al siguiente peluquero
-                    continue
-            else:
-                # 3. Si no hay excepción, buscamos su horario normal de la semana
-                h_normal = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
-                if h_normal and h_normal.trabaja:
-                    horario_a_usar = {
-                        'h_im': h_normal.h_inicio_m, 'h_fm': h_normal.h_fin_m,
-                        'h_it': h_normal.h_inicio_t, 'h_ft': h_normal.h_fin_t
-                    }
-
-            # 4. Si tenemos un horario definido (normal o especial), generamos las franjas
-            if horario_a_usar:
-                franjas_m = generar_franjas(horario_a_usar['h_im'], horario_a_usar['h_fm'])
-                franjas_t = generar_franjas(horario_a_usar['h_it'], horario_a_usar['h_ft'])
-                todas_sus_franjas = franjas_m + franjas_t
-                
-                # 5. Filtrar las ya ocupadas
-                citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
-                horas_cogidas = [c.hora.strftime('%H:%M') for c in citas_hoy]
-                
-                for f in todas_sus_franjas:
-                    if f not in horas_cogidas:
-                        horas_libres.add(f)
-
+        
+        # Llamamos a nuestro nuevo motor limpio
+        horas_libres = obtener_horas_libres_por_fecha(fecha_obj)
+        
         return jsonify(sorted(list(horas_libres)))
 
     except Exception as e:
         print(f"❌ Error en API Disponibilidad: {e}")
         return jsonify([]), 500
+
+
+@citas_bp.route('/api/disponibilidad-mensual')
+def disponibilidad_mensual():
+    """Nueva Ruta Optimimizada: Devuelve un resumen de los días TOTALMENTE OCUPADOS en un mes."""
+    try:
+        dias_ocupados = []
+        
+        # Analizamos los próximos 30 días
+        for i in range(30):
+            fecha_obj = datetime.now().date() + timedelta(days=i)
+            
+            # Saltamos los domingos para ahorrar carga a la DB (siempre están cerrados)
+            if fecha_obj.weekday() == 6:
+                dias_ocupados.append(fecha_obj.strftime('%Y-%m-%d'))
+                continue
+                
+            # Reutilizamos el motor: si no hay horas libres, el día está ocupado/cerrado
+            horas_libres = obtener_horas_libres_por_fecha(fecha_obj)
+            
+            if not horas_libres:
+                dias_ocupados.append(fecha_obj.strftime('%Y-%m-%d'))
+                
+        return jsonify({"dias_ocupados": dias_ocupados})
+        
+    except Exception as e:
+        print(f"❌ Error en API Disponibilidad Mensual: {e}")
+        return jsonify({"dias_ocupados": []}), 500
+
 
 @citas_bp.route('/reservar', methods=['POST'])
 def reservar():
