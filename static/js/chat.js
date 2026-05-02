@@ -29,6 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ mensaje: texto })
             });
 
+            // Si la respuesta no es 200 OK, lanzamos un error a propósito
+            if (!response.ok) {
+                const textError = await response.text(); // Leemos qué nos ha devuelto realmente el servidor
+                throw new Error(`Error del servidor (${response.status}): ${textError}`);
+            }
+
             const data = await response.json();
 
             // REPARACIÓN CLAVE: Usar innerHTML aquí también para que el enlace sea clicable
@@ -36,7 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
             mensajeBotElement.innerHTML = data.respuesta;
 
         } catch (error) {
-            document.getElementById(loadingId).innerText = "Hubo un error de conexión.";
+            // Imprimimos el error REAL en la consola oculta para poder investigar
+            console.error("Fallo exacto en el chat:", error);
+            
+            // Le mostramos un mensaje amigable al usuario
+            document.getElementById(loadingId).innerText = "Hubo un error de conexión. Por favor, inténtalo de nuevo.";
         }
     };
 
