@@ -12,18 +12,28 @@ def registro():
         telefono = request.form.get('telefono')
         password = request.form.get('password')
         
-        # --- ESTO VA AQUÍ: Evitar duplicados al registrar ---
+        # Evitar duplicados al registrar
         usuario_existente = Usuario.query.filter_by(telefono=telefono).first()
         if usuario_existente:
-            flash('Este número de teléfono ya está registrado. Intenta iniciar sesión.')
+            # Podemos añadir categorías a los mensajes flash para estilizarlos en CSS (ej: 'error' o 'success')
+            flash('Este número de teléfono ya está registrado. Intenta iniciar sesión.', 'error')
             return redirect(url_for('auth.registro'))
         
+        # Hasheo de contraseña y creación del usuario
         pw_hash = generate_password_hash(password).decode('utf8')
         nuevo_usuario = Usuario(nombre=nombre, telefono=telefono, password=pw_hash)
+        
         db.session.add(nuevo_usuario)
         db.session.commit()
-        flash('Registro completado. ¡Ya puedes entrar!')
-        return redirect(url_for('auth.login'))
+        
+        # --- MEJORA: Iniciar sesión automáticamente ---
+        # Como acabamos de hacer commit, 'nuevo_usuario' ya es un objeto válido de la DB
+        login_user(nuevo_usuario)
+        
+        flash('Registro completado. ¡Bienvenido/a! Ya puedes reservar tu cita.', 'success')
+        
+        # Redirigimos directamente a la página de contacto/reservas
+        return redirect(url_for('contacto'))
         
     return render_template('registro.html')
 
@@ -36,16 +46,20 @@ def login():
         
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('index'))
+            # Ya que mejoramos la UX, si el usuario hace login, también le podemos mandar a contacto 
+            # para que reserve directamente, o dejarlo en el index si lo prefieres.
+            return redirect(url_for('contacto')) 
         else:
-            flash('Teléfono o contraseña incorrectos.')
+            flash('Teléfono o contraseña incorrectos.', 'error')
+            
     return render_template('login.html')
 
 @auth_bp.route('/logout')
+@login_required # Añadimos esta buena práctica: solo un usuario logueado puede desloguearse
 def logout():
     logout_user()
+    flash('Has cerrado sesión correctamente.', 'success')
     return redirect(url_for('index'))
-
 
 @auth_bp.route('/recuperar', methods=['GET', 'POST'])
 def recuperar():
@@ -58,9 +72,9 @@ def recuperar():
             # Encriptamos la nueva clave
             user.password = generate_password_hash(nueva_pass).decode('utf8')
             db.session.commit()
-            flash('Contraseña actualizada con éxito.')
+            flash('Contraseña actualizada con éxito. Por favor, inicia sesión.', 'success')
             return redirect(url_for('auth.login'))
         else:
-            flash('No encontramos ningún usuario con ese teléfono.')
+            flash('No encontramos ningún usuario con ese teléfono.', 'error')
             
     return render_template('recuperar.html')

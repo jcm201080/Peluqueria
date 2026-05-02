@@ -285,7 +285,7 @@ def modificar_cita(id):
     
     # Generamos los próximos 10 días
     dias_disponibles = []
-    for i in range(10):
+    for i in range(15):
         fecha_iter = datetime.now() + timedelta(days=i)
         dias_disponibles.append({
             'valor': fecha_iter.strftime('%Y-%m-%d'),
