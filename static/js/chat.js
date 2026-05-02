@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         agregarMensaje("usuario", texto);
         inputField.value = "";
 
-        const loadingId = agregarMensaje("bot", "Escribiendo...");
+        const loadingId = agregarMensaje("bot", "Escribiendo ....");
 
         try {
             const response = await fetch("/api/ia/chat", {

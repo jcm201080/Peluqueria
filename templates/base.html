@@ -173,14 +173,14 @@
     <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
     {% endif %}
 
-    <!-- <script>
+    <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register("/static/sw.js")
                     .then(reg => console.log('SW registrado', reg))
                     .catch(err => console.log('SW error', err));
             });
-        } -->
+        }
     </script>
 </body>
 
