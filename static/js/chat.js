@@ -10,17 +10,21 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.addEventListener("click", () => chatWindow.classList.toggle("oculto"));
     closeBtn.addEventListener("click", () => chatWindow.classList.add("oculto"));
 
-    // Enviar mensaje
-    // static/js/chat.js
-
+    // Función principal para enviar el mensaje
     const enviarMensaje = async () => {
         const texto = inputField.value.trim();
         if (texto === "") return;
 
+        // 1. Mostramos el mensaje del usuario y limpiamos la caja
         agregarMensaje("usuario", texto);
         inputField.value = "";
 
-        const loadingId = agregarMensaje("bot", "Escribiendo ....");
+        // 2. PROTECCIÓN: Bloqueamos el input y botón para que no envíen varios a la vez
+        inputField.disabled = true;
+        sendBtn.disabled = true;
+
+        // 3. Creamos el mensaje temporal y guardamos su ID
+        const loadingId = agregarMensaje("bot", "Escribiendo <span class='puntos-animados'>...</span>");
 
         try {
             const response = await fetch("/api/ia/chat", {
@@ -29,47 +33,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ mensaje: texto })
             });
 
-            // Si la respuesta no es 200 OK, lanzamos un error a propósito
             if (!response.ok) {
-                const textError = await response.text(); // Leemos qué nos ha devuelto realmente el servidor
+                const textError = await response.text();
                 throw new Error(`Error del servidor (${response.status}): ${textError}`);
             }
 
             const data = await response.json();
 
-            // REPARACIÓN CLAVE: Usar innerHTML aquí también para que el enlace sea clicable
-            const mensajeBotElement = document.getElementById(loadingId);
-            mensajeBotElement.innerHTML = data.respuesta;
+            // 4. ÉXITO: Eliminamos el "Escribiendo..." del DOM
+            const mensajeCarga = document.getElementById(loadingId);
+            if (mensajeCarga) mensajeCarga.remove();
+
+            // 5. Añadimos el mensaje final usando innerHTML para que los enlaces funcionen
+            agregarMensaje("bot", data.respuesta);
 
         } catch (error) {
-            // Imprimimos el error REAL en la consola oculta para poder investigar
             console.error("Fallo exacto en el chat:", error);
             
-            // Le mostramos un mensaje amigable al usuario
-            document.getElementById(loadingId).innerText = "Hubo un error de conexión. Por favor, inténtalo de nuevo.";
+            // 4B. ERROR: Eliminamos también el "Escribiendo..." si la conexión falla
+            const mensajeCarga = document.getElementById(loadingId);
+            if (mensajeCarga) mensajeCarga.remove();
+
+            // 5B. Mostramos un mensaje visual de error
+            agregarMensaje("bot", "⚠️ Hubo un error de conexión con mi sistema. Por favor, inténtalo de nuevo.");
+        } finally {
+            // 6. PASE LO QUE PASE: Volvemos a activar el cajón de texto
+            inputField.disabled = false;
+            sendBtn.disabled = false;
+            inputField.focus(); // Devolvemos el cursor al cajón automáticamente
         }
     };
 
     sendBtn.addEventListener("click", enviarMensaje);
     inputField.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") enviarMensaje();
+        if (e.key === "Enter" && !sendBtn.disabled) {
+            e.preventDefault(); // Evitamos saltos de línea raros en algunos navegadores
+            enviarMensaje();
+        }
     });
 
     // Función auxiliar para añadir mensajes al DOM
-    // Localiza tu función de agregar mensajes en static/js/chat.js
     function agregarMensaje(remitente, texto) {
         const div = document.createElement("div");
         div.className = `mensaje ${remitente}`;
+        div.innerHTML = texto; // Clave para que procese los enlaces <a> de la IA
 
-        // CAMBIO CLAVE: Usar innerHTML para que reconozca los enlaces <a>
-        div.innerHTML = texto;
-
-        const id = 'msg-' + Date.now();
+        // ID único garantizado combinando la fecha y un número aleatorio
+        const id = 'msg-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
         div.id = id;
 
-        const messagesContainer = document.getElementById("chatbot-messages");
         messagesContainer.appendChild(div);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Animación fluida de scroll
+        messagesContainer.scrollTo({
+            top: messagesContainer.scrollHeight,
+            behavior: "smooth"
+        });
+        
         return id;
     }
 });
