@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch("/api/ia/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mensaje: texto })
+                body: JSON.stringify({ mensaje: texto, url: window.location.pathname })
             });
 
             if (!response.ok) {
