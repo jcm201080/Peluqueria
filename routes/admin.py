@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, request
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 # Modifica tu línea de imports así:
 from database.models import db, Cita, Peluquero, Servicio, Configuracion, HorarioPeluquero, ExcepcionHorario, Usuario, Valoracion
@@ -274,6 +274,8 @@ def renombrar_foto():
     return redirect(url_for('fotos'))
 
 
+# --- GESTIÓN DIARIA (OPTIMIZADA) ---
+
 @admin_bp.route('/admin/gestion-diaria')
 @login_required
 def gestion_diaria():
@@ -282,41 +284,37 @@ def gestion_diaria():
 
     fecha_str = request.args.get('fecha_busqueda', datetime.now().strftime('%Y-%m-%d'))
     fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-    dia_semana_int = fecha_obj.weekday()
 
-    # 1. Obtener citas ya existentes para ese día
+    # 1. Obtener citas existentes
     citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
 
-    # 2. Calcular huecos libres usando la NUEVA estructura de HorarioPeluquero
+    # 2. Usar el motor de disponibilidad para calcular huecos reales
+    # Importamos la función centralizada de routes/citas.py para asegurar consistencia
+    from routes.citas import obtener_horas_libres_por_fecha 
+    
+    # Obtenemos el set de horas libres generales
+    horas_libres_set = obtener_horas_libres_por_fecha(fecha_obj)
+    
+    # 3. Mapear qué peluquero está libre en cada hora para el panel
     peluqueros = Peluquero.query.filter_by(activo=True).all()
-    huecos_detalles = {} # { '10:00': [p1, p2], '10:30': [p1] }
+    huecos_detalles = {}
 
-    for p in peluqueros:
-        # Buscamos el horario de este peluquero para el día de la semana actual
-        # Aquí es donde fallaba antes al buscar 'dias_laborables'
-        from database.models import HorarioPeluquero # Asegúrate de importar esto arriba
-        horario = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
-
-        if horario and horario.trabaja:
-            from routes.citas import generar_franjas
-            franjas = generar_franjas(horario.h_inicio_m, horario.h_fin_m) + \
-                      generar_franjas(horario.h_inicio_t, horario.h_fin_t)
-
-            for hora_f in franjas:
-                # Comprobar si ya tiene una cita a esa hora
-                hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
-                ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
-                
-                if not ocupado:
-                    if hora_f not in huecos_detalles:
-                        huecos_detalles[hora_f] = []
-                    huecos_detalles[hora_f].append(p)
-
-    horas_libres = sorted(huecos_detalles.keys())
+    for hora_f in sorted(list(horas_libres_set)):
+        hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
+        huecos_detalles[hora_f] = []
+        
+        for p in peluqueros:
+            # Verificamos si este peluquero específico tiene ese hueco libre
+            # (Lógica: trabaja hoy + no tiene cita a esa hora)
+            ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
+            if not ocupado:
+                # Aquí podrías añadir una validación extra de si el peluquero 
+                # tiene horario especial o normal ese día
+                huecos_detalles[hora_f].append(p)
 
     return render_template('admin/gestion_citas.html', 
                            citas=citas, 
-                           horas_libres=horas_libres, 
+                           horas_libres=sorted(huecos_detalles.keys()), 
                            huecos_detalles=huecos_detalles,
                            fecha_actual=fecha_str)
 
@@ -524,33 +522,30 @@ def añadir_horario_especial():
 
     fecha_str = request.form.get('fecha')
     p_id = request.form.get('peluquero_id')
-    h_im = request.form.get('h_im')
-    h_fm = request.form.get('h_fm')
-    h_it = request.form.get('h_it')
-    h_ft = request.form.get('h_ft')
-
+    
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
         peluquero_id = int(p_id) if p_id != "todos" else None
 
-        # IMPORTANTE: es_cerrado=False para que sea HORARIO ESPECIAL y no BLOQUEO
+        # Creamos la excepción como HORARIO (es_cerrado=False)
         nueva_excepcion = ExcepcionHorario(
             fecha=fecha_obj,
             peluquero_id=peluquero_id,
-            es_cerrado=False,  # <--- AQUÍ ESTÁ LA CLAVE
-            h_inicio_m=h_im,
-            h_fin_m=h_fm,
-            h_inicio_t=h_it,
-            h_fin_t=h_ft,
+            es_cerrado=False, 
+            h_inicio_m=request.form.get('h_im'),
+            h_fin_m=request.form.get('h_fm'),
+            h_inicio_t=request.form.get('h_it'),
+            h_fin_t=request.form.get('h_ft'),
             descripcion="Horario Especial"
         )
         
         db.session.add(nueva_excepcion)
         db.session.commit()
-        flash(f"✅ Horario especial añadido para el día {fecha_str}", "success")
+        flash(f"✅ Horario especial activado para el {fecha_obj.strftime('%d/%m/%Y')}", "success")
+        
     except Exception as e:
         db.session.rollback()
-        flash(f"❌ Error: {e}", "error")
+        flash(f"❌ Error al crear horario especial: {e}", "error")
 
     return redirect(url_for('admin.index', tab='horarios'))
 

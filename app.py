@@ -99,14 +99,14 @@ def fotos():
 def contacto():
     servicios = Servicio.query.all()
     
-    # 1. BUSCAR PRÓXIMA CITA DEL USUARIO
-    proxima_cita = None
+    # 1. BUSCAR PRÓXIMAS CITAS DEL USUARIO (Hasta 3)
+    proximas_citas = []
     if current_user.is_authenticated:
-        # Buscamos la cita más cercana (hoy o en el futuro)
-        proxima_cita = Cita.query.filter(
+        # Buscamos las citas más cercanas (hoy o en el futuro), máximo 3
+        proximas_citas = Cita.query.filter(
             Cita.usuario_id == current_user.id,
             Cita.fecha >= datetime.now().date()
-        ).order_by(Cita.fecha.asc(), Cita.hora.asc()).first()
+        ).order_by(Cita.fecha.asc(), Cita.hora.asc()).limit(3).all()
 
     # --- Lógica de días actualizada para 15 días (3 columnas x 5 filas) ---
     dias_es = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -114,11 +114,9 @@ def contacto():
     
     dias_disponibles = []
     
-    # CAMBIO 1: Ampliamos el rango de búsqueda a 30 días vista
     for i in range(30): 
         fecha = datetime.now() + timedelta(days=i)
         
-        # Si es domingo (índice 6), lo saltamos
         if fecha.weekday() == 6: 
             continue 
             
@@ -127,14 +125,14 @@ def contacto():
             'texto': f"{dias_es[fecha.weekday()]}, {fecha.day} {meses_es[fecha.month - 1]}"
         })
         
-        # CAMBIO 2: Detenemos el bucle al conseguir exactamente 15 días hábiles
         if len(dias_disponibles) == 15: 
             break
     
+    # OJO: Pasamos 'proximas_citas' en lugar de 'proxima_cita'
     return render_template('contacto.html', 
                            servicios=servicios, 
                            dias=dias_disponibles, 
-                           proxima_cita=proxima_cita)
+                           proximas_citas=proximas_citas)
 
 # contacto con wasap por ahora dejamos sin wasap (Nos mandan un wasap para confirmar)
 # @citas_bp.route('/reservar', methods=['POST'])

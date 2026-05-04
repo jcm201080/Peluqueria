@@ -10,29 +10,33 @@
         <p>📞 <a href="tel:+34633013315" class="tlfno">633 013 315</a></p>
 
         <hr>
-        {% if proxima_cita %}
-        <div class="ticket-proxima-cita">
-            <div class="ticket-header">
-                <span class="ticket-icon">📅</span>
-                <h4>Tu próxima cita reservada</h4>
-            </div>
-            <div class="ticket-body">
-                <p><strong>Servicio:</strong> {{ proxima_cita.servicio }}</p>
-                <p><strong>Día:</strong> {{ proxima_cita.fecha.strftime('%d/%m/%Y') }}</p>
-                <p><strong>Hora:</strong> {{ proxima_cita.hora.strftime('%H:%M') }}</p>
-                <p class="ticket-nota">¡Te esperamos! Si no puedes venir, avísanos.</p>
-            </div>
-            <div class="cita-acciones">
-                <a href="{{ url_for('citas.modificar_cita', id=proxima_cita.id) }}" class="btn-modificar">✏️
-                    Modificar</a>
-                <form action="{{ url_for('citas.eliminar_cita_cliente', id=proxima_cita.id) }}" method="POST"
-                    style="display:inline;">
-                    <button type="submit" class="btn-eliminar"
-                        onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌
-                        Anular</button>
-                </form>
+        {% if proximas_citas %}
+        <div class="seccion-proximas-citas">
+            <h3 style="margin-bottom: 15px;">📅 Tus próximas citas reservadas</h3>
+            <div class="tickets-container">
+                {% for cita in proximas_citas %}
+                <div class="ticket-proxima-cita">
+                    <div class="ticket-header">
+                        <span class="ticket-icon">✂️</span>
+                        <h4>Cita #{{ loop.index }}</h4>
+                    </div>
+                    <div class="ticket-body">
+                        <p><strong>Servicio:</strong> {{ cita.servicio }}</p>
+                        <p><strong>Día:</strong> {{ cita.fecha.strftime('%d/%m/%Y') }}</p>
+                        <p><strong>Hora:</strong> {{ cita.hora.strftime('%H:%M') }}</p>
+                        <p class="ticket-nota">¡Te esperamos! Si no puedes venir, avísanos.</p>
+                    </div>
+                    <div class="cita-acciones">
+                        <a href="{{ url_for('citas.modificar_cita', id=cita.id) }}" class="btn-modificar">✏️ Modificar</a>
+                        <form action="{{ url_for('citas.eliminar_cita_cliente', id=cita.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-eliminar" onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌ Anular</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
+        <hr>
         {% endif %}
 
         <!-- Sección de Búsqueda de Citas -->
