@@ -278,6 +278,22 @@ nav ul li a.active {
     color: #fff;
 }
 
+/* static/css/citas.css */
+
+.seccion-especial-separador {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3); /* Un fondo sutil para diferenciar */
+    border-radius: 15px;
+    border: 1px solid #d4af37;
+}
+
+.seccion-especial-separador h4 {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
 .btn-eliminar {
     background-color: #dc3545;
     color: #fff;

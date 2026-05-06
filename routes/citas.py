@@ -30,7 +30,7 @@ def obtener_calendario_separado(num_dias=15):
     especiales_db = ExcepcionHorario.query.filter(
         ExcepcionHorario.fecha > fecha_limite,
         ExcepcionHorario.es_cerrado == False
-    ).all()
+    ).order_by(ExcepcionHorario.fecha.asc()).all()
 
     for esp in especiales_db:
         if obtener_horas_libres_por_fecha(esp.fecha):
