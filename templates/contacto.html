@@ -27,9 +27,13 @@
                         <p class="ticket-nota">¡Te esperamos! Si no puedes venir, avísanos.</p>
                     </div>
                     <div class="cita-acciones">
-                        <a href="{{ url_for('citas.modificar_cita', id=cita.id) }}" class="btn-modificar">✏️ Modificar</a>
-                        <form action="{{ url_for('citas.eliminar_cita_cliente', id=cita.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn-eliminar" onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌ Anular</button>
+                        <a href="{{ url_for('citas.modificar_cita', id=cita.id) }}" class="btn-modificar">✏️
+                            Modificar</a>
+                        <form action="{{ url_for('citas.eliminar_cita_cliente', id=cita.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn-eliminar"
+                                onclick="return confirm('¿Seguro que quieres anular esta cita? Esta acción no se puede deshacer.');">❌
+                                Anular</button>
                         </form>
                     </div>
                 </div>
@@ -128,12 +132,12 @@
                     </select>
                 </div>
 
-                {# FECHA DINÁMICA (Próximos 10 días enviados desde el servidor) #}
+                {# FECHA DINÁMICA #}
                 <div class="form-group">
                     <label>Selecciona tu día:</label>
-                    <!-- Campo oculto que enviará la fecha al formulario al hacer clic en el calendario -->
                     <input type="hidden" name="fecha" id="fecha-seleccionada" required>
 
+                    <!-- Agenda habitual -->
                     <div id="calendario-itv" class="calendario-grid">
                         {% for dia in dias %}
                         <div class="dia-itv" data-fecha="{{ dia.valor }}"
@@ -143,6 +147,23 @@
                         </div>
                         {% endfor %}
                     </div>
+
+                    <!-- SECCIÓN DÍAS ESPECIALES (Solo si hay fechas lejanas configuradas) -->
+                    {% if especiales %}
+                    <div class="seccion-especial-separador">
+                        <h4>📅 Próximos días especiales disponibles:</h4>
+                        <div class="calendario-grid">
+                            {% for esp in especiales %}
+                            <div class="dia-itv dia-especial-resaltado" data-fecha="{{ esp.valor }}"
+                                onclick="seleccionarDia(this, '{{ esp.valor }}')">
+                                <span class="dia-nombre">{{ esp.texto[:3] }}</span>
+                                <span class="dia-numero">{{ esp.valor.split('-')[2] }}</span>
+                                <span class="dia-mes">{{ esp.valor.split('-')[1] }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
 
                 {# HORA DINÁMICA (Cuadrícula de botones) #}

@@ -31,7 +31,7 @@
 
     {# --- SECCIÓN CITAS --- #}
     {% if active_tab == 'citas' %}
-    <section  class="admin-card">
+    <section class="admin-card">
         <div class="card-header-flex">
             <h3>📅 Próximas Citas</h3>
             <form action="{{ url_for('admin.index') }}" method="GET" class="filter-form">
@@ -280,13 +280,6 @@
     </section>
     {% endif %}
 
-    <div class="logout-container">
-        <a href="{{ url_for('auth.logout') }}" class="btn-logout">Cerrar Sesión Segura</a>
-    </div>
-</div>
-
-<!-- Todo tu código HTML anterior se queda igual -->
-    
     <div class="logout-container">
         <a href="{{ url_for('auth.logout') }}" class="btn-logout">Cerrar Sesión Segura</a>
     </div>

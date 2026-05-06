@@ -33,7 +33,7 @@ def registro():
         flash('Registro completado. ¡Bienvenido/a! Ya puedes reservar tu cita.', 'success')
         
         # Redirigimos directamente a la página de contacto/reservas
-        return redirect(url_for('contacto'))
+        return redirect(url_for('cita.contacto'))
         
     return render_template('registro.html')
 
@@ -48,7 +48,7 @@ def login():
             login_user(user)
             # Ya que mejoramos la UX, si el usuario hace login, también le podemos mandar a contacto 
             # para que reserve directamente, o dejarlo en el index si lo prefieres.
-            return redirect(url_for('contacto')) 
+            return redirect(url_for('citas.contacto')) 
         else:
             flash('Teléfono o contraseña incorrectos.', 'error')
             
