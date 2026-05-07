@@ -20,6 +20,11 @@ Proyecto desarrollado en Python (Flask) para la gestión de citas y asesoría es
 - `app.py`: Archivo principal del servidor.
 - `models.py`: Definición de la base de datos SQLite.
 - `peluqueria.db`: Base de datos local generada automáticamente.
+- `/database`: Modelos SQLAlchemy (`models.py`).
+- `/routes`: Lógica de reservas, administración y autenticación.
+- `/ia`: Motor de inteligencia artificial y `herramientas.py` para conexión con la DB. (Falta meter pago para meter con la bd)
+- `/services` & `/task`: Lógica de mensajería y tareas programadas (reminders).
+- `app.py`: Punto de entrada Flask.
 
 Peluqueria/
 ├── app.py                # Punto de entrada (inicializa todo)
@@ -92,6 +97,12 @@ Panel de Administración (Dashboard): Visualización de citas próximas, gestió
 Galería Dinámica: Sistema de visualización de trabajos con optimización de imágenes y paginación.
 
 Seguridad: Autenticación robusta para el administrador con Flask-Login y Bcrypt.
+
+## 🚀 Funcionalidades estrella
+- **Asistente IA Operativo:** Chatbot que consulta disponibilidad en tiempo real y registra citas directamente en la base de datos.
+- **Notificaciones WhatsApp:** Integración para envío de confirmaciones y recordatorios automáticos (`services/` y `task/`).
+- **Gestión de Agenda:** Control de horarios independientes por peluquero y bloqueo de festivos desde el panel admin.
+- **Panel de Control:** Gestión de servicios, precios y visualización de citas próximas.
 
 📂 Estructura del Proyecto
 /database: Modelos de SQLAlchemy (models.py).

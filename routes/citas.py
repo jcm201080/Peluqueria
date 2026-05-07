@@ -253,7 +253,9 @@ def reservar():
 def buscar_cita():
     telefono = request.form.get('telefono_buscar', '').strip()
     servicios = Servicio.query.all()
-    dias = obtener_dias_proximos()
+    
+    # Corregimos la llamada a la función de calendario
+    calendario = obtener_calendario_separado()
 
     if not telefono:
         flash("Por favor, introduce un número de teléfono.", "error")
@@ -266,7 +268,8 @@ def buscar_cita():
                            telefono_buscado=telefono,
                            busqueda_realizada=True,
                            servicios=servicios,
-                           dias=dias)
+                           dias=calendario['normales'],        # Enviamos días normales
+                           especiales=calendario['especiales']) # Enviamos días especiales
 
 @citas_bp.route('/eliminar-cliente/<int:id>', methods=['POST'])
 def eliminar_cita_cliente(id):
@@ -298,6 +301,12 @@ def modificar_cita(id):
         return redirect(url_for('citas.contacto'))
         
     servicios = Servicio.query.all()
-    dias_disponibles = obtener_dias_proximos()
+    
+    # Corregimos también aquí la lógica del calendario
+    calendario = obtener_calendario_separado()
         
-    return render_template('modificar_cita.html', cita=cita, servicios=servicios, dias=dias_disponibles)
+    return render_template('modificar_cita.html', 
+                           cita=cita, 
+                           servicios=servicios, 
+                           dias=calendario['normales'],        # Enviamos días normales
+                           especiales=calendario['especiales']) # Enviamos días especiales
