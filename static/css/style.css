@@ -937,3 +937,34 @@ nav ul li a.active {
         padding: 4px 0;
     }
 }
+
+
+
+/* =========================================
+   ESTILOS PARA PÁGINAS DE ERROR
+   ========================================= */
+.error-container {
+    text-align: center;
+    max-width: 600px;
+    margin: 100px auto;
+    color: white; /* Asumiendo que tu fondo es oscuro #1a1a1a */
+    padding: 20px;
+}
+
+.error-title {
+    font-size: 6rem;
+    color: #d4a373; /* Tu color principal */
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.error-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.error-container p {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    color: #cccccc;
+}

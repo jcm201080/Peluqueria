@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="error-container">
+    <h1 class="error-title">{{ codigo }}</h1> 
+    <h2>¡Algo inesperado ha ocurrido!</h2>
+    <p>Detalle técnico: {{ mensaje }}</p>
+    <p>Si este error persiste, por favor avisa a nuestros barberos.</p>
+    <a href="{{ url_for('index') }}" class="btn-reservar">Volver al Inicio</a>
+</div>
+{% endblock %}

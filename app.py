@@ -11,6 +11,8 @@ from routes.citas import citas_bp
 from datetime import datetime, timedelta
 import json
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException
+
 
 load_dotenv()
 
@@ -76,6 +78,30 @@ def inject_config():
     except Exception:
         config = {"nombre_negocio": "Parra-Barber", "color_principal": "#d4a373", "color_fondo": "#1a1a1a"}
     return dict(web=config)
+
+
+from flask import abort # Asegúrate de añadir esto arriba del todo en tus imports
+
+
+# ---------------------------------------------
+
+# Manejador para el error 404 (Página no encontrada)
+@app.errorhandler(404)
+def pagina_no_encontrada(e):
+    return render_template('errores/404.html'), 404
+
+# Manejador para el error 500 (Error interno del servidor)
+@app.errorhandler(500)
+def error_interno(e):
+    # En producción aquí podrías registrar el error en un archivo .log
+    return render_template('errores/500.html'), 500
+
+# Este atrapa cualquier error HTTP estándar que no sea 404 o 500
+@app.errorhandler(HTTPException)
+def error_generico(e):
+    # e.code nos da el número del error (401, 403, etc.)
+    # e.name nos da el nombre del error
+    return render_template('errores/generico.html', codigo=e.code, mensaje=e.name), e.code
 
 if __name__ == '__main__':
     with app.app_context():

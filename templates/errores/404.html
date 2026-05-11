@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="error-container">
+    <h1 class="error-title">404</h1>
+    <h2>Ups... ¡Nos hemos cortado de más!</h2>
+    <p>La página que buscas no existe o ha sido movida.</p>
+    <a href="{{ url_for('index') }}" class="btn-reservar">Volver al Inicio</a>
+</div>
+{% endblock %}
