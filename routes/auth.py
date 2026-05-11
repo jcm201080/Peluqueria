@@ -33,7 +33,7 @@ def registro():
         flash('Registro completado. ¡Bienvenido/a! Ya puedes reservar tu cita.', 'success')
         
         # Redirigimos directamente a la página de contacto/reservas
-        return redirect(url_for('cita.contacto'))
+        return redirect(url_for('citas.contacto'))
         
     return render_template('registro.html')
 
