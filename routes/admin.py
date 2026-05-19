@@ -8,7 +8,7 @@ from database.models import db, Cita, Peluquero, Servicio, Configuracion, Horari
 from werkzeug.utils import secure_filename
 from PIL import Image
 import time # Añade este import
-from routes.citas import generar_franjas
+from routes.citas import generar_franjas, obtener_horario_activo_peluquero
 from datetime import datetime, timedelta
 from sqlalchemy import func # Necesario para hacer la media (AVG)
 
@@ -560,7 +560,6 @@ def gestion_diaria_v2():
     # Obtenemos la fecha seleccionada o la de hoy
     fecha_str = request.args.get('fecha_busqueda', datetime.now().strftime('%Y-%m-%d'))
     fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-    dia_semana_int = fecha_obj.weekday()
     
     # 1. Generar la cuadrícula de 35 días (7 columnas x 5 filas)
     dias_es = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
@@ -573,17 +572,19 @@ def gestion_diaria_v2():
             'texto': f"{dias_es[fecha_iter.weekday()]} {fecha_iter.day}"
         })
 
-    # 2. OBTENER CITAS Y HUECOS DE LA BASE DE DATOS (Lógica de tu antigua gestión_diaria)
+    # 2. OBTENER CITAS Y HUECOS DE LA BASE DE DATOS
     citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
     peluqueros = Peluquero.query.filter_by(activo=True).all()
     huecos_detalles = {}
 
     for p in peluqueros:
-        horario = HorarioPeluquero.query.filter_by(peluquero_id=p.id, dia_semana=dia_semana_int).first()
+        # 🟢 CORRECCIÓN: Usamos la función de citas.py que evalúa festivos y horarios especiales
+        horario = obtener_horario_activo_peluquero(p.id, fecha_obj)
 
-        if horario and horario.trabaja:
-            franjas = generar_franjas(horario.h_inicio_m, horario.h_fin_m) + \
-                      generar_franjas(horario.h_inicio_t, horario.h_fin_t)
+        if horario:
+            # Generamos las franjas usando los datos del diccionario devuelto
+            franjas = generar_franjas(horario.get('h_im'), horario.get('h_fm')) + \
+                      generar_franjas(horario.get('h_it'), horario.get('h_ft'))
 
             for hora_f in franjas:
                 hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
@@ -623,7 +624,6 @@ def gestion_diaria_v2():
                            fecha_actual=fecha_str,
                            dias_calendario=dias_calendario,
                            agenda=agenda_ordenada)
-
 
 
 
