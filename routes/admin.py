@@ -368,7 +368,34 @@ def eliminar_festivo(id):
     flash("Día festivo eliminado. El calendario vuelve a la normalidad.")
     return redirect(url_for('admin.index', tab='horarios'))
 
+@admin_bp.route('/modificar_festivo/<int:id>', methods=['POST'])
+@login_required
+def modificar_festivo(id):
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    festivo = ExcepcionHorario.query.get_or_404(id)
+    
+    # Recogemos los nuevos datos del formulario
+    p_id = request.form.get('peluquero_id')
+    
+    try:
+        festivo.peluquero_id = int(p_id) if p_id and p_id != "todos" else None
+        
+        # Actualizamos las horas
+        festivo.h_inicio_m = request.form.get('h_im')
+        festivo.h_fin_m = request.form.get('h_fm')
+        festivo.h_inicio_t = request.form.get('h_it')
+        festivo.h_fin_t = request.form.get('h_ft')
+        
+        db.session.commit()
+        flash(f"Horario especial del {festivo.fecha.strftime('%d/%m/%Y')} modificado correctamente.", "success")
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Error al modificar horario especial: {e}", "error")
 
+    return redirect(url_for('admin.index', tab='horarios'))
 
 def obtener_ruta_json():
     return os.path.join(current_app.root_path, 'config_web.json')

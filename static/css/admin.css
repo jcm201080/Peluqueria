@@ -378,4 +378,147 @@
 }
 
 
+/* =========================================
+   ESTILOS PARA EL MODAL DE HORARIOS
+   ========================================= */
+
+/* Fondo oscuro que cubre toda la pantalla con efecto desenfoque */
+.modal-admin {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); 
+    backdrop-filter: blur(5px); /* Efecto cristal de fondo */
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Caja principal del modal */
+.modal-admin .modal-content {
+    background-color: #1a1a1a; /* Fondo gris muy oscuro */
+    border: 1px solid #d4a373; /* Borde con tu color principal */
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    color: #ffffff;
+    animation: modalFadeIn 0.3s ease; /* Animación suave al abrir */
+}
+
+/* Animación para que aparezca suavemente */
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Título del modal */
+.modal-admin .modal-content h3 {
+    margin-top: 0;
+    color: #d4a373;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+}
+
+/* Etiquetas del formulario (Peluquero, Mañana, Tarde) */
+.modal-admin .modal-content label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #cccccc;
+    font-size: 0.95rem;
+}
+
+/* Estilos para el Selector (Select) */
+.modal-admin .modal-content select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+/* Estilos para los campos de hora */
+.modal-admin .modal-content input[type="time"] {
+    width: 42%; /* Para que quepan los dos en la misma línea */
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* Texto " a " entre las horas */
+.modal-admin .modal-content form {
+    color: #888;
+    font-weight: bold;
+}
+
+/* Efecto al hacer clic en los inputs (Focus) */
+.modal-admin .modal-content select:focus,
+.modal-admin .modal-content input[type="time"]:focus {
+    outline: none;
+    border-color: #d4a373;
+    background-color: #333;
+    box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.2);
+}
+
+/* Contenedor de los botones */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+/* Botón de cancelar */
+.modal-actions button[type="button"] {
+    padding: 12px 20px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.modal-actions button[type="button"]:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Botón de guardar (si ya tienes .btn-save en tu css, esto solo reforzará el modal) */
+.modal-actions .btn-save {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: #d4a373;
+    color: #111111;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.modal-actions .btn-save:hover {
+    background-color: #e5b887;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(212, 163, 115, 0.3);
+}
+
 

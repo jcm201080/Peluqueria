@@ -266,6 +266,13 @@
                     <td>{{ ex.h_inicio_m }} - {{ ex.h_fin_m }}</td>
                     <td>{{ ex.h_inicio_t }} - {{ ex.h_fin_t }}</td>
                     <td>
+                        <!-- Botón para abrir el formulario/modal de edición -->
+                        <!-- Botón para abrir el formulario/modal de edición -->
+                        <button type="button" class="btn-edit"
+                            onclick="abrirModalModificarFestivo('{{ ex.id }}', '{{ ex.fecha.strftime('%d/%m/%Y') }}', '{{ ex.peluquero_id or 'todos' }}', '{{ ex.h_inicio_m }}', '{{ ex.h_fin_m }}', '{{ ex.h_inicio_t }}', '{{ ex.h_fin_t }}')">
+                            Modificar
+                        </button>
+
                         <a href="{{ url_for('admin.eliminar_festivo', id=ex.id) }}" class="btn-delete"
                             onclick="return confirm('¿Eliminar este horario especial?')">Eliminar</a>
                     </td>
@@ -278,6 +285,67 @@
             </tbody>
         </table>
     </section>
+
+    <!-- Modal / Formulario Oculto para Modificar Festivo -->
+    <div id="modalModificarFestivo" style="display: none;" class="modal-admin">
+        <div class="modal-content">
+            <h3>Modificando día: <span id="mod_fecha_display" style="color: #fff;"></span></h3>
+            <form id="formModificarFestivo" method="POST">
+                <!-- Selector de Peluquero -->
+                <label>Peluquero:</label>
+                <select name="peluquero_id" id="mod_peluquero_id">
+                    <option value="todos">🌍 Todos</option>
+                    {% for p in peluqueros %}
+                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Horarios Mañana -->
+                <label>Mañana:</label>
+                <input type="time" name="h_im" id="mod_h_im"> a
+                <input type="time" name="h_fm" id="mod_h_fm">
+
+                <!-- Horarios Tarde -->
+                <label>Tarde:</label>
+                <input type="time" name="h_it" id="mod_h_it"> a
+                <input type="time" name="h_ft" id="mod_h_ft">
+
+                <div class="modal-actions">
+                    <button type="button" onclick="cerrarModalFestivo()">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // Función para rellenar los datos y mostrar el formulario
+    function abrirModalModificarFestivo(id, fechaStr, peluqueroId, him, hfm, hit, hft) {
+        // Apuntar el formulario a la URL correcta
+        document.getElementById('formModificarFestivo').action = "/admin/modificar_festivo/" + id;
+
+        // Escribir la fecha en el título del modal
+        document.getElementById('mod_fecha_display').innerText = fechaStr;
+
+        // Rellenar los campos con los datos actuales
+        document.getElementById('mod_peluquero_id').value = peluqueroId;
+        document.getElementById('mod_h_im').value = him;
+        document.getElementById('mod_h_fm').value = hfm;
+        document.getElementById('mod_h_it').value = hit;
+        document.getElementById('mod_h_ft').value = hft;
+
+        // Mostrar el modal
+        document.getElementById('modalModificarFestivo').style.display = 'block';
+    }
+
+    function cerrarModalFestivo() {
+        document.getElementById('modalModificarFestivo').style.display = 'none';
+    }
+</script>
+
+    <!-- ========================================== -->
+    <!-- HASTA AQUÍ -->
+    <!-- ========================================== -->
     {% endif %}
 
     <div class="logout-container">
