@@ -60,9 +60,7 @@ Web profesional para peluquería con reserva de citas, gestión de profesionales
 2. Configurar DB y Admin: `python setup_db.py`
 3. Ejecutar: `python app.py`
 
-## 🔐 Credenciales Admin por defecto
-- **Teléfono:** 633013315
-- **Password:** admin123
+
 
 ## 🚀 Despliegue en Producción (VPS)
 1. Subir cambios: `git push origin main`
@@ -128,10 +126,6 @@ Inicializar: python setup_db.py (Crea la estructura de horarios independientes y
 
 Ejecutar: python app.py
 
-🔐 Credenciales Admin (Por defecto)
-Teléfono: 633013315
-
-Password: admin123
 
 🚀 Próximos Pasos (Hoja de Ruta)
 [ ] Implementación de IA (Asesor Estético): Integrar el motor de OpenAI para responder dudas sobre cortes, barbas y cuidado capilar basándose en los servicios ofrecidos.
