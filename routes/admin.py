@@ -388,6 +388,32 @@ def nuevo_peluquero():
         
     return redirect(url_for('admin.index', tab='horarios'))
 
+@admin_bp.route('/peluquero/eliminar/<int:id>')
+@login_required
+def eliminar_peluquero(id):
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    peluquero = Peluquero.query.get_or_404(id)
+    nombre_eliminado = peluquero.nombre
+    
+    try:
+        # 1. Borramos primero todos los horarios base asociados a este profesional
+        for horario in peluquero.horarios:
+            db.session.delete(horario)
+            
+        # 2. Borramos al profesional
+        db.session.delete(peluquero)
+        db.session.commit()
+        
+        flash(f"✅ Profesional '{nombre_eliminado}' y sus horarios eliminados correctamente.", "success")
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Error al eliminar el profesional. (Es posible que tenga citas futuras asignadas). Error: {str(e)}", "error")
+        
+    return redirect(url_for('admin.index', tab='horarios'))
+
 @admin_bp.route('/añadir_festivo', methods=['POST'])
 @login_required
 def añadir_festivo():

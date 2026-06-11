@@ -171,11 +171,19 @@
         {% for p in peluqueros %}
         <div class="peluquero-config-box">
             
+            <!-- MODIFICAR O ELIMINAR PELUQUERO -->
             <div class="peluquero-header-edit">
                 <form action="{{ url_for('admin.editar_nombre_peluquero', id=p.id) }}" method="POST" class="form-inline">
                     <input type="text" name="nombre" value="{{ p.nombre }}" required class="input-peluquero-nombre">
                     <button type="submit" class="btn-edit">Renombrar</button>
                 </form>
+                
+                <!-- BOTÓN ELIMINAR CON CONFIRMACIÓN -->
+                <a href="{{ url_for('admin.eliminar_peluquero', id=p.id) }}" 
+                   class="btn-delete" 
+                   onclick="return confirm('⚠️ ALERTA: ¿Estás seguro de que deseas eliminar a {{ p.nombre }}? Se borrará todo su horario asociado. Esta acción NO se puede deshacer.');">
+                   🗑️ Eliminar Profesional
+                </a>
             </div>
 
             <form action="{{ url_for('admin.actualizar_horario_detallado', id=p.id) }}" method="POST">

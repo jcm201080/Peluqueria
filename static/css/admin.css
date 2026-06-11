@@ -533,9 +533,13 @@
     border: 1px dashed #d4a373; /* Adaptado a tu color principal */
 }
 
+/* =========================================
+   CABECERA DEL PELUQUERO (EDICIÓN Y BORRADO)
+========================================= */
 .peluquero-header-edit {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Separa el formulario a la izq. y borrar a la der. */
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #333;
