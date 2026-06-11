@@ -175,7 +175,9 @@
                     <input type="text" name="hora" id="hora-seleccionada" required
                         style="position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;">
 
-                    <div id="contenedor-horas" class="horas-grid">
+                    <!-- AÑADIMOS data-mostrar-peluquero LEYENDO LA CONFIGURACIÓN -->
+                    <div id="contenedor-horas" class="horas-grid" 
+                         data-mostrar-peluquero="{{ 'true' if web.mostrar_peluqueros else 'false' }}">
                         <!-- El JavaScript inyectará aquí los botones de las horas -->
                     </div>
                 </div>

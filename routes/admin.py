@@ -339,6 +339,55 @@ def actualizar_horario_detallado(id):
     flash(f"Horario de {peluquero.nombre} actualizado correctamente.")
     return redirect(url_for('admin.index', tab='horarios'))
 
+
+# --- GESTIÓN DE NOMBRES Y CREACIÓN DE PELUQUEROS ---
+
+@admin_bp.route('/peluquero/editar_nombre/<int:id>', methods=['POST'])
+@login_required
+def editar_nombre_peluquero(id):
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    peluquero = Peluquero.query.get_or_404(id)
+    nuevo_nombre = request.form.get('nombre')
+    
+    if nuevo_nombre:
+        peluquero.nombre = nuevo_nombre
+        db.session.commit()
+        flash(f"Nombre actualizado correctamente a {nuevo_nombre}.", "success")
+        
+    return redirect(url_for('admin.index', tab='horarios'))
+
+@admin_bp.route('/peluquero/nuevo', methods=['POST'])
+@login_required
+def nuevo_peluquero():
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+    
+    nombre = request.form.get('nombre')
+    if nombre:
+        # 1. Creamos al peluquero (activo por defecto)
+        nuevo_p = Peluquero(nombre=nombre, activo=True)
+        db.session.add(nuevo_p)
+        db.session.commit() # Hacemos commit para obtener su ID real
+        
+        # 2. Generamos automáticamente sus 7 días de horario base
+        for i in range(7):
+            es_laborable = True if i < 5 else False # Lunes(0) a Viernes(4) trabajan, Finde(5,6) descansan por defecto
+            nuevo_horario = HorarioPeluquero(
+                peluquero_id=nuevo_p.id,
+                dia_semana=i,
+                trabaja=es_laborable,
+                h_inicio_m="09:00", h_fin_m="14:00",
+                h_inicio_t="16:00", h_fin_t="20:00"
+            )
+            db.session.add(nuevo_horario)
+            
+        db.session.commit()
+        flash(f"Peluquero {nombre} añadido con sus horarios base generados.", "success")
+        
+    return redirect(url_for('admin.index', tab='horarios'))
+
 @admin_bp.route('/añadir_festivo', methods=['POST'])
 @login_required
 def añadir_festivo():
@@ -414,6 +463,30 @@ def leer_config():
             "ia_prompt": "Eres un experto barbero..."
         }
 
+
+# --- NUEVA RUTA PARA EL INTERRUPTOR DE PELUQUEROS ---
+@admin_bp.route('/toggle_mostrar_peluqueros', methods=['POST'])
+@login_required
+def toggle_mostrar_peluqueros():
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+
+    config_data = leer_config()
+    
+    # Si el interruptor está activado, manda 'on'. Si se desactiva, no manda nada.
+    estado = request.form.get('mostrar_peluqueros') == 'on'
+    config_data['mostrar_peluqueros'] = estado
+
+    try:
+        with open(obtener_ruta_json(), 'w', encoding='utf-8') as f:
+            json.dump(config_data, f, indent=4, ensure_ascii=False)
+        flash('✅ Vista de clientes actualizada.', 'success')
+    except Exception as e:
+        flash(f'❌ Error al guardar la configuración: {str(e)}', 'error')
+
+    # Volvemos a la misma pestaña de horarios
+    return redirect(url_for('admin.index', tab='horarios'))
+
 #Página de ajustes:
 
 
@@ -432,6 +505,10 @@ def ajustes():
         config_data['color_principal'] = request.form.get('color_principal')
         config_data['color_fondo'] = request.form.get('color_secundario')
         config_data['ia_prompt'] = request.form.get('ia_prompt')
+
+        # --- 👇 NUEVA LÍNEA PARA EL INTERRUPTOR DE PELUQUEROS 👇 ---
+        config_data['mostrar_peluqueros'] = True if request.form.get('mostrar_peluqueros') == 'on' else False
+        # -----------------------------------------------------------
 
         # Gestión del Logo
         if 'logo' in request.files:

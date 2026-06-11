@@ -133,13 +133,51 @@
     {% elif active_tab == 'horarios' %}
     <section class="admin-card">
         <div class="header-seccion">
-            <h3>⏰ Gestión de Horarios por Peluquero</h3>
-            <p class="subtitle">Configura el horario específico para cada día de la semana.</p>
+            <h3>⏰ Gestión de Peluqueros y Horarios</h3>
+            <p class="subtitle">Administra tu equipo, sus nombres y configura el horario para cada día de la semana.</p>
         </div>
+
+        <!-- NUEVO BLOQUE: INTERRUPTOR DE VISIBILIDAD -->
+        <div class="config-toggle-box">
+            <form action="{{ url_for('admin.toggle_mostrar_peluqueros') }}" method="POST" id="form-toggle-peluqueros">
+                <label class="toggle-label" for="mostrar_peluqueros">
+                    <div class="toggle-text">
+                        <strong>👁️ Mostrar peluqueros al reservar</strong>
+                        <p class="text-muted">Si está apagado, el cliente solo verá la hora disponible sin saber quién le atiende.</p>
+                    </div>
+                    <div class="switch-wrapper">
+                        <!-- El onchange hace que el formulario se envíe solo al hacer clic -->
+                        <input type="checkbox" name="mostrar_peluqueros" id="mostrar_peluqueros" 
+                               {% if web.get('mostrar_peluqueros', False) %}checked{% endif %}
+                               onchange="document.getElementById('form-toggle-peluqueros').submit();">
+                        <span class="slider round"></span>
+                    </div>
+                </label>
+            </form>
+        </div>
+
+        <div class="divider-large"></div>
+
+        <div class="peluquero-add-box">
+            <h4>➕ Añadir Nuevo Profesional</h4>
+            <form action="{{ url_for('admin.nuevo_peluquero') }}" method="POST" class="form-inline">
+                <input type="text" name="nombre" placeholder="Nombre del peluquero" required class="flex-2">
+                <button type="submit" class="btn-save btn-create">Crear Peluquero</button>
+            </form>
+        </div>
+
+        <div class="divider-large"></div>
 
         {% for p in peluqueros %}
         <div class="peluquero-config-box">
-            <h4>{{ p.nombre }}</h4>
+            
+            <div class="peluquero-header-edit">
+                <form action="{{ url_for('admin.editar_nombre_peluquero', id=p.id) }}" method="POST" class="form-inline">
+                    <input type="text" name="nombre" value="{{ p.nombre }}" required class="input-peluquero-nombre">
+                    <button type="submit" class="btn-edit">Renombrar</button>
+                </form>
+            </div>
+
             <form action="{{ url_for('admin.actualizar_horario_detallado', id=p.id) }}" method="POST">
                 <div class="horarios-grid">
                     {% for h in p.horarios|sort(attribute='dia_semana') %}
@@ -147,8 +185,7 @@
                         <div class="dia-header">
                             <label>
                                 <input type="checkbox" name="trabaja_{{ h.dia_semana }}" {{ 'checked' if h.trabaja }}>
-                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
-                                'Domingo'] %}
+                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] %}
                                 <strong>{{ nombres[h.dia_semana] }}</strong>
                             </label>
                         </div>

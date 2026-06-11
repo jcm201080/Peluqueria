@@ -7,5 +7,6 @@
     "instagram_user": "parrabarber",
     "logo_img": "img/logo.jpeg",
     "logo_texto_img": "img/logo.jpeg",
-    "ia_prompt": "Eres un experto en peluquería masculina y estilismo..."
+    "ia_prompt": "Eres un experto en peluquería masculina y estilismo...",
+    "mostrar_peluqueros": false
 }

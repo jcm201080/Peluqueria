@@ -1,38 +1,30 @@
 document.addEventListener('DOMContentLoaded', actualizarCalendario);
 
-// static/js/reservas.js
-
 async function actualizarCalendario() {
     try {
-        // 1. Hacemos UNA ÚNICA petición al nuevo endpoint para obtener el resumen mensual
         const responseResumen = await fetch('/api/disponibilidad-mensual');
         const resumen = await responseResumen.json();
         
-        // Asumimos que la API devuelve un array de fechas ocupadas
         const diasOcupadosCompletamente = resumen.dias_ocupados || []; 
         
-        // 2. Además, podemos pedir los cierres totales si los mantienes en otra API
         const responseBloqueados = await fetch('/api/dias-ocupados');
         const diasBloqueados = await responseBloqueados.json();
 
-        // Unimos ambos arrays para tener la lista completa de días sin citas
         const todosLosDiasInactivos = [...new Set([...diasBloqueados, ...diasOcupadosCompletamente])];
 
         const diasElements = document.querySelectorAll('.dia-itv');
         
-        // 3. Iteramos por el DOM, ¡pero SIN hacer peticiones fetch aquí!
         for (let el of diasElements) {
             const fecha = el.getAttribute('data-fecha');
             
             if (todosLosDiasInactivos.includes(fecha)) {
-                marcarOcupado(el); //[cite: 1]
+                marcarOcupado(el); 
             } else {
-                marcarDisponible(el); //[cite: 1]
+                marcarDisponible(el); 
             }
         }
     } catch (error) {
-        console.error("Error consultando disponibilidad:", error); //[cite: 1]
-        // Si falla, es mejor marcar todo como ocupado o mostrar un mensaje de error global
+        console.error("Error consultando disponibilidad:", error); 
         document.querySelectorAll('.dia-itv').forEach(marcarOcupado); 
     }
 }
@@ -40,7 +32,7 @@ async function actualizarCalendario() {
 function marcarOcupado(elemento) {
     elemento.classList.add('ocupado');
     elemento.classList.remove('disponible');
-    elemento.onclick = null; // Desactiva el clic por completo
+    elemento.onclick = null;
 }
 
 function marcarDisponible(elemento) {
@@ -48,56 +40,76 @@ function marcarDisponible(elemento) {
     elemento.classList.remove('ocupado');
 }
 
-// Esta función es llamada directamente por el 'onclick' del HTML
 window.seleccionarDia = function(elemento, fecha) {
-    // Evitar hacer clic en un día rojo (ocupado)
     if (elemento.classList.contains('ocupado')) return;
     
-    // Quitar la clase 'active' de todos los días y ponérsela al actual
     document.querySelectorAll('.dia-itv').forEach(d => d.classList.remove('active'));
     elemento.classList.add('active');
     
-    // Guardar valor en el input oculto para enviarlo con el formulario
     document.getElementById('fecha-seleccionada').value = fecha;
     document.getElementById('hora-seleccionada').value = '';
-    // Cargar las horas en el select
+    
     cargarHoras(fecha); 
 }
 
-// Añade esta línea dentro de tu función seleccionarDia(elemento, fecha) existente,
-// justo debajo de document.getElementById('fecha-seleccionada').value = fecha;
-document.getElementById('hora-seleccionada').value = ''; 
-
-
-// Sustituye tu función cargarHoras(fecha) por esta:
 function cargarHoras(fecha) {
     const grupoHoras = document.getElementById('grupo-horas');
     const contenedorHoras = document.getElementById('contenedor-horas');
 
-    // Mostramos la sección de horas y ponemos un mensaje de carga
     grupoHoras.style.display = 'block';
     contenedorHoras.innerHTML = '<p style="color: #aaa; grid-column: 1 / -1;">Buscando huecos...</p>';
 
     fetch(`/api/disponibilidad?fecha=${fecha}`)
         .then(response => response.json())
-        .then(horas => {
-            contenedorHoras.innerHTML = ''; // Limpiamos el mensaje
+        .then(datos => {
+            contenedorHoras.innerHTML = ''; 
             
-            if (horas.length === 0) {
+            if (!datos || datos.length === 0) {
                 contenedorHoras.innerHTML = '<p style="color: #dc3545; grid-column: 1 / -1;">❌ No quedan huecos para este día.</p>';
+                return;
+            }
+
+            // LEEMOS LA CONFIGURACIÓN DEL HTML
+            const mostrarPeluquero = contenedorHoras.getAttribute('data-mostrar-peluquero') === 'true';
+            
+            let huecosProcesados = [];
+
+            if (mostrarPeluquero) {
+                // Si mostramos peluqueros, volcamos todas las combinaciones (Ej: 10:00 - Jose, 10:00 - Antonio)
+                huecosProcesados = datos;
             } else {
-                // Creamos un botón div por cada hora disponible
-                horas.forEach(h => {
-                    const btn = document.createElement('div');
-                    btn.className = 'hora-btn';
-                    btn.textContent = h;
-                    
-                    // Al hacer clic, ejecuta seleccionarHora
-                    btn.onclick = function() { seleccionarHora(this, h); };
-                    
-                    contenedorHoras.appendChild(btn);
+                // Si NO mostramos peluqueros, agrupamos por hora para que no salgan botones duplicados
+                const horasVistas = new Set();
+                huecosProcesados = datos.filter(h => {
+                    const horaTexto = typeof h === 'string' ? h : h.hora;
+                    if (horasVistas.has(horaTexto)) return false;
+                    horasVistas.add(horaTexto);
+                    return true;
                 });
             }
+
+            // PINTAMOS LOS BOTONES
+            huecosProcesados.forEach(hueco => {
+                const horaTexto = typeof hueco === 'string' ? hueco : hueco.hora;
+                const peluqueroId = typeof hueco === 'object' ? hueco.peluquero_id : '';
+                const peluqueroNombre = typeof hueco === 'object' ? hueco.peluquero_nombre : '';
+
+                const btn = document.createElement('div');
+                btn.className = 'hora-btn btn-hora'; 
+                
+                let htmlContenido = `<span>${horaTexto}</span>`;
+                
+                if (mostrarPeluquero && peluqueroNombre) {
+                    htmlContenido += `<span class="tag-peluquero">${peluqueroNombre}</span>`;
+                }
+                
+                btn.innerHTML = htmlContenido;
+                
+                // Al hacer click, enviamos tanto la hora como el ID del profesional
+                btn.onclick = function() { seleccionarHora(this, horaTexto, peluqueroId); };
+                
+                contenedorHoras.appendChild(btn);
+            });
         })
         .catch(error => {
             console.error("Error al cargar horas:", error);
@@ -105,14 +117,23 @@ function cargarHoras(fecha) {
         });
 }
 
-// Nueva función para manejar el clic en los botones de hora
-window.seleccionarHora = function(elemento, hora) {
-    // 1. Quitar la clase 'active' de todas las horas
-    document.querySelectorAll('.hora-btn').forEach(btn => btn.classList.remove('active'));
+window.seleccionarHora = function(elemento, hora, peluquero_id) {
+    document.querySelectorAll('.hora-btn').forEach(btn => btn.classList.remove('active', 'seleccionado'));
+    elemento.classList.add('active', 'seleccionado');
     
-    // 2. Ponérsela solo a la que hemos hecho clic
-    elemento.classList.add('active');
-    
-    // 3. Guardar el valor en el input oculto para que el formulario lo envíe
+    // Guardamos la hora
     document.getElementById('hora-seleccionada').value = hora;
+
+    // MAGIA: Creamos un input oculto al vuelo para enviar el ID del peluquero al backend si existe
+    let inputPeluquero = document.getElementById('input-peluquero-dinamico');
+    if (!inputPeluquero) {
+        inputPeluquero = document.createElement('input');
+        inputPeluquero.type = 'hidden';
+        inputPeluquero.name = 'peluquero_id'; // Coincide con tu request.form.get('peluquero_id') en backend
+        inputPeluquero.id = 'input-peluquero-dinamico';
+        document.querySelector('form').appendChild(inputPeluquero);
+    }
+    
+    // Si la opción de elegir peluquero está oculta o no aplica, se manda vacío y el backend autoasigna.
+    inputPeluquero.value = peluquero_id || '';
 }

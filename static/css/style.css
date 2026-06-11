@@ -968,3 +968,33 @@ nav ul li a.active {
     margin-bottom: 40px;
     color: #cccccc;
 }
+
+/* =========================================
+   ETIQUETA DE PELUQUERO EN RESERVAS
+========================================= */
+.horas-grid .btn-hora {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 5px;
+    /* Asegúrate de mantener aquí el resto de estilos de tu botón actual */
+}
+
+.tag-peluquero {
+    font-size: 0.75rem;
+    background-color: var(--color-principal, #d4a373); /* Usa tu variable de color */
+    color: #f3eeee;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Opcional: Si el botón de hora está seleccionado, cambiar el color del tag para que contraste */
+.horas-grid .btn-hora.seleccionado .tag-peluquero {
+    background-color: #fff;
+    color: var(--color-principal, #d4a373);
+}

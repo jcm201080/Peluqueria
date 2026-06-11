@@ -123,8 +123,34 @@ def check_disponibilidad():
 
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        horas_libres = obtener_horas_libres_por_fecha(fecha_obj)
-        return jsonify(sorted(list(horas_libres)))
+        peluqueros = Peluquero.query.filter_by(activo=True).all()
+        
+        # Obtenemos las horas generales que están libres
+        horas_libres_set = obtener_horas_libres_por_fecha(fecha_obj)
+        resultados = []
+        
+        for hora_f in sorted(list(horas_libres_set)):
+            hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
+            
+            # Comprobamos QUÉ peluqueros están libres en esa hora concreta
+            for p in peluqueros:
+                horario_a_usar = obtener_horario_activo_peluquero(p.id, fecha_obj)
+                
+                if horario_a_usar:
+                    franjas_validas = generar_franjas(horario_a_usar.get('h_im'), horario_a_usar.get('h_fm')) + \
+                                      generar_franjas(horario_a_usar.get('h_it'), horario_a_usar.get('h_ft'))
+                    
+                    if hora_f in franjas_validas:
+                        ocupada = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
+                        if not ocupada:
+                            # Si está libre, lo añadimos como hueco disponible
+                            resultados.append({
+                                'hora': hora_f,
+                                'peluquero_id': p.id,
+                                'peluquero_nombre': p.nombre
+                            })
+                            
+        return jsonify(resultados)
     except Exception as e:
         print(f"❌ Error en API Disponibilidad: {e}")
         return jsonify([]), 500

@@ -522,3 +522,122 @@
 }
 
 
+/* =========================================
+   GESTIÓN DE PELUQUEROS
+========================================= */
+.peluquero-add-box {
+    background-color: #1a1a1a; /* Usa una variable si tienes, ej: var(--bg-secundario) */
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px dashed #d4a373; /* Adaptado a tu color principal */
+}
+
+.peluquero-header-edit {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #333;
+}
+
+.input-peluquero-nombre {
+    font-size: 1.3rem;
+    font-weight: bold;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 250px;
+}
+
+.input-peluquero-nombre:hover,
+.input-peluquero-nombre:focus {
+    border-color: #d4a373;
+    background: #222;
+    outline: none;
+}
+
+/* =========================================
+   INTERRUPTOR (SWITCH) VISTA CLIENTES
+========================================= */
+.config-toggle-box {
+    background-color: #1a1a1a;
+    border: 1px dashed #d4a373; /* A juego con tu paleta */
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+}
+
+.toggle-text strong {
+    font-size: 1.1rem;
+    color: #fff;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.toggle-text p.text-muted {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+}
+
+/* Contenedor del interruptor */
+.switch-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.switch-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Deslizador */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #444;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+/* Estado activado */
+input:checked + .slider {
+    background-color: #d4a373;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
