@@ -16,6 +16,9 @@ class Peluquero(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), nullable=False)
     activo = db.Column(db.Boolean, default=True)
+
+    # NUEVO CAMPO: Orden de prioridad (1 = Se llena primero, 2 = Siguiente...)
+    prioridad = db.Column(db.Integer, default=1)
     # Relaciones
     horarios = db.relationship('HorarioPeluquero', backref='peluquero', lazy=True, cascade="all, delete-orphan")
     excepciones = db.relationship('ExcepcionHorario', backref='peluquero', lazy=True)
