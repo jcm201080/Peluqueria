@@ -1,4 +1,6 @@
-from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template
+import os
+import json
+from flask import Blueprint, request, redirect, url_for, flash, jsonify, render_template, current_app
 from flask_login import current_user
 from database.models import db, Cita, Peluquero, Servicio, HorarioPeluquero, ExcepcionHorario
 from datetime import datetime, timedelta
@@ -8,13 +10,98 @@ citas_bp = Blueprint('citas', __name__)
 DIAS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 MESES_ES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
 
+# ==========================================
+# 🛠️ NÚCLEO DE ASIGNACIÓN Y PRIORIDAD
+# ==========================================
+
+def leer_config_prioridad():
+    """Lee el estado del interruptor de prioridades desde el JSON"""
+    try:
+        ruta_json = os.path.join(current_app.root_path, 'config_web.json')
+        with open(ruta_json, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+            return config.get("usar_prioridades", False)
+    except Exception:
+        return False
+
+def obtener_disponibilidad_del_dia(fecha_obj):
+    """
+    Motor híbrido: 
+    Si usar_prioridades=False, une todos los huecos por igual.
+    Si usar_prioridades=True, llena los peluqueros de prioridad 1 antes de mostrar los del 2.
+    Devuelve siempre una lista agrupada: [{'hora': '10:00', 'peluqueros': [{'id': 1, 'nombre': 'Juan'}]}]
+    """
+    try:
+        peluqueros = Peluquero.query.filter_by(activo=True).order_by(Peluquero.prioridad.asc()).all()
+    except Exception:
+        peluqueros = Peluquero.query.filter_by(activo=True).order_by(Peluquero.id.asc()).all()
+
+    if not peluqueros:
+        return []
+
+    usar_prioridades = leer_config_prioridad()
+
+    # --- MODO 1: SIN PRIORIDADES (Reparto equitativo) ---
+    if not usar_prioridades:
+        huecos_agrupados = {}
+        for p in peluqueros:
+            horario = obtener_horario_activo_peluquero(p.id, fecha_obj)
+            if not horario: continue
+
+            franjas = generar_franjas(horario.get('h_im'), horario.get('h_fm')) + \
+                      generar_franjas(horario.get('h_it'), horario.get('h_ft'))
+            
+            citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
+            horas_cogidas = {c.hora.strftime('%H:%M') for c in citas_hoy}
+
+            for h in franjas:
+                if h not in horas_cogidas:
+                    if h not in huecos_agrupados:
+                        huecos_agrupados[h] = []
+                    huecos_agrupados[h].append({'id': p.id, 'nombre': p.nombre})
+        
+        return [{'hora': h, 'peluqueros': huecos_agrupados[h]} for h in sorted(huecos_agrupados.keys())]
+
+    # --- MODO 2: CON PRIORIDADES (Se llena nivel a nivel) ---
+    niveles_prioridad = sorted(list(set(getattr(p, 'prioridad', 1) for p in peluqueros)))
+
+    for nivel in niveles_prioridad:
+        peluqueros_en_nivel = [p for p in peluqueros if getattr(p, 'prioridad', 1) == nivel]
+        huecos_agrupados = {}
+
+        for p in peluqueros_en_nivel:
+            horario = obtener_horario_activo_peluquero(p.id, fecha_obj)
+            if not horario: continue
+
+            franjas = generar_franjas(horario.get('h_im'), horario.get('h_fm')) + \
+                      generar_franjas(horario.get('h_it'), horario.get('h_ft'))
+            
+            citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
+            horas_cogidas = {c.hora.strftime('%H:%M') for c in citas_hoy}
+
+            for h in franjas:
+                if h not in horas_cogidas:
+                    if h not in huecos_agrupados:
+                        huecos_agrupados[h] = []
+                    huecos_agrupados[h].append({'id': p.id, 'nombre': p.nombre})
+        
+        # Si hemos encontrado huecos en este nivel de prioridad, cortamos y enviamos solo estos.
+        if huecos_agrupados:
+            return [{'hora': h, 'peluqueros': huecos_agrupados[h]} for h in sorted(huecos_agrupados.keys())]
+            
+    return []
+
+def obtener_horas_libres_por_fecha(fecha_obj):
+    # Puente optimizado para el calendario
+    dispo = obtener_disponibilidad_del_dia(fecha_obj)
+    return set([hueco['hora'] for hueco in dispo])
+
 def obtener_calendario_separado(num_dias=15):
     hoy = datetime.now().date()
     limite_habitual = hoy + timedelta(days=num_dias)
     dias_normales = []
     dias_especiales = []
 
-    # 1. Días habituales
     for i in range(30):
         fecha = hoy + timedelta(days=i)
         if fecha.weekday() == 6: continue
@@ -25,7 +112,9 @@ def obtener_calendario_separado(num_dias=15):
             })
         if len(dias_normales) == 15: break
 
-    # 2. Días Especiales (más allá de los 15 días normales)
+    if not dias_normales:
+        return {'normales': [], 'especiales': []}
+        
     fecha_limite = datetime.strptime(dias_normales[-1]['valor'], '%Y-%m-%d').date()
     especiales_db = ExcepcionHorario.query.filter(
         ExcepcionHorario.fecha > fecha_limite,
@@ -60,7 +149,7 @@ def contacto():
                            especiales=calendario['especiales'],
                            proximas_citas=proximas_citas)
 
-# --- Funciones de apoyo ---
+# --- Funciones de apoyo menores ---
 
 def generar_franjas(inicio_str, fin_str):
     franjas = []
@@ -95,22 +184,6 @@ def obtener_horario_activo_peluquero(p_id, fecha_obj):
                 'h_it': h_normal.h_inicio_t, 'h_ft': h_normal.h_fin_t}
     return None
 
-def obtener_horas_libres_por_fecha(fecha_obj):
-    peluqueros = Peluquero.query.filter_by(activo=True).all()
-    horas_libres = set()
-    for p in peluqueros:
-        horario_a_usar = obtener_horario_activo_peluquero(p.id, fecha_obj)
-        if horario_a_usar:
-            franjas = generar_franjas(horario_a_usar.get('h_im'), horario_a_usar.get('h_fm')) + \
-                      generar_franjas(horario_a_usar.get('h_it'), horario_a_usar.get('h_ft'))
-            citas_hoy = Cita.query.filter_by(fecha=fecha_obj, peluquero_id=p.id).all()
-            horas_cogidas = [c.hora.strftime('%H:%M') for c in citas_hoy]
-            for f in franjas:
-                if f not in horas_cogidas:
-                    horas_libres.add(f)
-    return horas_libres
-
-
 # ==========================================
 # 🌐 RUTAS DE LA API (FRONTEND)
 # ==========================================
@@ -123,33 +196,8 @@ def check_disponibilidad():
 
     try:
         fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        peluqueros = Peluquero.query.filter_by(activo=True).all()
-        
-        # Obtenemos las horas generales que están libres
-        horas_libres_set = obtener_horas_libres_por_fecha(fecha_obj)
-        resultados = []
-        
-        for hora_f in sorted(list(horas_libres_set)):
-            hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
-            
-            # Comprobamos QUÉ peluqueros están libres en esa hora concreta
-            for p in peluqueros:
-                horario_a_usar = obtener_horario_activo_peluquero(p.id, fecha_obj)
-                
-                if horario_a_usar:
-                    franjas_validas = generar_franjas(horario_a_usar.get('h_im'), horario_a_usar.get('h_fm')) + \
-                                      generar_franjas(horario_a_usar.get('h_it'), horario_a_usar.get('h_ft'))
-                    
-                    if hora_f in franjas_validas:
-                        ocupada = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
-                        if not ocupada:
-                            # Si está libre, lo añadimos como hueco disponible
-                            resultados.append({
-                                'hora': hora_f,
-                                'peluquero_id': p.id,
-                                'peluquero_nombre': p.nombre
-                            })
-                            
+        # El motor devuelve la lista lista y agrupada para pintar en JS
+        resultados = obtener_disponibilidad_del_dia(fecha_obj)
         return jsonify(resultados)
     except Exception as e:
         print(f"❌ Error en API Disponibilidad: {e}")
@@ -161,7 +209,6 @@ def disponibilidad_mensual():
         dias_ocupados = []
         for i in range(30):
             fecha_obj = datetime.now().date() + timedelta(days=i)
-            # Descartar domingos directamente
             if fecha_obj.weekday() == 6:
                 dias_ocupados.append(fecha_obj.strftime('%Y-%m-%d'))
                 continue
@@ -181,7 +228,6 @@ def dias_ocupados():
     fechas_bloqueadas = [c.fecha.strftime('%Y-%m-%d') for c in cierres]
     return jsonify(fechas_bloqueadas)
 
-
 # ==========================================
 # 💾 RUTAS DE ACCIÓN (BACKEND)
 # ==========================================
@@ -193,7 +239,6 @@ def reservar():
     servicio = request.form.get('servicio')
     peluquero_id_manual = request.form.get('peluquero_id') 
 
-    # 1. Gestión de la Identidad del usuario
     if current_user.is_authenticated and current_user.es_admin and request.form.get('nombre'):
         nombre = f"Admin: {request.form.get('nombre')}"
         telefono = request.form.get('telefono', 'S/N')
@@ -217,24 +262,18 @@ def reservar():
         if peluquero_id_manual:
             peluquero_asignado_id = int(peluquero_id_manual)
         else:
-            # 2. Motor de Asignación Automática (¡Ahora sincronizado con la API!)
-            peluqueros = Peluquero.query.filter_by(activo=True).all()
-            for p in peluqueros:
-                horario_a_usar = obtener_horario_activo_peluquero(p.id, fecha_obj)
-                
-                if horario_a_usar:
-                    # Generamos los huecos exactos válidos para este peluquero hoy
-                    franjas_validas = generar_franjas(horario_a_usar.get('h_im'), horario_a_usar.get('h_fm')) + \
-                                      generar_franjas(horario_a_usar.get('h_it'), horario_a_usar.get('h_ft'))
-                    
-                    # Si la hora que pide el cliente es una franja válida para el peluquero
-                    if hora_str_simple in franjas_validas:
-                        ocupada = Cita.query.filter_by(fecha=fecha_obj, hora=hora_obj, peluquero_id=p.id).first()
-                        if not ocupada:
-                            peluquero_asignado_id = p.id
-                            break # Encontramos peluquero, rompemos el bucle
+            # Motor centralizado que soporta ambos modos (con y sin prioridades)
+            dispo = obtener_disponibilidad_del_dia(fecha_obj)
+            opciones_libres = []
+            
+            for hueco in dispo:
+                if hueco['hora'] == hora_str_simple:
+                    opciones_libres = [p['id'] for p in hueco['peluqueros']]
+                    break
+            
+            if opciones_libres:
+                peluquero_asignado_id = opciones_libres[0]
 
-        # 3. Guardado en Base de Datos
         if peluquero_asignado_id:
             nueva_cita = Cita(
                 fecha=fecha_obj, hora=hora_obj,
@@ -262,14 +301,13 @@ def reservar():
                 return redirect(url_for('citas.contacto'))
 
         else:
-            flash("Lo sentimos, otro cliente acaba de reservar este hueco o el peluquero no está disponible.", "error")
+            flash("Lo sentimos, otro cliente acaba de reservar este hueco o el profesional no está disponible.", "error")
             return redirect(url_for('citas.contacto'))
 
     except Exception as e:
         db.session.rollback()
         flash(f"Error al procesar la reserva: {e}", "error")
         return redirect(url_for('citas.contacto'))
-
 
 # ==========================================
 # 👤 RUTAS DE CLIENTES Y GESTIÓN DE CITAS
@@ -279,8 +317,6 @@ def reservar():
 def buscar_cita():
     telefono = request.form.get('telefono_buscar', '').strip()
     servicios = Servicio.query.all()
-    
-    # Corregimos la llamada a la función de calendario
     calendario = obtener_calendario_separado()
 
     if not telefono:
@@ -294,8 +330,8 @@ def buscar_cita():
                            telefono_buscado=telefono,
                            busqueda_realizada=True,
                            servicios=servicios,
-                           dias=calendario['normales'],        # Enviamos días normales
-                           especiales=calendario['especiales']) # Enviamos días especiales
+                           dias=calendario['normales'],
+                           especiales=calendario['especiales'])
 
 @citas_bp.route('/eliminar-cliente/<int:id>', methods=['POST'])
 def eliminar_cita_cliente(id):
@@ -327,12 +363,10 @@ def modificar_cita(id):
         return redirect(url_for('citas.contacto'))
         
     servicios = Servicio.query.all()
-    
-    # Corregimos también aquí la lógica del calendario
     calendario = obtener_calendario_separado()
         
     return render_template('modificar_cita.html', 
                            cita=cita, 
                            servicios=servicios, 
-                           dias=calendario['normales'],        # Enviamos días normales
-                           especiales=calendario['especiales']) # Enviamos días especiales
+                           dias=calendario['normales'],
+                           especiales=calendario['especiales'])

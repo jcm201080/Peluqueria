@@ -342,21 +342,34 @@ def actualizar_horario_detallado(id):
 
 # --- GESTIÓN DE NOMBRES Y CREACIÓN DE PELUQUEROS ---
 
-@admin_bp.route('/peluquero/editar_nombre/<int:id>', methods=['POST'])
+# --- GESTIÓN DE NOMBRES, PRIORIDADES Y CREACIÓN DE PELUQUEROS ---
+
+@admin_bp.route('/peluquero/editar/<int:id>', methods=['POST'])
 @login_required
-def editar_nombre_peluquero(id):
+def editar_peluquero(id):
     if not current_user.es_admin:
         return redirect(url_for('index'))
     
     peluquero = Peluquero.query.get_or_404(id)
     nuevo_nombre = request.form.get('nombre')
+    nueva_prioridad = request.form.get('prioridad') 
     
     if nuevo_nombre:
         peluquero.nombre = nuevo_nombre
+        
+    if nueva_prioridad and nueva_prioridad.isdigit():
+        peluquero.prioridad = int(nueva_prioridad)
+
+    try:
         db.session.commit()
-        flash(f"Nombre actualizado correctamente a {nuevo_nombre}.", "success")
+        flash(f"Datos de {peluquero.nombre} actualizados correctamente.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al actualizar profesional: {str(e)}", "error")
         
     return redirect(url_for('admin.index', tab='horarios'))
+
+from sqlalchemy import func # Asegúrate de que esta importación está al principio del archivo
 
 @admin_bp.route('/peluquero/nuevo', methods=['POST'])
 @login_required
@@ -366,14 +379,17 @@ def nuevo_peluquero():
     
     nombre = request.form.get('nombre')
     if nombre:
-        # 1. Creamos al peluquero (activo por defecto)
-        nuevo_p = Peluquero(nombre=nombre, activo=True)
+        # 1. Calculamos cuál es la prioridad más alta actual para asignarle la siguiente
+        max_prioridad = db.session.query(func.max(Peluquero.prioridad)).scalar() or 0
+        
+        # 2. Creamos al peluquero (activo por defecto y con su prioridad calculada)
+        nuevo_p = Peluquero(nombre=nombre, activo=True, prioridad=max_prioridad + 1)
         db.session.add(nuevo_p)
         db.session.commit() # Hacemos commit para obtener su ID real
         
-        # 2. Generamos automáticamente sus 7 días de horario base
+        # 3. Generamos automáticamente sus 7 días de horario base
         for i in range(7):
-            es_laborable = True if i < 5 else False # Lunes(0) a Viernes(4) trabajan, Finde(5,6) descansan por defecto
+            es_laborable = True if i < 5 else False # Lunes(0) a Viernes(4) trabajan, Finde(5,6) descansan
             nuevo_horario = HorarioPeluquero(
                 peluquero_id=nuevo_p.id,
                 dia_semana=i,
@@ -384,7 +400,7 @@ def nuevo_peluquero():
             db.session.add(nuevo_horario)
             
         db.session.commit()
-        flash(f"Peluquero {nombre} añadido con sus horarios base generados.", "success")
+        flash(f"Peluquero {nombre} añadido con sus horarios base (Prioridad: {nuevo_p.prioridad}).", "success")
         
     return redirect(url_for('admin.index', tab='horarios'))
 
@@ -507,6 +523,35 @@ def toggle_mostrar_peluqueros():
         with open(obtener_ruta_json(), 'w', encoding='utf-8') as f:
             json.dump(config_data, f, indent=4, ensure_ascii=False)
         flash('✅ Vista de clientes actualizada.', 'success')
+    except Exception as e:
+        flash(f'❌ Error al guardar la configuración: {str(e)}', 'error')
+
+    # Volvemos a la misma pestaña de horarios
+    return redirect(url_for('admin.index', tab='horarios'))
+
+
+# --- NUEVA RUTA PARA EL INTERRUPTOR DE PRIORIDADES ---
+@admin_bp.route('/toggle_prioridades', methods=['POST'])
+@login_required
+def toggle_prioridades():
+    if not current_user.es_admin:
+        return redirect(url_for('index'))
+
+    config_data = leer_config()
+    
+    # Si el checkbox está marcado, el form envía 'on'
+    estado = request.form.get('usar_prioridades') == 'on'
+    config_data['usar_prioridades'] = estado
+
+    try:
+        with open(obtener_ruta_json(), 'w', encoding='utf-8') as f:
+            json.dump(config_data, f, indent=4, ensure_ascii=False)
+            
+        if estado:
+            flash('✅ Sistema de prioridades ACTIVADO. (Se llenará un peluquero antes que otro).', 'success')
+        else:
+            flash('✅ Sistema de prioridades DESACTIVADO. (Reparto equitativo).', 'success')
+            
     except Exception as e:
         flash(f'❌ Error al guardar la configuración: {str(e)}', 'error')
 

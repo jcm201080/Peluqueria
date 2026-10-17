@@ -143,13 +143,32 @@
                 <label class="toggle-label" for="mostrar_peluqueros">
                     <div class="toggle-text">
                         <strong>👁️ Mostrar peluqueros al reservar</strong>
-                        <p class="text-muted">Si está apagado, el cliente solo verá la hora disponible sin saber quién le atiende.</p>
+                        <p class="text-muted">Si está apagado, el cliente solo verá la hora disponible sin saber quién
+                            le atiende.</p>
                     </div>
                     <div class="switch-wrapper">
                         <!-- El onchange hace que el formulario se envíe solo al hacer clic -->
-                        <input type="checkbox" name="mostrar_peluqueros" id="mostrar_peluqueros" 
-                               {% if web.get('mostrar_peluqueros', False) %}checked{% endif %}
-                               onchange="document.getElementById('form-toggle-peluqueros').submit();">
+                        <input type="checkbox" name="mostrar_peluqueros" id="mostrar_peluqueros" {% if
+                            web.get('mostrar_peluqueros', False) %}checked{% endif %}
+                            onchange="document.getElementById('form-toggle-peluqueros').submit();">
+                        <span class="slider round"></span>
+                    </div>
+                </label>
+            </form>
+        </div>
+        <!-- NUEVO BLOQUE: INTERRUPTOR DE PRIORIDADES -->
+        <div class="config-toggle-box" style="margin-top: 15px;">
+            <form action="{{ url_for('admin.toggle_prioridades') }}" method="POST" id="form-toggle-prioridades">
+                <label class="toggle-label" for="usar_prioridades">
+                    <div class="toggle-text">
+                        <strong>⭐ Sistema de Prioridades</strong>
+                        <p class="text-muted">Si está encendido, se llenará la agenda del peluquero con prioridad 1
+                            antes de mostrar los huecos del nivel 2.</p>
+                    </div>
+                    <div class="switch-wrapper">
+                        <input type="checkbox" name="usar_prioridades" id="usar_prioridades" {% if
+                            web.get('usar_prioridades', False) %}checked{% endif %}
+                            onchange="document.getElementById('form-toggle-prioridades').submit();">
                         <span class="slider round"></span>
                     </div>
                 </label>
@@ -170,19 +189,24 @@
 
         {% for p in peluqueros %}
         <div class="peluquero-config-box">
-            
+
             <!-- MODIFICAR O ELIMINAR PELUQUERO -->
             <div class="peluquero-header-edit">
-                <form action="{{ url_for('admin.editar_nombre_peluquero', id=p.id) }}" method="POST" class="form-inline">
+                <form action="{{ url_for('admin.editar_peluquero', id=p.id) }}" method="POST" class="form-inline">
                     <input type="text" name="nombre" value="{{ p.nombre }}" required class="input-peluquero-nombre">
-                    <button type="submit" class="btn-edit">Renombrar</button>
+
+                    <!-- Campo numérico para la prioridad -->
+                    <label for="prioridad_{{ p.id }}" class="label-prioridad">Prioridad:</label>
+                    <input type="number" name="prioridad" id="prioridad_{{ p.id }}" value="{{ p.prioridad }}" min="1"
+                        max="10" title="1 = Máxima prioridad" class="input-peluquero-prioridad" required>
+
+                    <button type="submit" class="btn-edit">Actualizar</button>
                 </form>
-                
+
                 <!-- BOTÓN ELIMINAR CON CONFIRMACIÓN -->
-                <a href="{{ url_for('admin.eliminar_peluquero', id=p.id) }}" 
-                   class="btn-delete" 
-                   onclick="return confirm('⚠️ ALERTA: ¿Estás seguro de que deseas eliminar a {{ p.nombre }}? Se borrará todo su horario asociado. Esta acción NO se puede deshacer.');">
-                   🗑️ Eliminar Profesional
+                <a href="{{ url_for('admin.eliminar_peluquero', id=p.id) }}" class="btn-delete"
+                    onclick="return confirm('⚠️ ALERTA: ¿Estás seguro de que deseas eliminar a {{ p.nombre }}? Se borrará todo su horario asociado. Esta acción NO se puede deshacer.');">
+                    🗑️ Eliminar Profesional
                 </a>
             </div>
 
@@ -193,7 +217,8 @@
                         <div class="dia-header">
                             <label>
                                 <input type="checkbox" name="trabaja_{{ h.dia_semana }}" {{ 'checked' if h.trabaja }}>
-                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] %}
+                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
+                                'Domingo'] %}
                                 <strong>{{ nombres[h.dia_semana] }}</strong>
                             </label>
                         </div>
@@ -364,29 +389,29 @@
     </div>
 
     <script>
-    // Función para rellenar los datos y mostrar el formulario
-    function abrirModalModificarFestivo(id, fechaStr, peluqueroId, him, hfm, hit, hft) {
-        // Apuntar el formulario a la URL correcta
-        document.getElementById('formModificarFestivo').action = "/admin/modificar_festivo/" + id;
+        // Función para rellenar los datos y mostrar el formulario
+        function abrirModalModificarFestivo(id, fechaStr, peluqueroId, him, hfm, hit, hft) {
+            // Apuntar el formulario a la URL correcta
+            document.getElementById('formModificarFestivo').action = "/admin/modificar_festivo/" + id;
 
-        // Escribir la fecha en el título del modal
-        document.getElementById('mod_fecha_display').innerText = fechaStr;
+            // Escribir la fecha en el título del modal
+            document.getElementById('mod_fecha_display').innerText = fechaStr;
 
-        // Rellenar los campos con los datos actuales
-        document.getElementById('mod_peluquero_id').value = peluqueroId;
-        document.getElementById('mod_h_im').value = him;
-        document.getElementById('mod_h_fm').value = hfm;
-        document.getElementById('mod_h_it').value = hit;
-        document.getElementById('mod_h_ft').value = hft;
+            // Rellenar los campos con los datos actuales
+            document.getElementById('mod_peluquero_id').value = peluqueroId;
+            document.getElementById('mod_h_im').value = him;
+            document.getElementById('mod_h_fm').value = hfm;
+            document.getElementById('mod_h_it').value = hit;
+            document.getElementById('mod_h_ft').value = hft;
 
-        // Mostrar el modal
-        document.getElementById('modalModificarFestivo').style.display = 'block';
-    }
+            // Mostrar el modal
+            document.getElementById('modalModificarFestivo').style.display = 'block';
+        }
 
-    function cerrarModalFestivo() {
-        document.getElementById('modalModificarFestivo').style.display = 'none';
-    }
-</script>
+        function cerrarModalFestivo() {
+            document.getElementById('modalModificarFestivo').style.display = 'none';
+        }
+    </script>
 
     <!-- ========================================== -->
     <!-- HASTA AQUÍ -->

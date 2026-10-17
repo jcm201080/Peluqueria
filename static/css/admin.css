@@ -645,3 +645,30 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(24px);
 }
+
+/* --- ESTILOS PARA GESTIÓN DE PRIORIDADES --- */
+
+.label-prioridad {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+.input-peluquero-prioridad {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+.input-peluquero-prioridad:focus {
+    border-color: #d4a373; /* Color principal de Parra-Barber */
+    box-shadow: 0 0 5px rgba(212, 163, 115, 0.5);
+    outline: none;
+}

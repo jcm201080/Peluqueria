@@ -8,5 +8,6 @@
     "logo_img": "img/logo.jpeg",
     "logo_texto_img": "img/logo.jpeg",
     "ia_prompt": "Eres un experto en peluquería masculina y estilismo...",
-    "mostrar_peluqueros": false
+    "mostrar_peluqueros": false,
+    "usar_prioridades": true
 }
