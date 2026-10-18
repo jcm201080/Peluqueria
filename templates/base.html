@@ -66,7 +66,7 @@
                 </li>
                 <li>
                     <a href="{{ url_for('citas.contacto') }}"
-                        class="{{ 'active' if request.endpoint == 'contacto' else '' }}">Citas</a>
+                        class="{{ 'active' if request.endpoint in ['citas.contacto', 'citas.modificar_cita'] else '' }}">Citas</a>
                 </li>
                 <li>
                     <a href="{{ url_for('servicios') }}"
@@ -83,7 +83,7 @@
                 {# Si es Administrador #}
                 {% if current_user.es_admin %}
                 <li>
-                    <a href="{{ url_for('admin.gestion_diaria_v2') }}" 
+                    <a href="{{ url_for('admin.gestion_diaria_v2') }}"
                         class="{{ 'active' if request.endpoint == 'admin.index' else '' }}">⚙️ Admin</a>
                 </li>
                 {% endif %}
@@ -139,57 +139,59 @@
     </footer>
 
     <!-- Botón flotante de WhatsApp -->
-    <a href="https://wa.me/34633013315" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+    <a href="https://wa.me/34633013315" id="whatsapp-float-btn" target="_blank" rel="noopener noreferrer"
+        aria-label="Contactar por WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <!-- ESTRUCTURA DEL CHATBOT (Añadir antes de cerrar </body>) -->
     <div id="chatbot-container">
 
-    <!-- ESTRUCTURA DEL CHATBOT (Añadir antes de cerrar </body>) -->
-    <div id="chatbot-container">
-        <!-- Ventana del chat (Oculta por defecto) -->
-        <div id="chatbot-window" class="oculto">
-            <div id="chatbot-header">
-                <span>💈 Asistente Virtual</span>
-                <button id="close-chat-btn">&times;</button>
-            </div>
-            <div id="chatbot-messages" id="chat-box">
-                <div class="mensaje bot">¡Hola! Soy el asistente experto de Parra-Barber. ¿En qué puedo ayudarte hoy?
+        <!-- ESTRUCTURA DEL CHATBOT (Añadir antes de cerrar </body>) -->
+        <div id="chatbot-container">
+            <!-- Ventana del chat (Oculta por defecto) -->
+            <div id="chatbot-window" class="oculto">
+                <div id="chatbot-header">
+                    <span>💈 Asistente Virtual</span>
+                    <button id="close-chat-btn">&times;</button>
+                </div>
+                <div id="chatbot-messages" id="chat-box">
+                    <div class="mensaje bot">¡Hola! Soy el asistente experto de Parra-Barber. ¿En qué puedo ayudarte
+                        hoy?
+                    </div>
+                </div>
+                <div id="chatbot-input">
+                    <input type="text" id="chat-input-field" placeholder="Escribe tu duda aquí...">
+                    <button id="send-chat-btn">
+                        <i class="fas fa-paper-plane"></i> <!-- Si usas FontAwesome -->
+                    </button>
                 </div>
             </div>
-            <div id="chatbot-input">
-                <input type="text" id="chat-input-field" placeholder="Escribe tu duda aquí...">
-                <button id="send-chat-btn">
-                    <i class="fas fa-paper-plane"></i> <!-- Si usas FontAwesome -->
-                </button>
-            </div>
+
+            <!-- Botón flotante -->
+            <button id="chatbot-toggle-btn">💬</button>
         </div>
 
-        <!-- Botón flotante -->
-        <button id="chatbot-toggle-btn">💬</button>
-    </div>
+        <!-- Enlace al archivo JavaScript -->
+        <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 
-    <!-- Enlace al archivo JavaScript -->
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+        <!-- Scripts separados -->
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    <!-- Scripts separados -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+        {% if request.path == '/contacto' %}
+        <!-- Corregida la tilde suelta que había al final de esta línea -->
+        <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
+        {% endif %}
 
-    {% if request.path == '/contacto' %}
-    <!-- Corregida la tilde suelta que había al final de esta línea -->
-    <script src="{{ url_for('static', filename='script_contacto.js') }}"></script>
-    {% endif %}
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register("/static/sw.js")
-                    .then(reg => console.log('SW registrado', reg))
-                    .catch(err => console.log('SW error', err));
-            });
-        }
-    </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register("/static/sw.js")
+                        .then(reg => console.log('SW registrado', reg))
+                        .catch(err => console.log('SW error', err));
+                });
+            }
+        </script>
 </body>
 
 </html>
