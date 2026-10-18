@@ -28,7 +28,7 @@
         </form>
     </section>
 
-    {# --- SECCIÓN HORARIOS --- #}
+    {# --- SECCIÓN HORARIOS (Incluye peluqueros, festivos y horarios especiales) --- #}
     {% elif active_tab == 'horarios' %}
     <section class="admin-card">
         <div class="header-seccion">
@@ -133,5 +133,166 @@
         </div>
         {% endfor %}
     </section>
+
+    <!-- --- SECCIÓN DÍAS FESTIVOS Y CIERRES --- -->
+    <section class="admin-card" style="margin-top: 30px;">
+        <h3>📅 Días Festivos y Cierres</h3>
+        <form action="{{ url_for('admin.añadir_festivo') }}" method="POST" class="form-inline" style="margin-top: 15px;">
+            <input type="date" name="fecha" required class="input-admin">
+            <input type="text" name="descripcion" placeholder="Ej: Festivo Nacional" required class="input-admin flex-2">
+            <button type="submit" class="btn-add btn-save">Bloquear Día</button>
+        </form>
+        <div class="festivos-list" style="margin-top: 20px;">
+            <h4>📅 Días bloqueados actualmente</h4>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in festivos if f.es_cerrado %}
+                    <tr>
+                        <td>{{ f.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ f.descripcion }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.eliminar_festivo', id=f.id) }}" class="btn-delete"
+                                onclick="return confirm('¿Quieres volver a habilitar este día?')">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="no-data-msg" style="text-align: center; color: #888;">No hay festivos próximos programados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- --- SECCIÓN HORARIOS ESPECIALES (DÍAS CONCRETOS) --- -->
+    <section class="admin-card special-hours-card" style="margin-top: 30px;">
+        <h3>🌟 Horarios Especiales (Días Concretos)</h3>
+        <p class="subtitle">Usa esto para días sueltos que no siguen el horario normal.</p>
+
+        <form action="{{ url_for('admin.añadir_horario_especial') }}" method="POST" class="admin-form-especial" style="margin-top: 15px;">
+            <div class="form-row-flex" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="date" name="fecha" required class="input-admin flex-1">
+                <select name="peluquero_id" class="select-admin flex-1">
+                    <option value="todos">Todos los peluqueros</option>
+                    {% for p in peluqueros %}
+                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="turnos-inputs-max" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="turno-group">
+                    <strong>Mañana:</strong>
+                    <input type="time" name="h_im" value="09:00"> a <input type="time" name="h_fm" value="14:00">
+                </div>
+                <div class="turno-group">
+                    <strong>Tarde:</strong>
+                    <input type="time" name="h_it" value="16:00"> a <input type="time" name="h_ft" value="20:00">
+                </div>
+            </div>
+            <button type="submit" class="btn-special-save btn-save">Activar Horario Especial</button>
+        </form>
+
+        <div class="divider-large"></div>
+
+        <h4>📋 Horarios Especiales Activos</h4>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Peluquero</th>
+                    <th>Mañana</th>
+                    <th>Tarde</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ex in festivos if not ex.es_cerrado %}
+                <tr>
+                    <td>{{ ex.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if ex.peluquero_id %}
+                        {{ ex.peluquero.nombre }}
+                        {% else %}
+                        <span class="tag-all-staff">🌍 Todos</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ ex.h_inicio_m }} - {{ ex.h_fin_m }}</td>
+                    <td>{{ ex.h_inicio_t }} - {{ ex.h_fin_t }}</td>
+                    <td>
+                        <button type="button" class="btn-edit"
+                            onclick="abrirModalModificarFestivo('{{ ex.id }}', '{{ ex.fecha.strftime('%d/%m/%Y') }}', '{{ ex.peluquero_id or 'todos' }}', '{{ ex.h_inicio_m }}', '{{ ex.h_fin_m }}', '{{ ex.h_inicio_t }}', '{{ ex.h_fin_t }}')">
+                            Modificar
+                        </button>
+                        <a href="{{ url_for('admin.eliminar_festivo', id=ex.id) }}" class="btn-delete"
+                            onclick="return confirm('¿Eliminar este horario especial?')">Eliminar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="no-data-msg" style="text-align: center; color: #888;">No hay horarios especiales programados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Modal para Modificar Festivo / Horario Especial -->
+    <div id="modalModificarFestivo" style="display: none;" class="modal-admin">
+        <div class="modal-content">
+            <h3>Modificando día: <span id="mod_fecha_display" style="color: #fff;"></span></h3>
+            <form id="formModificarFestivo" method="POST">
+                <label>Peluquero:</label>
+                <select name="peluquero_id" id="mod_peluquero_id" class="select-admin" style="width: 100%; margin-bottom: 10px;">
+                    <option value="todos">🌍 Todos</option>
+                    {% for p in peluqueros %}
+                    <option value="{{ p.id }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Mañana:</label>
+                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                    <input type="time" name="h_im" id="mod_h_im" class="input-admin"> a
+                    <input type="time" name="h_fm" id="mod_h_fm" class="input-admin">
+                </div>
+
+                <label>Tarde:</label>
+                <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                    <input type="time" name="h_it" id="mod_h_it" class="input-admin"> a
+                    <input type="time" name="h_ft" id="mod_h_ft" class="input-admin">
+                </div>
+
+                <div class="modal-actions" style="display: flex; gap: 10px;">
+                    <button type="button" onclick="cerrarModalFestivo()" class="btn-delete">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalModificarFestivo(id, fechaStr, peluqueroId, him, hfm, hit, hft) {
+            document.getElementById('formModificarFestivo').action = "/admin/modificar_festivo/" + id;
+            document.getElementById('mod_fecha_display').innerText = fechaStr;
+            document.getElementById('mod_peluquero_id').value = peluqueroId;
+            document.getElementById('mod_h_im').value = him;
+            document.getElementById('mod_h_fm').value = hfm;
+            document.getElementById('mod_h_it').value = hit;
+            document.getElementById('mod_h_ft').value = hft;
+            document.getElementById('modalModificarFestivo').style.display = 'block';
+        }
+
+        function cerrarModalFestivo() {
+            document.getElementById('modalModificarFestivo').style.display = 'none';
+        }
+    </script>
     {% endif %}
 {% endblock %}
