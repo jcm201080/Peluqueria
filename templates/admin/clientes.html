@@ -8,12 +8,17 @@
     <h1 class="admin-title">Panel de Administración</h1>
 
     <nav class="admin-tabs">
-        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'citas' else '' }}">📅 Citas</a>
-        <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' else '' }}">⚡ Gestión Diaria</a>
+        <!-- <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'citas' else '' }}">📅 Citas</a> -->
+        <a href="{{ url_for('admin.gestion_diaria_v2') }}"  class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' else '' }}">⚡ Gestión Diaria</a>
         <a href="{{ url_for('admin.index', tab='servicios') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'servicios' else '' }}">💰 Servicios</a>
         <a href="{{ url_for('admin.index', tab='horarios') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.index' and request.args.get('tab') == 'horarios' else '' }}">⏰ Horarios</a>
-        <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' else '' }}">⚙️ Ajustes</a>
+        <!-- <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' else '' }}">⚙️ Ajustes</a> -->
         <a href="{{ url_for('admin.gestionar_clientes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">👥 Clientes</a>
+        <!-- Valoraciones -->
+        <a href="{{ url_for('admin.ver_valoraciones') }}" 
+           class="tab-link {{ 'active' if request.endpoint == 'admin.ver_valoraciones' }}">
+           ⭐ Valoraciones
+        </a>
     </nav>
 
     <div class="admin-section">

@@ -1,146 +1,137 @@
-{% extends "base.html" %}
+{% extends "admin/base_admin.html" %}
 
-{% block title %}Gestión Diaria V2 - Parra-Barber{% endblock %}
+{% block admin_title %}Gestión Diaria V2 - Parra-Barber{% endblock %}
 
-{% block contenido %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% block admin_content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/gestion_diaria_v2.css') }}">
 
-<div class="admin-container">
-    <h1 class="admin-title">Panel de Control</h1>
-
-    <nav class="admin-tabs">
-        <!-- NUEVA PESTAÑA V2 AÑADIDA -->
-         
-        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
-            Citas</a>
-        <a href="{{ url_for('admin.gestion_diaria_v2') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' else '' }}">
-            🚀 Gestión V2
-        </a>
-        <a href="{{ url_for('admin.gestion_diaria') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' }}">⚡ Gestión Diaria</a>
-
-        <a href="{{ url_for('admin.index', tab='servicios') }}"
-            class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
-        <a href="{{ url_for('admin.index', tab='horarios') }}"
-            class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
-        <a href="{{ url_for('admin.gestionar_clientes') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">
-            👥 Clientes
-        </a>
-        <!-- <a href="{{ url_for('admin.ajustes') }}" class="tab-link {{ 'active' if request.endpoint == 'admin.ajustes' }}">
-            ⚙️ Ajustes
-        </a> -->
-    </nav>
-
-    <section class="admin-card">
-        <h3 style="margin-bottom: 15px;">🗓️ Selecciona un día:</h3>
-
-        <!-- NUEVA CUADRÍCULA DE 35 DÍAS -->
-        <div class="calendario-grid-v2">
-            {% for d in dias_calendario %}
-            <a href="{{ url_for('admin.gestion_diaria_v2', fecha_busqueda=d.valor) }}"
-                class="dia-admin-btn {{ 'active' if d.valor == fecha_actual else '' }}">
-                <span class="dia-sem">{{ d.texto[:3] }}</span>
-                <span class="dia-num">{{ d.valor.split('-')[2] }}</span>
+<section class="admin-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+        <h3 style="margin: 0;">🗓️ Agenda y Disponibilidad</h3>
+        
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <!-- BOTÓN ESPECIAL: VER TODAS LAS CITAS -->
+            <a href="{{ url_for('admin.gestion_diaria_v2', fecha_busqueda='todas', peluquero_id=peluquero_seleccionado) }}" 
+               class="btn-save {% if modo_todas %}active-btn-todas{% endif %}" style="text-decoration: none; background-color: {% if modo_todas %}#b5835a{% else %}#d4a373{% endif %};">
+               📋 Ver Todas las Citas
             </a>
-            {% endfor %}
+
+            <!-- FILTRO DE PELUQUEROS -->
+            <form method="GET" action="{{ url_for('admin.gestion_diaria_v2') }}" style="display: flex; gap: 5px; align-items: center; margin: 0;">
+                <input type="hidden" name="fecha_busqueda" value="{{ fecha_actual }}">
+                <select name="peluquero_id" class="select-admin" onchange="this.form.submit()">
+                    <option value="todos" {% if peluquero_seleccionado == 'todos' %}selected{% endif %}>👥 Todos los peluqueros</option>
+                    {% for p in peluqueros %}
+                    <option value="{{ p.id }}" {% if peluquero_seleccionado == p.id|string %}selected{% endif %}>{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
+    </div>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    <th>Estado</th>
-                    <th>Cliente / Peluquero</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {# BUCLE ÚNICO ORDENADO CRONOLÓGICAMENTE #}
-                {% for item in agenda %}
+    <!-- CUADRÍCULA DE 35 DÍAS (SOLO SE MUESTRA SI NO ESTAMOS EN MODO "TODAS") -->
+    {% if not modo_todas %}
+    <div class="calendario-grid-v2">
+        {% for d in dias_calendario %}
+        <a href="{{ url_for('admin.gestion_diaria_v2', fecha_busqueda=d.valor, peluquero_id=peluquero_seleccionado) }}"
+            class="dia-admin-btn {{ 'active' if d.valor == fecha_actual else '' }}">
+            <span class="dia-sem">{{ d.texto[:3] }}</span>
+            <span class="dia-num">{{ d.valor.split('-')[2] }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: rgba(212, 163, 115, 0.15); padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span>🔍 Mostrando <strong>el listado global de todas las citas futuras</strong> programadas.</span>
+        <a href="{{ url_for('admin.gestion_diaria_v2') }}" class="btn-delete" style="text-decoration: none; padding: 5px 10px; font-size: 0.85rem;">Volver a vista diaria</a>
+    </div>
+    {% endif %}
 
-                {% if item.estado == 'ocupado' %}
-                {% set cita = item.datos %}
-                <!-- FILA DE CITA OCUPADA -->
-                <tr style="background-color: rgba(212, 163, 115, 0.1);">
-                    <td><strong>{{ item.hora }}</strong></td>
-                    <td><span style="color: #ff6b6b; font-weight: bold;">🔴 OCUPADO</span></td>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                {% if modo_todas %}<th>Fecha</th>{% endif %}
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Cliente / Profesional</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in agenda %}
+
+            {% if item.estado == 'ocupado' %}
+            {% set cita = item.datos %}
+            <!-- FILA DE CITA OCUPADA -->
+            <tr style="background-color: rgba(212, 163, 115, 0.1);">
+                {% if modo_todas %}<td><strong>{{ item.fecha }}</strong></td>{% endif %}
+                <td><strong>{{ item.hora }}</strong></td>
+                <td><span style="color: #ff6b6b; font-weight: bold;">🔴 OCUPADO</span></td>
+                <td>
+                    {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}
+                    <small style="color: #888;">(Profesional ID: {{ cita.peluquero_id }})</small>
+                </td>
+                <td>
+                    <div class="acciones-container" style="display: flex; gap: 8px; align-items: center;">
+                        {% set telefono = cita.cliente_rel.telefono if cita.usuario_id and cita.cliente_rel and cita.cliente_rel.telefono else (cita.telefono_cliente if cita.telefono_cliente and cita.telefono_cliente != 'S/N' else "") %}
+                        {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id and cita.cliente_rel else (cita.nombre_invitado if cita.nombre_invitado else 'Cliente') %}
+
+                        {% if telefono %}
+                        <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber..."
+                            target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
+                            <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i>
+                        </a>
+                        {% endif %}
+
+                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion_v2') }}"
+                            class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
+                    </div>
+                </td>
+            </tr>
+
+            {% else %}
+            <!-- FILA DE HORA LIBRE (Solo aparece en vista diaria) -->
+            <tr>
+                <td><strong>{{ item.hora }}</strong></td>
+                <td>
+                    {% set cantidad_libres = item.peluqueros|length %}
+                    <span class="status-badge {{ 'multiple' if cantidad_libres > 1 else 'single' }}">
+                        🟢 LIBRE ({{ cantidad_libres }})
+                    </span>
+                </td>
+                <form action="{{ url_for('citas.reservar') }}" method="POST" style="display: contents;">
                     <td>
-                        {{ cita.cliente_rel.nombre if cita.usuario_id else cita.nombre_invitado }}
-                        <small style="color: #888;">(Peluquero ID: {{ cita.peluquero_id }})</small>
-                    </td>
-                    <td>
-                        <div class="acciones-container" style="display: flex; gap: 8px; align-items: center;">
-                            {% set telefono = cita.cliente_rel.telefono if cita.usuario_id and cita.cliente_rel.telefono
-                            else (cita.telefono_cliente if cita.telefono_cliente and cita.telefono_cliente != 'S/N' else
-                            "") %}
-                            {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id else (cita.nombre_invitado if
-                            cita.nombre_invitado else 'Cliente') %}
-
-                            {% if telefono %}
-                            <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber..."
-                                target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
-                                <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i>
-                            </a>
-                            {% endif %}
-
-                            <!-- Importante: origen='gestion_v2' para que al borrar vuelva a esta misma página -->
-                            <a href="{{ url_for('admin.eliminar_cita', id=cita.id, origen='gestion_v2') }}"
-                                class="btn-delete" onclick="return confirm('¿Anular cita?')">Anular</a>
+                        <div style="display: flex; gap: 5px;">
+                            <select name="peluquero_id" class="select-admin">
+                                {% for p in item.peluqueros %}
+                                <option value="{{ p.id }}">{{ p.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="nombre" placeholder="Nombre cliente" required
+                                class="input-admin">
                         </div>
                     </td>
-                </tr>
-
-                {% else %}
-                <!-- FILA DE HORA LIBRE -->
-                <tr>
-                    <td><strong>{{ item.hora }}</strong></td>
                     <td>
-                        {% set cantidad_libres = item.peluqueros|length %}
-                        <span class="status-badge {{ 'multiple' if cantidad_libres > 1 else 'single' }}">
-                            🟢 LIBRE ({{ cantidad_libres }})
-                        </span>
+                        <input type="hidden" name="fecha" value="{{ fecha_actual }}">
+                        <input type="hidden" name="hora" value="{{ item.hora }}">
+                        <input type="hidden" name="servicio" value="Reserva Manual Admin">
+                        <input type="hidden" name="origen" value="gestion_v2">
+                        <button type="submit" class="btn-save" style="width: 100%;">Reservar</button>
                     </td>
-                    <form action="{{ url_for('citas.reservar') }}" method="POST" style="display: contents;">
-                        <td>
-                            <div style="display: flex; gap: 5px;">
-                                <select name="peluquero_id" class="select-admin">
-                                    {% for p in item.peluqueros %}
-                                    <option value="{{ p.id }}">{{ p.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                                <input type="text" name="nombre" placeholder="Nombre cliente" required
-                                    class="input-admin">
-                            </div>
-                        </td>
-                        <td>
-                            <input type="hidden" name="fecha" value="{{ fecha_actual }}">
-                            <input type="hidden" name="hora" value="{{ item.hora }}">
-                            <input type="hidden" name="servicio" value="Reserva Manual Admin">
-                            <input type="hidden" name="origen" value="gestion_v2">
-                            <button type="submit" class="btn-save" style="width: 100%;">Reservar</button>
-                        </td>
-                    </form>
-                </tr>
-                {% endif %}
+                </form>
+            </tr>
+            {% endif %}
 
-                {% else %}
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #888;">No hay horarios registrados para este día.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-</div>
+            {% else %}
+            <tr>
+                <td colspan="{% if modo_todas %}5{% else %}4{% endif %}" style="text-align: center; color: #888; padding: 20px;">No hay registros para mostrar.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 
-<!-- IMPORTAMOS EL SCRIPT PARA EL SCROLL -->
-<script src="{{ url_for('static', filename='js/admin_scroll.js') }}"></script>
-
-<!-- Pequeño script para asegurar que el carrusel hace scroll automático hacia el día seleccionado -->
+<!-- SCRIPT PARA SCROLL AUTOMÁTICO AL DÍA SELECCIONADO -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const diaActivo = document.querySelector('.dia-admin-btn.active');

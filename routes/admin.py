@@ -725,21 +725,21 @@ def añadir_horario_especial():
     return redirect(url_for('admin.index', tab='horarios'))
 
 
-@admin_bp.route('/gestion-diaria-v2')
+@admin_bp.route('/admin/gestion-diaria-v2')
 @login_required
 def gestion_diaria_v2():
-    # Seguridad: solo admin
     if not current_user.es_admin:
         return redirect(url_for('index'))
 
-    # Obtenemos la fecha seleccionada o la de hoy
     fecha_str = request.args.get('fecha_busqueda', datetime.now().strftime('%Y-%m-%d'))
-    fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+    peluquero_filtro = request.args.get('peluquero_id', 'todos')
     
-    # 1. Generar la cuadrícula de 35 días (7 columnas x 5 filas)
+    # Verificamos si el usuario ha pulsado el botón de "Ver Todas"
+    modo_todas = (fecha_str == 'todas')
+
+    # 1. Generar la cuadrícula de 35 días para el carrusel superior
     dias_es = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
     dias_calendario = []
-    
     for i in range(35):
         fecha_iter = datetime.now() + timedelta(days=i)
         dias_calendario.append({
@@ -747,57 +747,85 @@ def gestion_diaria_v2():
             'texto': f"{dias_es[fecha_iter.weekday()]} {fecha_iter.day}"
         })
 
-    # 2. OBTENER CITAS Y HUECOS DE LA BASE DE DATOS
-    citas = Cita.query.filter_by(fecha=fecha_obj).order_by(Cita.hora).all()
     peluqueros = Peluquero.query.filter_by(activo=True).all()
-    huecos_detalles = {}
-
-    for p in peluqueros:
-        # 🟢 CORRECCIÓN: Usamos la función de citas.py que evalúa festivos y horarios especiales
-        horario = obtener_horario_activo_peluquero(p.id, fecha_obj)
-
-        if horario:
-            # Generamos las franjas usando los datos del diccionario devuelto
-            franjas = generar_franjas(horario.get('h_im'), horario.get('h_fm')) + \
-                      generar_franjas(horario.get('h_it'), horario.get('h_ft'))
-
-            for hora_f in franjas:
-                hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
-                ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
-                
-                if not ocupado:
-                    if hora_f not in huecos_detalles:
-                        huecos_detalles[hora_f] = []
-                    huecos_detalles[hora_f].append(p)
-
-    horas_libres = sorted(huecos_detalles.keys())
-    
-    # 3. CREAR AGENDA UNIFICADA Y ORDENADA POR HORA
     agenda_ordenada = []
-    
-    # Añadimos las ocupadas
-    for cita in citas:
-        agenda_ordenada.append({
-            'hora': cita.hora.strftime('%H:%M'),
-            'estado': 'ocupado',
-            'datos': cita
-        })
-        
-    # Añadimos las libres
-    for hora in horas_libres:
-        agenda_ordenada.append({
-            'hora': hora,
-            'estado': 'libre',
-            'peluqueros': huecos_detalles[hora]
-        })
-        
-    # Ordenamos la lista final de menor a mayor hora para que se intercalen cronológicamente
-    agenda_ordenada = sorted(agenda_ordenada, key=lambda x: x['hora'])
+    fecha_obj = None
 
-    # 4. Enviar a la plantilla
+    if modo_todas:
+        # --- MODO LISTADO GLOBAL: Todas las citas futuras ---
+        hoy = datetime.now().date()
+        query_citas = Cita.query.filter(Cita.fecha >= hoy)
+        
+        if peluquero_filtro != 'todos' and peluquero_filtro.isdigit():
+            query_citas = query_citas.filter_by(peluquero_id=int(peluquero_filtro))
+            
+        citas_totales = query_citas.order_by(Cita.fecha.asc(), Cita.hora.asc()).all()
+        
+        for cita in citas_totales:
+            agenda_ordenada.append({
+                'fecha': cita.fecha.strftime('%d/%m/%Y'),
+                'hora': cita.hora.strftime('%H:%M'),
+                'estado': 'ocupado',
+                'datos': cita
+            })
+    else:
+        # --- MODO DIARIO HABITUAL ---
+        try:
+            fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        except ValueError:
+            fecha_obj = datetime.now().date()
+            fecha_str = fecha_obj.strftime('%Y-%m-%d')
+
+        query_citas = Cita.query.filter_by(fecha=fecha_obj)
+        if peluquero_filtro != 'todos' and peluquero_filtro.isdigit():
+            query_citas = query_citas.filter_by(peluquero_id=int(peluquero_filtro))
+        
+        citas = query_citas.order_by(Cita.hora).all()
+        
+        # Cálculo de huecos libres para ese día
+        huecos_detalles = {}
+        for p in peluqueros:
+            if peluquero_filtro != 'todos' and peluquero_filtro.isdigit() and p.id != int(peluquero_filtro):
+                continue
+                
+            horario = obtener_horario_activo_peluquero(p.id, fecha_obj)
+            if horario:
+                franjas = generar_franjas(horario.get('h_im'), horario.get('h_fm')) + \
+                          generar_franjas(horario.get('h_it'), horario.get('h_ft'))
+
+                for hora_f in franjas:
+                    hora_cita_obj = datetime.strptime(hora_f, '%H:%M').time()
+                    ocupado = Cita.query.filter_by(fecha=fecha_obj, hora=hora_cita_obj, peluquero_id=p.id).first()
+                    
+                    if not ocupado:
+                        if hora_f not in huecos_detalles:
+                            huecos_detalles[hora_f] = []
+                        huecos_detalles[hora_f].append(p)
+
+        horas_libres = sorted(huecos_detalles.keys())
+        
+        for cita in citas:
+            agenda_ordenada.append({
+                'hora': cita.hora.strftime('%H:%M'),
+                'estado': 'ocupado',
+                'datos': cita
+            })
+            
+        for hora in horas_libres:
+            agenda_ordenada.append({
+                'hora': hora,
+                'estado': 'libre',
+                'peluqueros': huecos_detalles[hora]
+            })
+            
+        agenda_ordenada = sorted(agenda_ordenada, key=lambda x: x['hora'])
+
     return render_template('admin/gestion_diaria_v2.html', 
                            fecha_actual=fecha_str,
+                           modo_todas=modo_todas,
+                           peluquero_seleccionado=peluquero_filtro,
                            dias_calendario=dias_calendario,
+                           peluqueros=peluqueros,
                            agenda=agenda_ordenada)
 
 

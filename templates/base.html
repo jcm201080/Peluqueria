@@ -83,7 +83,7 @@
                 {# Si es Administrador #}
                 {% if current_user.es_admin %}
                 <li>
-                    <a href="{{ url_for('admin.index') }}"
+                    <a href="{{ url_for('admin.gestion_diaria_v2') }}" 
                         class="{{ 'active' if request.endpoint == 'admin.index' else '' }}">⚙️ Admin</a>
                 </li>
                 {% endif %}

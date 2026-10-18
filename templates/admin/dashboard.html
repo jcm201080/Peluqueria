@@ -1,113 +1,12 @@
-{% extends "base.html" %}
+{% extends "admin/base_admin.html" %}
 
-{% block title %}Panel Admin - Parra-Barber{% endblock %}
+{% block admin_title %}Gestión y Horarios - Parra-Barber{% endblock %}
 
-{% block contenido %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-
-<div class="admin-container">
-    <h1 class="admin-title">Panel de Control</h1>
-
-    {% set active_tab = request.args.get('tab', 'citas') %}
-
-    <nav class="admin-tabs">
-        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link {{ 'active' if active_tab == 'citas' }}">📅
-            Citas</a>
-        <a href="{{ url_for('admin.gestion_diaria_v2') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' }}">🚀 Gestión V2</a>
-        <a href="{{ url_for('admin.gestion_diaria') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' }}">⚡ Gestión Diaria</a>
-        <a href="{{ url_for('admin.index', tab='servicios') }}"
-            class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
-        <a href="{{ url_for('admin.index', tab='horarios') }}"
-            class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
-        <a href="{{ url_for('admin.gestionar_clientes') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' }}">👥 Clientes</a>
-        <a href="{{ url_for('admin.ver_valoraciones') }}"
-            class="tab-link {{ 'active' if request.endpoint == 'admin.ver_valoraciones' }}">⭐ Valoraciones</a>
-    </nav>
-
-    <p class="welcome-text">Bienvenido, <strong>{{ current_user.nombre }}</strong></p>
-
-    {# --- SECCIÓN CITAS --- #}
-    {% if active_tab == 'citas' %}
-    <section class="admin-card">
-        <div class="card-header-flex">
-            <h3>📅 Próximas Citas</h3>
-            <form action="{{ url_for('admin.index') }}" method="GET" class="filter-form">
-                <input type="hidden" name="tab" value="citas">
-                <input type="date" name="fecha_busqueda" value="{{ fecha_actual }}" class="input-orden">
-                <button type="submit" class="btn-save">Buscar</button>
-                {% if request.args.get('fecha_busqueda') %}
-                <a href="{{ url_for('admin.index', tab='citas') }}" class="btn-delete no-decor">Limpiar</a>
-                {% endif %}
-            </form>
-        </div>
-
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th>Servicio</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cita in citas %}
-                <tr>
-                    <td>{{ cita.fecha }}</td>
-                    <td>{{ cita.hora.strftime('%H:%M') }}</td>
-                    <td>
-                        {% if cita.usuario_id %}
-                        <span class="icon-user-reg">👤</span> {{ cita.cliente_rel.nombre }}
-                        {% elif cita.nombre_invitado %}
-                        {% if 'Admin:' in cita.nombre_invitado %}
-                        <span class="tag-admin-manual">🛠️ {{ cita.nombre_invitado }}</span>
-                        {% else %}
-                        <span class="icon-user-guest">📞</span> {{ cita.nombre_invitado }}
-                        {% endif %}
-                        {% else %}
-                        Sin nombre
-                        {% endif %}
-                    </td>
-                    <td>{{ cita.telefono_cliente }}</td>
-                    <td>{{ cita.servicio }}</td>
-                    <td class="actions-cell">
-                        {% set telefono = "" %}
-                        {% if cita.usuario_id and cita.cliente_rel.telefono %}
-                        {% set telefono = cita.cliente_rel.telefono %}
-                        {% elif cita.telefono_cliente and cita.telefono_cliente != 'S/N' %}
-                        {% set telefono = cita.telefono_cliente %}
-                        {% endif %}
-
-                        {% set nombre_msg = cita.cliente_rel.nombre if cita.usuario_id else (cita.nombre_invitado if
-                        cita.nombre_invitado else 'Cliente') %}
-
-                        {% if telefono %}
-                        <a href="https://wa.me/34{{ telefono }}?text=Hola%20{{ nombre_msg | urlencode }},%20te%20escribimos%20de%20Parra-Barber%20sobre%20tu%20cita%20del%20día%20{{ cita.fecha }}%20a%20las%20{{ cita.hora.strftime('%H:%M') }}..."
-                            target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                        {% endif %}
-
-                        <a href="{{ url_for('admin.eliminar_cita', id=cita.id) }}" class="btn-delete"
-                            onclick="return confirm('¿Borrar cita?')">Eliminar</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" class="text-center">No hay citas para mostrar.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
+{% block admin_content %}
+    {% set active_tab = request.args.get('tab', 'horarios') %}
 
     {# --- SECCIÓN SERVICIOS --- #}
-    {% elif active_tab == 'servicios' %}
+    {% if active_tab == 'servicios' %}
     <section class="admin-card">
         <h3>💰 Gestión de Servicios</h3>
         {% for s in servicios %}
@@ -137,38 +36,36 @@
             <p class="subtitle">Administra tu equipo, sus nombres y configura el horario para cada día de la semana.</p>
         </div>
 
-        <!-- NUEVO BLOQUE: INTERRUPTOR DE VISIBILIDAD -->
+        <!-- INTERRUPTOR DE VISIBILIDAD -->
         <div class="config-toggle-box">
             <form action="{{ url_for('admin.toggle_mostrar_peluqueros') }}" method="POST" id="form-toggle-peluqueros">
                 <label class="toggle-label" for="mostrar_peluqueros">
                     <div class="toggle-text">
                         <strong>👁️ Mostrar peluqueros al reservar</strong>
-                        <p class="text-muted">Si está apagado, el cliente solo verá la hora disponible sin saber quién
-                            le atiende.</p>
+                        <p class="text-muted">Si está apagado, el cliente solo verá la hora disponible sin saber quién le atiende.</p>
                     </div>
                     <div class="switch-wrapper">
-                        <!-- El onchange hace que el formulario se envíe solo al hacer clic -->
-                        <input type="checkbox" name="mostrar_peluqueros" id="mostrar_peluqueros" {% if
-                            web.get('mostrar_peluqueros', False) %}checked{% endif %}
-                            onchange="document.getElementById('form-toggle-peluqueros').submit();">
+                        <input type="checkbox" name="mostrar_peluqueros" id="mostrar_peluqueros" 
+                               {% if web.get('mostrar_peluqueros', False) %}checked{% endif %}
+                               onchange="document.getElementById('form-toggle-peluqueros').submit();">
                         <span class="slider round"></span>
                     </div>
                 </label>
             </form>
         </div>
-        <!-- NUEVO BLOQUE: INTERRUPTOR DE PRIORIDADES -->
+
+        <!-- INTERRUPTOR DE PRIORIDADES -->
         <div class="config-toggle-box" style="margin-top: 15px;">
             <form action="{{ url_for('admin.toggle_prioridades') }}" method="POST" id="form-toggle-prioridades">
                 <label class="toggle-label" for="usar_prioridades">
                     <div class="toggle-text">
                         <strong>⭐ Sistema de Prioridades</strong>
-                        <p class="text-muted">Si está encendido, se llenará la agenda del peluquero con prioridad 1
-                            antes de mostrar los huecos del nivel 2.</p>
+                        <p class="text-muted">Si está encendido, se llenará la agenda del peluquero con prioridad 1 antes de mostrar los huecos del nivel 2.</p>
                     </div>
                     <div class="switch-wrapper">
-                        <input type="checkbox" name="usar_prioridades" id="usar_prioridades" {% if
-                            web.get('usar_prioridades', False) %}checked{% endif %}
-                            onchange="document.getElementById('form-toggle-prioridades').submit();">
+                        <input type="checkbox" name="usar_prioridades" id="usar_prioridades" 
+                               {% if web.get('usar_prioridades', False) %}checked{% endif %}
+                               onchange="document.getElementById('form-toggle-prioridades').submit();">
                         <span class="slider round"></span>
                     </div>
                 </label>
@@ -189,23 +86,18 @@
 
         {% for p in peluqueros %}
         <div class="peluquero-config-box">
-
-            <!-- MODIFICAR O ELIMINAR PELUQUERO -->
             <div class="peluquero-header-edit">
                 <form action="{{ url_for('admin.editar_peluquero', id=p.id) }}" method="POST" class="form-inline">
                     <input type="text" name="nombre" value="{{ p.nombre }}" required class="input-peluquero-nombre">
 
-                    <!-- Campo numérico para la prioridad -->
                     <label for="prioridad_{{ p.id }}" class="label-prioridad">Prioridad:</label>
-                    <input type="number" name="prioridad" id="prioridad_{{ p.id }}" value="{{ p.prioridad }}" min="1"
-                        max="10" title="1 = Máxima prioridad" class="input-peluquero-prioridad" required>
+                    <input type="number" name="prioridad" id="prioridad_{{ p.id }}" value="{{ p.prioridad }}" min="1" max="10" class="input-peluquero-prioridad" required>
 
                     <button type="submit" class="btn-edit">Actualizar</button>
                 </form>
 
-                <!-- BOTÓN ELIMINAR CON CONFIRMACIÓN -->
                 <a href="{{ url_for('admin.eliminar_peluquero', id=p.id) }}" class="btn-delete"
-                    onclick="return confirm('⚠️ ALERTA: ¿Estás seguro de que deseas eliminar a {{ p.nombre }}? Se borrará todo su horario asociado. Esta acción NO se puede deshacer.');">
+                   onclick="return confirm('⚠️ ALERTA: ¿Eliminar a {{ p.nombre }} y sus horarios?');">
                     🗑️ Eliminar Profesional
                 </a>
             </div>
@@ -217,8 +109,7 @@
                         <div class="dia-header">
                             <label>
                                 <input type="checkbox" name="trabaja_{{ h.dia_semana }}" {{ 'checked' if h.trabaja }}>
-                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado',
-                                'Domingo'] %}
+                                {% set nombres = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] %}
                                 <strong>{{ nombres[h.dia_semana] }}</strong>
                             </label>
                         </div>
@@ -242,188 +133,5 @@
         </div>
         {% endfor %}
     </section>
-
-    {# --- DÍAS FESTIVOS --- #}
-    <section class="admin-card">
-        <h3>📅 Días Festivos y Cierres</h3>
-        <form action="{{ url_for('admin.añadir_festivo') }}" method="POST" class="form-inline">
-            <input type="date" name="fecha" required>
-            <input type="text" name="descripcion" placeholder="Ej: Festivo Nacional" required>
-            <button type="submit" class="btn-add">Bloquear Día</button>
-        </form>
-        <div class="festivos-list">
-            <h4>📅 Días bloqueados actualmente</h4>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for f in festivos if f.es_cerrado %}
-                    <tr>
-                        <td>{{ f.fecha.strftime('%d/%m/%Y') }}</td>
-                        <td>{{ f.descripcion }}</td>
-                        <td>
-                            <a href="{{ url_for('admin.eliminar_festivo', id=f.id) }}" class="btn-delete"
-                                onclick="return confirm('¿Quieres volver a habilitar este día?')">Eliminar</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3" class="no-data-msg">No hay festivos próximos programados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-    {# --- HORARIOS ESPECIALES (DÍAS CONCRETOS) --- #}
-    <section class="admin-card special-hours-card">
-        <h3>🌟 Horarios Especiales (Días Concretos)</h3>
-        <p class="subtitle">Usa esto para días sueltos que no siguen el horario normal.</p>
-
-        <form action="{{ url_for('admin.añadir_horario_especial') }}" method="POST" class="admin-form-especial">
-            <div class="form-row-flex">
-                <input type="date" name="fecha" required class="input-admin flex-1">
-                <select name="peluquero_id" class="select-admin flex-1">
-                    <option value="todos">Todos los peluqueros</option>
-                    {% for p in peluqueros %}
-                    <option value="{{ p.id }}">{{ p.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="turnos-inputs-max">
-                <div class="turno-group">
-                    <strong>Mañana:</strong>
-                    <input type="time" name="h_im" value="09:00"> a <input type="time" name="h_fm" value="14:00">
-                </div>
-                <div class="turno-group">
-                    <strong>Tarde:</strong>
-                    <input type="time" name="h_it" value="16:00"> a <input type="time" name="h_ft" value="20:00">
-                </div>
-            </div>
-            <button type="submit" class="btn-special-save">Activar Horario Especial</button>
-        </form>
-
-        <div class="divider-large"></div>
-
-        <h4>📋 Horarios Especiales Activos</h4>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Peluquero</th>
-                    <th>Mañana</th>
-                    <th>Tarde</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ex in festivos if not ex.es_cerrado %}
-                <tr>
-                    <td>{{ ex.fecha.strftime('%d/%m/%Y') }}</td>
-                    <td>
-                        {% if ex.peluquero_id %}
-                        {{ ex.peluquero.nombre }}
-                        {% else %}
-                        <span class="tag-all-staff">🌍 Todos</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ ex.h_inicio_m }} - {{ ex.h_fin_m }}</td>
-                    <td>{{ ex.h_inicio_t }} - {{ ex.h_fin_t }}</td>
-                    <td>
-                        <!-- Botón para abrir el formulario/modal de edición -->
-                        <!-- Botón para abrir el formulario/modal de edición -->
-                        <button type="button" class="btn-edit"
-                            onclick="abrirModalModificarFestivo('{{ ex.id }}', '{{ ex.fecha.strftime('%d/%m/%Y') }}', '{{ ex.peluquero_id or 'todos' }}', '{{ ex.h_inicio_m }}', '{{ ex.h_fin_m }}', '{{ ex.h_inicio_t }}', '{{ ex.h_fin_t }}')">
-                            Modificar
-                        </button>
-
-                        <a href="{{ url_for('admin.eliminar_festivo', id=ex.id) }}" class="btn-delete"
-                            onclick="return confirm('¿Eliminar este horario especial?')">Eliminar</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="5" class="no-data-msg">No hay horarios especiales programados.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <!-- Modal / Formulario Oculto para Modificar Festivo -->
-    <div id="modalModificarFestivo" style="display: none;" class="modal-admin">
-        <div class="modal-content">
-            <h3>Modificando día: <span id="mod_fecha_display" style="color: #fff;"></span></h3>
-            <form id="formModificarFestivo" method="POST">
-                <!-- Selector de Peluquero -->
-                <label>Peluquero:</label>
-                <select name="peluquero_id" id="mod_peluquero_id">
-                    <option value="todos">🌍 Todos</option>
-                    {% for p in peluqueros %}
-                    <option value="{{ p.id }}">{{ p.nombre }}</option>
-                    {% endfor %}
-                </select>
-
-                <!-- Horarios Mañana -->
-                <label>Mañana:</label>
-                <input type="time" name="h_im" id="mod_h_im"> a
-                <input type="time" name="h_fm" id="mod_h_fm">
-
-                <!-- Horarios Tarde -->
-                <label>Tarde:</label>
-                <input type="time" name="h_it" id="mod_h_it"> a
-                <input type="time" name="h_ft" id="mod_h_ft">
-
-                <div class="modal-actions">
-                    <button type="button" onclick="cerrarModalFestivo()">Cancelar</button>
-                    <button type="submit" class="btn-save">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Función para rellenar los datos y mostrar el formulario
-        function abrirModalModificarFestivo(id, fechaStr, peluqueroId, him, hfm, hit, hft) {
-            // Apuntar el formulario a la URL correcta
-            document.getElementById('formModificarFestivo').action = "/admin/modificar_festivo/" + id;
-
-            // Escribir la fecha en el título del modal
-            document.getElementById('mod_fecha_display').innerText = fechaStr;
-
-            // Rellenar los campos con los datos actuales
-            document.getElementById('mod_peluquero_id').value = peluqueroId;
-            document.getElementById('mod_h_im').value = him;
-            document.getElementById('mod_h_fm').value = hfm;
-            document.getElementById('mod_h_it').value = hit;
-            document.getElementById('mod_h_ft').value = hft;
-
-            // Mostrar el modal
-            document.getElementById('modalModificarFestivo').style.display = 'block';
-        }
-
-        function cerrarModalFestivo() {
-            document.getElementById('modalModificarFestivo').style.display = 'none';
-        }
-    </script>
-
-    <!-- ========================================== -->
-    <!-- HASTA AQUÍ -->
-    <!-- ========================================== -->
     {% endif %}
-
-    <div class="logout-container">
-        <a href="{{ url_for('auth.logout') }}" class="btn-logout">Cerrar Sesión Segura</a>
-    </div>
-</div>
-
-<!-- AÑADIR ESTA LÍNEA AQUÍ -->
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-
 {% endblock %}

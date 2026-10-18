@@ -11,7 +11,21 @@
 
     <!-- Pegamos tu menú de navegación exacto aquí (el que incluye la nueva pestaña) -->
     <nav class="admin-tabs">
-        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.gestion_diaria_v2') }}"
+            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' else '' }}">
+            🚀 Gestión Diaria
+        </a>
+        <!-- <a href="{{ url_for('admin.gestion_diaria') }}"
+            class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria' }}">⚡ Gestión Diaria</a> -->
+
+        <a href="{{ url_for('admin.index', tab='servicios') }}"
+            class="tab-link {{ 'active' if active_tab == 'servicios' }}">💰 Servicios</a>
+        <a href="{{ url_for('admin.index', tab='horarios') }}"
+            class="tab-link {{ 'active' if active_tab == 'horarios' }}">⏰ Horarios</a>
+        <a href="{{ url_for('admin.gestionar_clientes') }}"
+            class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' else '' }}">
+            👥 Clientes
+        </a>
         <a href="{{ url_for('admin.ver_valoraciones') }}" class="tab-link active">⭐ Valoraciones</a>
     </nav>
 

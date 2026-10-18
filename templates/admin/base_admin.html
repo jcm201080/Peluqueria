@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{% block admin_title %}Panel Admin - Parra-Barber{% endblock %}{% endblock %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-container">
+    <h1 class="admin-title">Panel de Control</h1>
+
+    <!-- BARRA DE NAVEGACIÓN SIMPLIFICADA Y MODULAR -->
+    <nav class="admin-tabs">
+        <!-- Gestión V2 como principal -->
+        <a href="{{ url_for('admin.gestion_diaria_v2') }}" 
+           class="tab-link {{ 'active' if request.endpoint == 'admin.gestion_diaria_v2' }}">
+           🚀 Gestión Diaria
+        </a>
+        
+        <!-- Servicios -->
+        <a href="{{ url_for('admin.index', tab='servicios') }}" 
+           class="tab-link {{ 'active' if request.args.get('tab') == 'servicios' }}">
+           💰 Servicios
+        </a>
+        
+        <!-- Horarios -->
+        <a href="{{ url_for('admin.index', tab='horarios') }}" 
+           class="tab-link {{ 'active' if request.args.get('tab') == 'horarios' }}">
+           ⏰ Horarios
+        </a>
+        
+        <!-- Clientes -->
+        <a href="{{ url_for('admin.gestionar_clientes') }}" 
+           class="tab-link {{ 'active' if request.endpoint == 'admin.gestionar_clientes' }}">
+           👥 Clientes
+        </a>
+        
+        <!-- Valoraciones -->
+        <a href="{{ url_for('admin.ver_valoraciones') }}" 
+           class="tab-link {{ 'active' if request.endpoint == 'admin.ver_valoraciones' }}">
+           ⭐ Valoraciones
+        </a>
+
+        <!-- SECCIÓN CITAS Y GESTIÓN ANTIGUA: Comentadas para limpiar la interfaz por ahora
+        <a href="{{ url_for('admin.index', tab='citas') }}" class="tab-link">📅 Citas</a>
+        <a href="{{ url_for('admin.gestion_diaria') }}" class="tab-link">⚡ Gestión Diaria Antigüa</a>
+        -->
+    </nav>
+
+    <p class="welcome-text">Bienvenido, <strong>{{ current_user.nombre }}</strong></p>
+
+    <!-- BLOQUE DINÁMICO DONDE CADA PESTAÑA INYECTARÁ SU CONTENIDO -->
+    {% block admin_content %}{% endblock %}
+
+    <div class="logout-container">
+        <a href="{{ url_for('auth.logout') }}" class="btn-logout">Cerrar Sesión Segura</a>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
